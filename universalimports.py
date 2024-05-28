@@ -24,6 +24,11 @@ class TextModifiers:
     NEGATIVE = "\033[7m"
     CROSSED = "\033[9m"
     END = "\033[0m"
+# Aliases for TM
+
+TM = TextModifiers
+STOP = TM.END
+
 class Dice:
     def __init__(self, diceType, lowerBound, upperBound, counter=False, description=None):
         '''
@@ -54,6 +59,9 @@ class Dice:
         else:
             self.primaryColor = TM.LIGHT_RED
             self.secondaryColor = TM.RED
+        if self.description and ":" in self.description: # Usually means its something like On Hit: do thing
+            parts = self.description.split(':')
+            self.description = f"{TM.YELLOW}{parts[0]}:{STOP}{parts[1]}"        
         self.initial += self.type[0]
     @property
     def miniStrRepr(self):
@@ -96,9 +104,9 @@ class CombatPage:
         self.dice.append(die)
     def __str__(self):
         # OH GOD WHY
-        return f"{self.color}{self.name}{STOP} | {self.onEvent}: {self.action}\n" + '\n'.join([str(x) for x in self.dice])
+        if self.action: 
+            return f"{self.color}{self.name} | {TM.YELLOW}{self.onEvent}: {STOP}{self.action}\n" + '\n'.join([str(x) for x in self.dice])
+        else:
+            return f"{self.color}{self.name}{STOP}\n" + '\n'.join([str(x) for x in self.dice])
 # Constants
 
-# Aliases
-TM = TextModifiers
-STOP = TM.END

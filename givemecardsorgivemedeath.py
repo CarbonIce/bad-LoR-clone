@@ -20,7 +20,7 @@ def grabCardsFromPage(page):
                 action = onEvent.next_sibling.string.strip()
                 onEvent = onEvent.string
             else:
-                action = None
+                action = pageDescription.string # This is assuming that it's just a straight string. Hopefully no edge cases get out?
         else:
             onEvent = None
             action = None
@@ -34,7 +34,7 @@ def grabCardsFromPage(page):
             else:
                 dieDesc = None
             dieType = die['data-detail']
-            dieCounter = die['data-type'] # Counter die are referred to as "Standby" dice
+            dieCounter = die['data-type'] # Counter die are referred to as "Standby" dice on the site
             if dieCounter == "Standby":
                 dieCounter = True
             else:
