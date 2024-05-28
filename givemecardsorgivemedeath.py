@@ -16,9 +16,32 @@ def grabCardsFromPage(page):
         pageDescription = p.find("lor-card-desc").find("span", recursive=False)
         if pageDescription:
             onEvent = pageDescription.find("b")
-            if onEvent:
-                action = onEvent.next_sibling.string.strip()
-                onEvent = onEvent.string
+            if onEvent: # EDGE CASE... THERE MAY BE MULTIPLE OF THESE <B> TAGS, SEPERATED BY A BR. AGGGGGGGGGGGGGG
+                '''
+                My solution: Just give up. Pass every string in tags in the page description to the CombatPage object and let it figure it out.
+                All of this parsing shit is AIDS, One can only write so many edge case catchers before they crack
+                Like look at this shit
+                Trash Disposal
+                <b>On Use</b> All Offensive dice of this page gain '<b>On Hit</b> Recover 2 HP'<hr>
+                WHY?!
+                if pageDescription.find("br"):
+                    final = ""
+                    bolded = pageDescription.find_all("b")
+                    for b in bolded: # EDGE CASE: FOR CARDS SUCH AS "TAKE THE SHOT", WHICH ARE SINGLE USE, THERE *IS* NO SIBLING
+                        onEvent = b.string
+                        if b.next_sibling.string:
+                            action = b.next_sibling.string.strip()
+                            final += onEvent + ":" + action + "; "
+                        else:
+                            final += onEvent + "; "    
+                    onEvent = final
+                    action = None 
+                else:
+                    action = onEvent.next_sibling.string.strip()
+                    onEvent = onEvent.string
+                '''
+                onEvent = onEvent.text
+                action = None
             else:
                 action = pageDescription.string # This is assuming that it's just a straight string. Hopefully no edge cases get out?
         else:
@@ -51,7 +74,7 @@ def grabCardsFromPage(page):
 # Dice are under lor-card-back -> lor-card-description
 # Each individual die is in a table under lor-card-description, with range under tr of class range
 link = "https://tiphereth.zasz.su/cards/?dc=1&dc=2&dc=3&dc=4&dc=5&av=Collectable&av=Obtainable&page=" # Add the page number at the end
-page = 1 # Hardcoded so that we get more interesting cards
+page = 4 # Hardcoded so that we get more interesting cards
 rangecount = {}
 while page <= 18:
     grabCardsFromPage(page)

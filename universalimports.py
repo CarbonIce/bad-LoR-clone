@@ -85,7 +85,8 @@ class CombatPage:
         self.rarity = rarity # Dictates the color of the page name. Nothing else.
         self.onEvent = onEvent # This is going to be a hellhole. Events are fine, but there are so many custom actions I need to account for.
         # Prob just going to focus on the ones most critical to gameplay, namely Light Restore and Page Draw
-        self.action = action
+        self.action = action # If onEvent is defined, but action is not, treat onEvent as the entire description, and parse via breaking up with the ; character
+        # This project already makes me want to die and it hasn't even been 3 hours yet.
         self.dice = dice
         match self.rarity:
             case "Unique": # Object of Art
@@ -104,8 +105,10 @@ class CombatPage:
         self.dice.append(die)
     def __str__(self):
         # OH GOD WHY
-        if self.action: 
+        if self.onEvent != None and self.action != None: 
             return f"{self.color}{self.name} | {TM.YELLOW}{self.onEvent}: {STOP}{self.action}\n" + '\n'.join([str(x) for x in self.dice])
+        elif self.onEvent:
+            return f"{self.color}{self.name} | {self.onEvent}\n" + '\n'.join([str(x) for x in self.dice])
         else:
             return f"{self.color}{self.name}{STOP}\n" + '\n'.join([str(x) for x in self.dice])
 # Constants
