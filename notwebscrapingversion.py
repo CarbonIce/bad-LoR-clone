@@ -1,20 +1,24 @@
 # This gets the data from local files instead of from a web request, because of the size of each page, this is much faster.
 from bs4 import BeautifulSoup
 from universalimports import Dice, CombatPage
+
+
 COMBATPAGES = {}
+
+
 def grabCardsFromPage(page):
     with open(f"cardpages\\page{page}.html", encoding='utf-8') as pagepage:
-        soup = BeautifulSoup(pagepage, 'html.parser')
+        soup = BeautifulSoup(pagepage, 'html.parser')   # Grab file content and feed it into Soup
     cards = soup.find_all("lor-card")
     for p in cards:
-        pageTitle = p.find("lor-card-name").find('a').find('span').string
-        pageDiceTable = p.find("table")
+        pageTitle = p.find("lor-card-name").find('a').find('span').string   # Gets the title of the Page
+        pageDiceTable = p.find("table")     # The only table thats a descendant of the lor-card element should be
         pageRarity = p['data-rarity']
         pageDescription = p.find("lor-card-desc").find("span", recursive=False)
         if pageDescription:
             onEvent = pageDescription.find("b")
-            if onEvent: 
-                if len(pageDescription.find_all("b")) > 1:# EDGE CASE... THERE MAY BE MULTIPLE OF THESE <B> TAGS AGGGGGGGGGGGGGG
+            if onEvent:
+                if len(pageDescription.find_all("b")) > 1:  # EDGE CASE... THERE MAY BE MULTIPLE OF THESE <B> TAGS AGGGGGGGGGGGGGG
                     '''
                     My solution: Just give up. Pass every string in tags in the page description to the CombatPage object and let it figure it out.
                     All of this parsing shit is AIDS, One can only write so many edge case catchers before they crack
@@ -24,28 +28,28 @@ def grabCardsFromPage(page):
                     WHY?!
                     final = ""
                     bolded = pageDescription.find_all("b")
-                    for b in bolded: # EDGE CASE: FOR CARDS SUCH AS "TAKE THE SHOT", WHICH ARE SINGLE USE, THERE *IS* NO SIBLING
+                    for b in bolded:  # EDGE CASE: FOR CARDS SUCH AS "TAKE THE SHOT", WHICH ARE SINGLE USE, THERE *IS* NO SIBLING
                         onEvent = b.string
                         if b.next_sibling.string:
                             action = b.next_sibling.string.strip()
                             final += onEvent + ":" + action + "; "
                         else:
-                            final += onEvent + "; "    
+                            final += onEvent + "; "
                     onEvent = final
-                    action = None 
-                
+                    action = None
+
                     '''
                     onEvent = pageDescription.text.strip()
                     action = None
                 else:
-                    action = onEvent.next_sibling.string
-                    if action: # EDGE CASE: THERE MIGHT NOT BE A SIBLING
+                    action = onEvent.next_sibling.string    # Get the text not inside the bold tag but still inside the Description tag
+                    if action:  # EDGE CASE: THERE MIGHT NOT BE A SIBLING
                         action = action.strip()
                     else:
                         action = None
                     onEvent = onEvent.string
             else:
-                action = pageDescription.string # This is assuming that it's just a straight string. Hopefully no edge cases get out?
+                action = pageDescription.string  # This is assuming that it's just a straight string. Hopefully no edge cases get out?
         else:
             onEvent = None
             action = None
@@ -55,7 +59,7 @@ def grabCardsFromPage(page):
             dieRange = die.find(class_='range').string
             dieDesc = die.find(class_='desc').find('span')
             dieType = die['data-detail']
-            dieCounter = die['data-type'] # Counter die are referred to as "Standby" dice on the site
+            dieCounter = die['data-type']  # Counter die are referred to as "Standby" dice on the site
             if dieCounter == "Standby":
                 dieCounter = True
             else:
@@ -69,14 +73,17 @@ def grabCardsFromPage(page):
             dieRange = [int(x) for x in dieRange.split(" - ")]
             initializingPage.addDie(Dice(dieType, dieRange[0], dieRange[1], dieCounter, dieDesc))
         COMBATPAGES[initializingPage.name] = initializingPage
+
+
 # Look for all lor-card elements
 # Light cost of card is in the element lor-card-icon
 # Card name is under the link element of lor-card-name
 # Dice are under lor-card-back -> lor-card-description
 # Each individual die is in a table under lor-card-description, with range under tr of class range
-link = "https://tiphereth.zasz.su/cards/?dc=1&dc=2&dc=3&dc=4&dc=5&av=Collectable&av=Obtainable&page=" # Add the page number at the end
-page = 1 
+link = "https://tiphereth.zasz.su/cards/?dc=1&dc=2&dc=3&dc=4&dc=5&av=Collectable&av=Obtainable&page="  # Add the page number at the end
+page = 1
 rangecount = {}
-while page <= 16: # After 16, all the cards are either E.G.O pages or ones used in the Keter Realization (which arn't useful.)
+
+while page <= 16:  # After 16, all the cards are either E.G.O pages or ones used in the Keter Realization (which arn't useful.)
     grabCardsFromPage(page)
     page += 1
