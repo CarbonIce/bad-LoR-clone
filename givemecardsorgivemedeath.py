@@ -13,7 +13,7 @@ def grabCardsFromPage(page):
         pageTitle = p.find("lor-card-name").find('a').find('span').string
         pageDiceTable = p.find("table")
         pageRarity = p['data-rarity']
-        pageDescription = p.find("lor-card-desc").find("span")
+        pageDescription = p.find("lor-card-desc").find("span", recursive=False)
         if pageDescription:
             onEvent = pageDescription.find("b")
             if onEvent:
@@ -28,7 +28,11 @@ def grabCardsFromPage(page):
         initializingPage = CombatPage(pageTitle, pageRarity, onEvent, action, [])
         for die in dices:
             dieRange = die.find(class_='range').string
-            dieDesc = die.find(class_='desc')
+            dieDesc = die.find(class_='desc').find('span')
+            if dieDesc:
+                dieDesc = dieDesc.string
+            else:
+                dieDesc = None
             dieType = die['data-detail']
             dieCounter = die['data-type'] # Counter die are referred to as "Standby" dice
             if dieCounter == "Standby":
