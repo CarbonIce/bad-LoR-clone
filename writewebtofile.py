@@ -1,8 +1,5 @@
 import requests
-import random as rng
 import time
-from bs4 import BeautifulSoup
-from universalimports import TM, STOP, Dice, CombatPage
 COMBATPAGES = {}
 def grabCardsFromPage(page):
     webpage = requests.get(link + str(page)).text

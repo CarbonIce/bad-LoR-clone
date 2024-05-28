@@ -1,8 +1,6 @@
-import requests
-import random as rng
-import time
+# This gets the data from local files instead of from a web request, because of the size of each page, this is much faster.
 from bs4 import BeautifulSoup
-from universalimports import TM, STOP, Dice, CombatPage
+from universalimports import Dice, CombatPage
 COMBATPAGES = {}
 def grabCardsFromPage(page):
     with open(f"cardpages\\page{page}.html", encoding='utf-8') as pagepage:
