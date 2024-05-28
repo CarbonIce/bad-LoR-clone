@@ -16,15 +16,15 @@ def grabCardsFromPage(page):
         pageDescription = p.find("lor-card-desc").find("span", recursive=False)
         if pageDescription:
             onEvent = pageDescription.find("b")
-            if onEvent: # EDGE CASE... THERE MAY BE MULTIPLE OF THESE <B> TAGS, SEPERATED BY A BR. AGGGGGGGGGGGGGG
-                '''
-                My solution: Just give up. Pass every string in tags in the page description to the CombatPage object and let it figure it out.
-                All of this parsing shit is AIDS, One can only write so many edge case catchers before they crack
-                Like look at this shit
-                Trash Disposal
-                <b>On Use</b> All Offensive dice of this page gain '<b>On Hit</b> Recover 2 HP'<hr>
-                WHY?!
-                if pageDescription.find("br"):
+            if onEvent: 
+                if len(pageDescription.find_all("b")) > 1:# EDGE CASE... THERE MAY BE MULTIPLE OF THESE <B> TAGS AGGGGGGGGGGGGGG
+                    '''
+                    My solution: Just give up. Pass every string in tags in the page description to the CombatPage object and let it figure it out.
+                    All of this parsing shit is AIDS, One can only write so many edge case catchers before they crack
+                    Like look at this shit
+                    Trash Disposal
+                    <b>On Use</b> All Offensive dice of this page gain '<b>On Hit</b> Recover 2 HP'<hr>
+                    WHY?!
                     final = ""
                     bolded = pageDescription.find_all("b")
                     for b in bolded: # EDGE CASE: FOR CARDS SUCH AS "TAKE THE SHOT", WHICH ARE SINGLE USE, THERE *IS* NO SIBLING
@@ -36,12 +36,17 @@ def grabCardsFromPage(page):
                             final += onEvent + "; "    
                     onEvent = final
                     action = None 
+                
+                    '''
+                    onEvent = pageDescription.text.strip()
+                    action = None
                 else:
-                    action = onEvent.next_sibling.string.strip()
+                    action = onEvent.next_sibling.string
+                    if action: # EDGE CASE: THERE MIGHT NOT BE A SIBLING
+                        action = action.strip()
+                    else:
+                        action = None
                     onEvent = onEvent.string
-                '''
-                onEvent = onEvent.text
-                action = None
             else:
                 action = pageDescription.string # This is assuming that it's just a straight string. Hopefully no edge cases get out?
         else:
