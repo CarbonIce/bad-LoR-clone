@@ -29,10 +29,6 @@ def grabCardsFromPage(page):
         for die in dices:
             dieRange = die.find(class_='range').string
             dieDesc = die.find(class_='desc').find('span')
-            if dieDesc:
-                dieDesc = dieDesc.string
-            else:
-                dieDesc = None
             dieType = die['data-detail']
             dieCounter = die['data-type'] # Counter die are referred to as "Standby" dice on the site
             if dieCounter == "Standby":
@@ -40,7 +36,11 @@ def grabCardsFromPage(page):
             else:
                 dieCounter = False
             if dieDesc:
-                dieDesc = dieDesc.string
+                beequestion = dieDesc.find('b')
+                if beequestion:
+                    dieDesc = beequestion.string + ": " + beequestion.next_sibling.string.strip()
+                else:
+                    dieDesc = dieDesc.string
             dieRange = [int(x) for x in dieRange.split(" - ")]
             initializingPage.addDie(Dice(dieType, dieRange[0], dieRange[1], dieCounter, dieDesc))
         print(initializingPage)
