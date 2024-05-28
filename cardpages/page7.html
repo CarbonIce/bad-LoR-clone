@@ -1,0 +1,1997 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="theme-color" content="#ffd17d">
+		<meta name="robots" content="nosnippet">
+		<meta name="keywords" content="Library of Ruina, LOR, Tiphereth, database, wiki">
+		<meta property="og:site_name" content="Tiphereth Database">
+		<meta property="og:title" content="Cards"/>
+		<title>Cards - Tiphereth Database</title>
+		<link rel="stylesheet" href="/static/css/styles.css?v=21.2">
+		<link rel="shortcut icon" href="/static/res/favicon-16.png" sizes="16x16">
+		<link rel="shortcut icon" href="/static/res/favicon-32.png" sizes="32x32">
+		<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" referrerpolicy="no-referrer"></script>
+		<script src="/static/js/common.js?v=21"></script>
+		<noscript><style>.js-required{display:none!important}</style></noscript>
+		<link rel="canonical" href="/cards/" />
+		<link rel="prev" href="/cards/?dc=1&amp;dc=2&amp;dc=3&amp;dc=4&amp;dc=5&amp;av=Collectable&amp;av=Obtainable&amp;page=6" />
+		<link rel="next" href="/cards/?dc=1&amp;dc=2&amp;dc=3&amp;dc=4&amp;dc=5&amp;av=Collectable&amp;av=Obtainable&amp;page=8" />
+	</head>
+	<body>
+		<nav>
+			<a href="/cards/">Cards</a>
+			<a href="/keypages/">Keypages</a>
+			<a href="/passives/">Passives</a>
+			<a href="/abno_pages/">Abnormality Pages</a>
+			<a href="/stages/">Stages</a>
+			<div class="dropdown">
+				<span class="dropdown-label">Story</span>
+				<div class="dropdown-content">
+					<a href="/episodes/">Library of Ruina Story</a>
+					<a href="/combat_dialogues/">Combat Dialogues</a>
+					<hr/>
+					<a href="/lc/episodes/">Lobotomy Corp Story</a>
+				</div>
+			</div>
+			<div class="dropdown">
+				<span class="dropdown-label">Other</span>
+				<div class="dropdown-content">
+					<a href="/effects/">Effects (Buffs/Keywords)</a>
+					<a href="/gifts/">Battle Symbols</a>
+					<a href="/books/">Books</a>
+					<a href="/scripts/">Scripts</a>
+					<a href="/formations/">Formations</a>
+					<hr/>
+					<div class="dropdown">
+						<span class="dropdown-label">Tools</span>
+						<div class="dropdown-content">
+							<a href="/u/deck_editor/">Deck Editor</a>
+						</div>
+					</div>
+					<hr/>
+					<a href="/settings/">Website UI Settings</a>
+				</div>
+			</div>
+			<a href="/about/">About</a>
+		</nav>
+		
+
+		<div id="lse-main" class="lse ribbon-menu js-required">
+			<fieldset autocomplete="off">
+				<input id="lse-main-en" type="radio" name="lse-main" value="en" autocomplete="off" checked>
+				<label for="lse-main-en">EN</label>
+				<input id="lse-main-jp" type="radio" name="lse-main" value="jp" autocomplete="off">
+				<label for="lse-main-jp">JP</label>
+				<input id="lse-main-kr" type="radio" name="lse-main" value="kr" autocomplete="off">
+				<label for="lse-main-kr">KR</label>
+			</fieldset>
+		</div>
+
+
+		<main>
+			
+			<div class="search-block">
+			<search>
+				<form id="sf-card" class="search-form" method="get" autocomplete="off">
+					
+					<div class="row">
+						<div>
+								<input type="text" name="qn" placeholder="Search by card name" minlength="2" maxlength="100">
+						</div>
+						<div>
+								<input type="text" name="qd" placeholder="Search by card/dice description" minlength="2" maxlength="100">
+						</div>
+					</div>
+					<div class="row">
+						<div>
+								<fieldset id="flt--ego" class="flt">
+									<input id="flt-x--ego" class="flt-expand-flag" type="checkbox">
+									<label for="flt-x--ego" class="flt-label"><span class="flt-name">EGO Type</span><span class="flt-val"></span></label>
+									<fieldset class="flt-content">
+										<hr/>
+										<div class="flt-options">
+											<label>
+			<input type="checkbox" name="ego" value="0" data-val-brief="Non-EGO">
+			<span>Non-EGO</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="ego" value="1" data-val-brief="Abno">
+			<span>Abnormality EGO</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="ego" value="2" data-val-brief="Personal">
+			<span>Personal EGO</span>
+		</label>
+
+										</div>
+										<hr class="js-required"/>
+										<button type="button" class="flt-reset js-required">Reset</button>
+									</fieldset>
+								</fieldset>
+						</div>
+						<div>
+								<fieldset id="flt--seph" class="flt">
+									<input id="flt-x--seph" class="flt-expand-flag" type="checkbox">
+									<label for="flt-x--seph" class="flt-label"><span class="flt-name">EGO Floor</span><span class="flt-val"></span></label>
+									<fieldset class="flt-content">
+										<hr/>
+										<div class="flt-options">
+											<label class="sephirah-filter-value" data-sephirah="Malkuth">
+			<input type="checkbox" name="seph" value="Malkuth" data-val-brief="Malkuth">
+			<span>Malkuth</span>
+		</label>
+
+											<label class="sephirah-filter-value" data-sephirah="Yesod">
+			<input type="checkbox" name="seph" value="Yesod" data-val-brief="Yesod">
+			<span>Yesod</span>
+		</label>
+
+											<label class="sephirah-filter-value" data-sephirah="Hod">
+			<input type="checkbox" name="seph" value="Hod" data-val-brief="Hod">
+			<span>Hod</span>
+		</label>
+
+											<label class="sephirah-filter-value" data-sephirah="Netzach">
+			<input type="checkbox" name="seph" value="Netzach" data-val-brief="Netzach">
+			<span>Netzach</span>
+		</label>
+
+											<label class="sephirah-filter-value" data-sephirah="Tiphereth">
+			<input type="checkbox" name="seph" value="Tiphereth" data-val-brief="Tiphereth">
+			<span>Tiphereth</span>
+		</label>
+
+											<label class="sephirah-filter-value" data-sephirah="Gebura">
+			<input type="checkbox" name="seph" value="Gebura" data-val-brief="Gebura">
+			<span>Gebura</span>
+		</label>
+
+											<label class="sephirah-filter-value" data-sephirah="Chesed">
+			<input type="checkbox" name="seph" value="Chesed" data-val-brief="Chesed">
+			<span>Chesed</span>
+		</label>
+
+											<label class="sephirah-filter-value" data-sephirah="Binah">
+			<input type="checkbox" name="seph" value="Binah" data-val-brief="Binah">
+			<span>Binah</span>
+		</label>
+
+											<label class="sephirah-filter-value" data-sephirah="Hokma">
+			<input type="checkbox" name="seph" value="Hokma" data-val-brief="Hokma">
+			<span>Hokma</span>
+		</label>
+
+											<label class="sephirah-filter-value" data-sephirah="Keter">
+			<input type="checkbox" name="seph" value="Keter" data-val-brief="Keter">
+			<span>Keter</span>
+		</label>
+
+										</div>
+										<hr class="js-required"/>
+										<button type="button" class="flt-reset js-required">Reset</button>
+									</fieldset>
+								</fieldset>
+						</div>
+						<div>
+								<fieldset id="flt--ch" class="flt">
+									<input id="flt-x--ch" class="flt-expand-flag" type="checkbox">
+									<label for="flt-x--ch" class="flt-label"><span class="flt-name">Chapter</span><span class="flt-val"></span></label>
+									<fieldset class="flt-content">
+										<hr/>
+										<div class="flt-options">
+											<label>
+			<input type="checkbox" name="ch" value="0" data-val-brief="0">
+			<span>(Unspecified)</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="ch" value="1" data-val-brief="1">
+			<span>Canard</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="ch" value="2" data-val-brief="2">
+			<span>Urban Myth</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="ch" value="3" data-val-brief="3">
+			<span>Urban Legend</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="ch" value="4" data-val-brief="4">
+			<span>Urban Plague</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="ch" value="5" data-val-brief="5">
+			<span>Urban Nightmare</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="ch" value="6" data-val-brief="6">
+			<span>Star of the City</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="ch" value="7" data-val-brief="7">
+			<span>Impurity</span>
+		</label>
+
+										</div>
+										<hr class="js-required"/>
+										<button type="button" class="flt-reset js-required">Reset</button>
+									</fieldset>
+								</fieldset>
+						</div>
+						<div>
+								<fieldset id="flt--dc" class="flt">
+									<input id="flt-x--dc" class="flt-expand-flag" type="checkbox">
+									<label for="flt-x--dc" class="flt-label"><span class="flt-name">Dice count</span><span class="flt-val"></span></label>
+									<fieldset class="flt-content">
+										<hr/>
+										<div class="flt-options">
+											<label>
+			<input type="checkbox" name="dc" value="0">
+			<span>0</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="dc" value="1" checked>
+			<span>1</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="dc" value="2" checked>
+			<span>2</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="dc" value="3" checked>
+			<span>3</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="dc" value="4" checked>
+			<span>4</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="dc" value="5" checked>
+			<span>5</span>
+		</label>
+
+										</div>
+										<hr class="js-required"/>
+										<button type="button" class="flt-reset js-required">Reset</button>
+									</fieldset>
+								</fieldset>
+						</div>
+						<div>
+								<fieldset id="flt--d" class="flt" data-no-dragging>
+									<input id="flt-x--d" class="flt-expand-flag" type="checkbox">
+									<label for="flt-x--d" class="flt-label"><span class="flt-name">Dice</span><span class="flt-val"></span></label>
+									<fieldset class="flt-content">
+										<hr/>
+										<select name="dsm">
+											<option value="or" title="Card must have at least one of the selected dice" selected>With any of:</option>
+											<option value="and" title="Card must have all of the selected dice">With all of:</option>
+											<option value="only" title="Card must not have any of the non-selected dice">With only any of:</option>
+											<option value="exact" title="The combination of two options above: card must have all of the selected dice, and only them">With only all of:</option>
+										</select>
+										<hr/>
+										<div class="flt-options">
+											<label data-icon="AtkSlash">
+			<input type="checkbox" name="d" value="AtkSlash" data-val-brief="Slash">
+			<span>Slash</span>
+		</label>
+
+											<label data-icon="AtkPierce">
+			<input type="checkbox" name="d" value="AtkPierce" data-val-brief="Pierce">
+			<span>Pierce</span>
+		</label>
+
+											<label data-icon="AtkBlunt">
+			<input type="checkbox" name="d" value="AtkBlunt" data-val-brief="Blunt">
+			<span>Blunt</span>
+		</label>
+
+											<label data-icon="DefGuard">
+			<input type="checkbox" name="d" value="DefGuard" data-val-brief="Guard">
+			<span>Guard</span>
+		</label>
+
+											<label data-icon="DefEvade">
+			<input type="checkbox" name="d" value="DefEvade" data-val-brief="Evade">
+			<span>Evade</span>
+		</label>
+
+											<label data-icon="StandbySlash">
+			<input type="checkbox" name="d" value="StandbySlash" data-val-brief="Slash Counter">
+			<span>Slash Counter</span>
+		</label>
+
+											<label data-icon="StandbyPierce">
+			<input type="checkbox" name="d" value="StandbyPierce" data-val-brief="Pierce Counter">
+			<span>Pierce Counter</span>
+		</label>
+
+											<label data-icon="StandbyBlunt">
+			<input type="checkbox" name="d" value="StandbyBlunt" data-val-brief="Blunt Counter">
+			<span>Blunt Counter</span>
+		</label>
+
+											<label data-icon="StandbyGuard">
+			<input type="checkbox" name="d" value="StandbyGuard" data-val-brief="Guard Counter">
+			<span>Guard Counter</span>
+		</label>
+
+											<label data-icon="StandbyEvade">
+			<input type="checkbox" name="d" value="StandbyEvade" data-val-brief="Evade Counter">
+			<span>Evade Counter</span>
+		</label>
+
+										</div>
+										<hr class="js-required"/>
+										<button type="button" class="flt-reset js-required">Reset</button>
+									</fieldset>
+								</fieldset>
+						</div>
+					</div>
+					<div class="row">
+						<div>
+								<fieldset id="flt--av" class="flt">
+									<input id="flt-x--av" class="flt-expand-flag" type="checkbox">
+									<label for="flt-x--av" class="flt-label"><span class="flt-name">Availability</span><span class="flt-val"></span></label>
+									<fieldset class="flt-content">
+										<hr/>
+										<div class="flt-options">
+											<label title="Can be collected">
+			<input type="checkbox" name="av" value="Collectable" data-val-brief="Collectable" checked>
+			<span>Collectable</span>
+		</label>
+
+											<label title="Does not drop as an item from books. Can only be obtained under specific circumstances">
+			<input type="checkbox" name="av" value="Obtainable" data-val-brief="Obtainable" checked>
+			<span>Obtainable</span>
+		</label>
+
+											<label title="Cannot be obtained by the player">
+			<input type="checkbox" name="av" value="EnemyOnly" data-val-brief="Enemy-only">
+			<span>Enemy-only</span>
+		</label>
+
+										</div>
+										<hr class="js-required"/>
+										<button type="button" class="flt-reset js-required">Reset</button>
+									</fieldset>
+								</fieldset>
+						</div>
+						<div>
+								<fieldset id="flt--r" class="flt">
+									<input id="flt-x--r" class="flt-expand-flag" type="checkbox">
+									<label for="flt-x--r" class="flt-label"><span class="flt-name">Range</span><span class="flt-val"></span></label>
+									<fieldset class="flt-content">
+										<hr/>
+										<div class="flt-options">
+											<label>
+			<input type="checkbox" name="r" value="Near" data-val-brief="Melee">
+			<span>Melee</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="r" value="Far" data-val-brief="Ranged">
+			<span>Ranged</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="r" value="Special" data-val-brief="Special">
+			<span>Special</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="r" value="Instance" data-val-brief="Immediate">
+			<span>Immediate</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="r" value="FarArea" data-val-brief="Summation">
+			<span>Mass-Summation</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="r" value="FarAreaEach" data-val-brief="Individual">
+			<span>Mass-Individual</span>
+		</label>
+
+										</div>
+										<hr class="js-required"/>
+										<button type="button" class="flt-reset js-required">Reset</button>
+									</fieldset>
+								</fieldset>
+						</div>
+						<div>
+								<fieldset id="flt--c" class="flt">
+									<input id="flt-x--c" class="flt-expand-flag" type="checkbox">
+									<label for="flt-x--c" class="flt-label"><span class="flt-name">Cost</span><span class="flt-val"></span></label>
+									<fieldset class="flt-content">
+										<hr/>
+										<div class="flt-options">
+											<label>
+			<input type="checkbox" name="c" value="0">
+			<span>0</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="c" value="1">
+			<span>1</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="c" value="2">
+			<span>2</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="c" value="3">
+			<span>3</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="c" value="4">
+			<span>4</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="c" value="5">
+			<span>5</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="c" value="6">
+			<span>6</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="c" value="7">
+			<span>7</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="c" value="8">
+			<span>8</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="c" value="9">
+			<span>9</span>
+		</label>
+
+											<label>
+			<input type="checkbox" name="c" value="10">
+			<span>10</span>
+		</label>
+
+										</div>
+										<hr class="js-required"/>
+										<button type="button" class="flt-reset js-required">Reset</button>
+									</fieldset>
+								</fieldset>
+						</div>
+						<div>
+								<fieldset id="flt--rr" class="flt">
+									<input id="flt-x--rr" class="flt-expand-flag" type="checkbox">
+									<label for="flt-x--rr" class="flt-label"><span class="flt-name">Rarity</span><span class="flt-val"></span></label>
+									<fieldset class="flt-content">
+										<hr/>
+										<div class="flt-options">
+											<label class="rarity-filter-value" data-rarity="Common">
+			<input type="checkbox" name="rr" value="Common" data-val-brief="Common">
+			<span>Paperback (Common)</span>
+		</label>
+
+											<label class="rarity-filter-value" data-rarity="Uncommon">
+			<input type="checkbox" name="rr" value="Uncommon" data-val-brief="Uncommon">
+			<span>Hardcover (Uncommon)</span>
+		</label>
+
+											<label class="rarity-filter-value" data-rarity="Rare">
+			<input type="checkbox" name="rr" value="Rare" data-val-brief="Rare">
+			<span>Limited (Rare)</span>
+		</label>
+
+											<label class="rarity-filter-value" data-rarity="Unique">
+			<input type="checkbox" name="rr" value="Unique" data-val-brief="Unique">
+			<span>Objet d&#39;art (Unique)</span>
+		</label>
+
+										</div>
+										<hr class="js-required"/>
+										<button type="button" class="flt-reset js-required">Reset</button>
+									</fieldset>
+								</fieldset>
+						</div>
+						<div>
+								<fieldset id="flt--sort" class="flt" data-text-unset="Id" data-singleselect>
+									<input id="flt-x--sort" class="flt-expand-flag" type="checkbox">
+									<label for="flt-x--sort" class="flt-label"><span class="flt-name">Sort</span><span class="flt-val"></span></label>
+									<fieldset class="flt-content">
+										<hr/>
+										<div class="flt-options">
+											<label style="grid-area:1/1/span 1/span 4">
+			<input type="radio" name="sort" value="id">
+			<span>Id</span>
+		</label>
+
+											<label style="grid-area:2/1/span 1/span 4">
+			<input type="radio" name="sort" value="name_en">
+			<span>Name (EN)</span>
+		</label>
+
+											<label style="grid-area:3/1/span 1/span 4">
+			<input type="radio" name="sort" value="cost">
+			<span>Cost</span>
+		</label>
+
+											<label style="grid-area:4/1/span 1/span 4">
+			<input type="radio" name="sort" value="dice_count">
+			<span>Dice count</span>
+		</label>
+
+											<div class="flt-separator" style="grid-area:5/1/span 1/span 4;"><b>By overall dice rolls:</b></div>
+											<label style="grid-area:6/1/span 1/span 4" title="Highest possible roll a card can yield">
+			<input type="radio" name="sort" value="d_max">
+			<span>Overall Max</span>
+		</label>
+
+											<label style="grid-area:7/1/span 1/span 4" title="Lowest possible roll a card can yield">
+			<input type="radio" name="sort" value="d_min">
+			<span>Overall Min</span>
+		</label>
+
+											<label style="grid-area:8/1/span 1/span 4" title="Average roll values across all dice">
+			<input type="radio" name="sort" value="d_avg">
+			<span>Overall Average</span>
+		</label>
+
+											<label style="grid-area:9/1/span 1/span 4" title="Highest of all lower roll bounds of a card">
+			<input type="radio" name="sort" value="d_max_of_lower">
+			<span>Max of lower bounds</span>
+		</label>
+
+											<label style="grid-area:10/1/span 1/span 4" title="Lowest of all upper roll bounds of a card">
+			<input type="radio" name="sort" value="d_min_of_upper">
+			<span>Min of upper bounds</span>
+		</label>
+
+											<div class="flt-separator" style="grid-area:11/1/span 1/span 4;"><b>By rolls of specific dice:</b></div>
+											<div style="grid-area:12/1/span 1/span 1"><b>1:</b></div>
+											<label style="grid-area:12/2/span 1/span 1" title="Lower bound of the roll range of dice #1">
+			<input type="radio" name="sort" value="d_min_of_dice_1" data-val-brief="Min of #1">
+			<span>Min</span>
+		</label>
+
+											<label style="grid-area:12/3/span 1/span 1" title="Average roll value of dice #1">
+			<input type="radio" name="sort" value="d_avg_of_dice_1" data-val-brief="Avg of #1">
+			<span>Avg</span>
+		</label>
+
+											<label style="grid-area:12/4/span 1/span 1" title="Upper bound of the roll range of dice #1">
+			<input type="radio" name="sort" value="d_max_of_dice_1" data-val-brief="Max of #1">
+			<span>Max</span>
+		</label>
+
+											<div style="grid-area:13/1/span 1/span 1"><b>2:</b></div>
+											<label style="grid-area:13/2/span 1/span 1" title="Lower bound of the roll range of dice #2">
+			<input type="radio" name="sort" value="d_min_of_dice_2" data-val-brief="Min of #2">
+			<span>Min</span>
+		</label>
+
+											<label style="grid-area:13/3/span 1/span 1" title="Average roll value of dice #2">
+			<input type="radio" name="sort" value="d_avg_of_dice_2" data-val-brief="Avg of #2">
+			<span>Avg</span>
+		</label>
+
+											<label style="grid-area:13/4/span 1/span 1" title="Upper bound of the roll range of dice #2">
+			<input type="radio" name="sort" value="d_max_of_dice_2" data-val-brief="Max of #2">
+			<span>Max</span>
+		</label>
+
+											<div style="grid-area:14/1/span 1/span 1"><b>3:</b></div>
+											<label style="grid-area:14/2/span 1/span 1" title="Lower bound of the roll range of dice #3">
+			<input type="radio" name="sort" value="d_min_of_dice_3" data-val-brief="Min of #3">
+			<span>Min</span>
+		</label>
+
+											<label style="grid-area:14/3/span 1/span 1" title="Average roll value of dice #3">
+			<input type="radio" name="sort" value="d_avg_of_dice_3" data-val-brief="Avg of #3">
+			<span>Avg</span>
+		</label>
+
+											<label style="grid-area:14/4/span 1/span 1" title="Upper bound of the roll range of dice #3">
+			<input type="radio" name="sort" value="d_max_of_dice_3" data-val-brief="Max of #3">
+			<span>Max</span>
+		</label>
+
+											<div style="grid-area:15/1/span 1/span 1"><b>4:</b></div>
+											<label style="grid-area:15/2/span 1/span 1" title="Lower bound of the roll range of dice #4">
+			<input type="radio" name="sort" value="d_min_of_dice_4" data-val-brief="Min of #4">
+			<span>Min</span>
+		</label>
+
+											<label style="grid-area:15/3/span 1/span 1" title="Average roll value of dice #4">
+			<input type="radio" name="sort" value="d_avg_of_dice_4" data-val-brief="Avg of #4">
+			<span>Avg</span>
+		</label>
+
+											<label style="grid-area:15/4/span 1/span 1" title="Upper bound of the roll range of dice #4">
+			<input type="radio" name="sort" value="d_max_of_dice_4" data-val-brief="Max of #4">
+			<span>Max</span>
+		</label>
+
+											<div style="grid-area:16/1/span 1/span 1"><b>5:</b></div>
+											<label style="grid-area:16/2/span 1/span 1" title="Lower bound of the roll range of dice #5">
+			<input type="radio" name="sort" value="d_min_of_dice_5" data-val-brief="Min of #5">
+			<span>Min</span>
+		</label>
+
+											<label style="grid-area:16/3/span 1/span 1" title="Average roll value of dice #5">
+			<input type="radio" name="sort" value="d_avg_of_dice_5" data-val-brief="Avg of #5">
+			<span>Avg</span>
+		</label>
+
+											<label style="grid-area:16/4/span 1/span 1" title="Upper bound of the roll range of dice #5">
+			<input type="radio" name="sort" value="d_max_of_dice_5" data-val-brief="Max of #5">
+			<span>Max</span>
+		</label>
+
+										</div>
+										<hr class="js-required"/>
+										<button type="button" class="flt-reset js-required">Reset</button>
+									</fieldset>
+								</fieldset>
+						</div>
+					</div>
+					
+					<div class="row">
+						<div>
+							<button type="reset" class="search-form-reset js-required">Reset</button>
+						</div>
+						<div>
+							<button type="submit" class="search-form-submit">Search</button>
+						</div>
+					</div>
+
+				</form>
+			</search>
+			<script>SearchForm.init($(document.currentScript).parent().find('.search-form'))</script>
+		</div>
+
+
+			<h1 class="main-heading">
+				<span>Cards</span>
+			</h1>
+
+			
+			<div class="ent-list">
+				<article>
+					
+				<lor-card class="card full" data-id="504004" data-rarity="Rare" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>2</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/504004/"><span data-ls-key="17801" data-ls-kind="html" data-ls-default="???">For the Family</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/504004/">
+								<img src="/static/assets/cards_thumb/Sweepers4.jpg" alt="Sweepers4">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/>
+							<img class="dice-icon" src="/static/assets/dice/DefEvade.png" alt="Evade"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25589" data-ls-kind="html"><b>Combat Start</b> Give 1 Protection to two random allies
+				<hr/></span>
+							<table>
+								<tr data-type="Atk" data-detail="Pierce">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/></td>
+									<td class="range">4 - 7</td>
+									<td class="desc"><span data-ls-key="28346" data-ls-kind="html"><b>On Hit</b> Inflict 2 Bleed next Scene</span></td>
+								</tr>
+								<tr data-type="Def" data-detail="Evade">
+									<td><img class="dice-icon" src="/static/assets/dice/DefEvade.png" alt="Evade"/></td>
+									<td class="range">3 - 7</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Blunt">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/></td>
+									<td class="range">3 - 7</td>
+									<td class="desc"></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="504005" data-rarity="Common" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>1</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/504005/"><span data-ls-key="17802" data-ls-kind="html" data-ls-default="???">Extract Fuel</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/504005/">
+								<img src="/static/assets/cards_thumb/Sweepers5.jpg" alt="Sweepers5">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/>
+							<img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25592" data-ls-kind="html"><b>On Use</b> Restore 2 Light
+				<hr/></span>
+							<table>
+								<tr data-type="Atk" data-detail="Pierce">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/></td>
+									<td class="range">3 - 7</td>
+									<td class="desc"><span data-ls-key="28349" data-ls-kind="html"><b>On Hit</b> Recover 2 HP</span></td>
+								</tr>
+								<tr data-type="Def" data-detail="Guard">
+									<td><img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/></td>
+									<td class="range">2 - 6</td>
+									<td class="desc"></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="504006" data-rarity="Common" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>1</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/504006/"><span data-ls-key="17803" data-ls-kind="html" data-ls-default="???">Night in the Backstreets</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/504006/">
+								<img src="/static/assets/cards_thumb/Sweepers6.jpg" alt="Sweepers6">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25595" data-ls-kind="html"><b>Combat Start</b> All dice the user plays lose 2 Power for this Scene
+				<hr/></span>
+							<table>
+								<tr data-type="Atk" data-detail="Blunt">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/></td>
+									<td class="range">6 - 9</td>
+									<td class="desc"><span data-ls-key="28352" data-ls-kind="html"><b>On Hit</b> Recover 3 HP</span></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Pierce">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/></td>
+									<td class="range">5 - 9</td>
+									<td class="desc"><span data-ls-key="32510" data-ls-kind="html"><b>On Hit</b> Recover 2 HP</span></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="505001" data-rarity="Uncommon" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>2</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/505001/"><span data-ls-key="17804" data-ls-kind="html" data-ls-default="???">To Where the Prescript Points</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/505001/">
+								<img src="/static/assets/cards_thumb/TheIndex1.jpg" alt="TheIndex1">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25598" data-ls-kind="html"><b>On Use</b> If Singleton, all dice on this page gain +1 Power
+				<hr/></span>
+							<table>
+								<tr data-type="Atk" data-detail="Pierce">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/></td>
+									<td class="range">4 - 7</td>
+									<td class="desc"><span data-ls-key="32336" data-ls-kind="html"><b>On Hit</b> Inflict 1 Fragile next Scene</span></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Pierce">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/></td>
+									<td class="range">3 - 7</td>
+									<td class="desc"></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="505002" data-rarity="Uncommon" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>2</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/505002/"><span data-ls-key="17805" data-ls-kind="html" data-ls-default="???">Undertake Prescript</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/505002/">
+								<img src="/static/assets/cards_thumb/TheIndex2.jpg" alt="TheIndex2">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="27791" data-ls-kind="html"><b>On Use</b> If Singleton, all dice on this page gain +1 Power
+				<hr/></span>
+							<table>
+								<tr data-type="Atk" data-detail="Blunt">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/></td>
+									<td class="range">3 - 6</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Blunt">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/></td>
+									<td class="range">3 - 5</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Pierce">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/></td>
+									<td class="range">1 - 4</td>
+									<td class="desc"></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="505003" data-rarity="Rare" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>2</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/505003/"><span data-ls-key="17806" data-ls-kind="html" data-ls-default="???">Execute</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/505003/">
+								<img src="/static/assets/cards_thumb/TheIndex3.jpg" alt="TheIndex3">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							
+							<table>
+								<tr data-type="Atk" data-detail="Slash">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/></td>
+									<td class="range">3 - 5</td>
+									<td class="desc"><span data-ls-key="28322" data-ls-kind="html">If Singleton, add +4 Power</span></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Slash">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/></td>
+									<td class="range">3 - 6</td>
+									<td class="desc"></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="505004" data-rarity="Common" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>3</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/505004/"><span data-ls-key="17807" data-ls-kind="html" data-ls-default="???">Will of the Prescript</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/505004/">
+								<img src="/static/assets/cards_thumb/TheIndex4.jpg" alt="TheIndex4">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/DefEvade.png" alt="Evade"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25577" data-ls-kind="html"><b>On Use</b> If Singleton, draw 3 pages
+				<hr/></span>
+							<table>
+								<tr data-type="Def" data-detail="Evade">
+									<td><img class="dice-icon" src="/static/assets/dice/DefEvade.png" alt="Evade"/></td>
+									<td class="range">3 - 8</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Pierce">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/></td>
+									<td class="range">4 - 8</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Pierce">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/></td>
+									<td class="range">4 - 7</td>
+									<td class="desc"></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="505005" data-rarity="Common" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>1</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/505005/"><span data-ls-key="17808" data-ls-kind="html" data-ls-default="???">Faith</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/505005/">
+								<img src="/static/assets/cards_thumb/TheIndex5.jpg" alt="TheIndex5">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25604" data-ls-kind="html"><b>On Use</b> Restore 1 Light
+				<hr/></span>
+							<table>
+								<tr data-type="Atk" data-detail="Pierce">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/></td>
+									<td class="range">3 - 8</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Slash">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/></td>
+									<td class="range">2 - 6</td>
+									<td class="desc"></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="505006" data-rarity="Rare" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>1</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/505006/"><span data-ls-key="17809" data-ls-kind="html" data-ls-default="???">Sense Quarry</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/505006/">
+								<img src="/static/assets/cards_thumb/TheIndex6.jpg" alt="TheIndex6">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/>
+							<img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25616" data-ls-kind="html"><b>On Use</b> If there are 7 or more pages in hand, all dice on this page gain +2 Power
+				<hr/></span>
+							<table>
+								<tr data-type="Def" data-detail="Guard">
+									<td><img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/></td>
+									<td class="range">2 - 5</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Def" data-detail="Guard">
+									<td><img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/></td>
+									<td class="range">2 - 5</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Pierce">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/></td>
+									<td class="range">3 - 7</td>
+									<td class="desc"><span data-ls-key="28286" data-ls-kind="html"><b>On Hit</b> Inflict 1 Bind next Scene</span></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="505007" data-rarity="Uncommon" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>1</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/505007/"><span data-ls-key="17810" data-ls-kind="html" data-ls-default="???">Proselyte’s Blade</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/505007/">
+								<img src="/static/assets/cards_thumb/TheIndex7.jpg" alt="TheIndex7">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25640" data-ls-kind="html"><b>Combat Start</b> All dice the user plays lose 3 Power for this Scene
+				<hr/></span>
+							<table>
+								<tr data-type="Atk" data-detail="Blunt">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/></td>
+									<td class="range">7 - 11</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Pierce">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/></td>
+									<td class="range">7 - 10</td>
+									<td class="desc"></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="506001" data-rarity="Unique" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>2</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/506001/"><span data-ls-key="17831" data-ls-kind="html" data-ls-default="???">Rip Space</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/506001/">
+								<img src="/static/assets/cards_thumb/Warp1.jpg" alt="Warp1">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="27734" data-ls-kind="html"><b>Exclusive Page</b>, <b>On Use</b> Spend all Charge; has a (Charge x 9.9)% chance to succeed.<br/>
+				<b>Success</b> All dice on this page gain +8 Power;<br/>
+				<b>Failure</b> Deal 20 damage to self
+				<hr/></span>
+							<table>
+								<tr data-type="Atk" data-detail="Pierce">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/></td>
+									<td class="range">2 - 4</td>
+									<td class="desc"><span data-ls-key="28307" data-ls-kind="html"><b>On Clash Win</b> Draw 2 pages</span></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Slash">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/></td>
+									<td class="range">3 - 6</td>
+									<td class="desc"><span data-ls-key="28325" data-ls-kind="html">If 10 Charge was spent at once, add +2 Power</span></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="506002" data-rarity="Uncommon" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>2</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/506002/"><span data-ls-key="17832" data-ls-kind="html" data-ls-default="???">Dimensional Rift</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/506002/">
+								<img src="/static/assets/cards_thumb/Warp2.jpg" alt="Warp2">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25634" data-ls-kind="html"><b>On Use</b> Gain 6 Charge
+				<hr/></span>
+							<table>
+								<tr data-type="Atk" data-detail="Slash">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/></td>
+									<td class="range">4 - 8</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Slash">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/></td>
+									<td class="range">3 - 8</td>
+									<td class="desc"></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="506003" data-rarity="Rare" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>3</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/506003/"><span data-ls-key="17833" data-ls-kind="html" data-ls-default="???">Ripple</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/506003/">
+								<img src="/static/assets/cards_thumb/Warp3.jpg" alt="Warp3">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/DefEvade.png" alt="Evade"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25655" data-ls-kind="html"><b>On Use</b> Spend 3 Charge to boost Power of all dice on this page by +3
+				<hr/></span>
+							<table>
+								<tr data-type="Def" data-detail="Evade">
+									<td><img class="dice-icon" src="/static/assets/dice/DefEvade.png" alt="Evade"/></td>
+									<td class="range">2 - 5</td>
+									<td class="desc"><span data-ls-key="28301" data-ls-kind="html"><b>On Clash Lose</b> Add +2 Power to next die</span></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Blunt">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/></td>
+									<td class="range">5 - 17</td>
+									<td class="desc"><span data-ls-key="28289" data-ls-kind="html"><b>On Hit</b> Inflict 2 Bind next Scene</span></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="506004" data-rarity="Uncommon" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>3</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/506004/"><span data-ls-key="17834" data-ls-kind="html" data-ls-default="???">Overcharge</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/506004/">
+								<img src="/static/assets/cards_thumb/Warp4.jpg" alt="Warp4">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/>
+							<img class="dice-icon" src="/static/assets/dice/StandbyGuard.png" alt="Guard Counter"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25637" data-ls-kind="html"><b>On Use</b> Gain 10 Charge and become Immobilized next Scene
+				<hr/></span>
+							<table>
+								<tr data-type="Atk" data-detail="Pierce">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/></td>
+									<td class="range">5 - 13</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Slash">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/></td>
+									<td class="range">4 - 12</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Pierce">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/></td>
+									<td class="range">5 - 11</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Standby" data-detail="Guard">
+									<td><img class="dice-icon" src="/static/assets/dice/StandbyGuard.png" alt="Guard Counter"/></td>
+									<td class="range">2 - 6</td>
+									<td class="desc"></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="506005" data-rarity="Common" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>1</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/506005/"><span data-ls-key="17835" data-ls-kind="html" data-ls-default="???">Rewind</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/506005/">
+								<img src="/static/assets/cards_thumb/Warp5.jpg" alt="Warp5">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/DefEvade.png" alt="Evade"/>
+							<img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25625" data-ls-kind="html"><b>On Use</b> Gain 4 Charge
+				<hr/></span>
+							<table>
+								<tr data-type="Def" data-detail="Evade">
+									<td><img class="dice-icon" src="/static/assets/dice/DefEvade.png" alt="Evade"/></td>
+									<td class="range">2 - 9</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Def" data-detail="Guard">
+									<td><img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/></td>
+									<td class="range">2 - 5</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Pierce">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/></td>
+									<td class="range">2 - 6</td>
+									<td class="desc"><span data-ls-key="28355" data-ls-kind="html"><b>On Hit</b> Recover 3 HP</span></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="506006" data-rarity="Common" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>1</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/506006/"><span data-ls-key="17836" data-ls-kind="html" data-ls-default="???">Leap</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/506006/">
+								<img src="/static/assets/cards_thumb/Warp6.jpg" alt="Warp6">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25652" data-ls-kind="html"><b>On Use</b> Gain 1 Haste next Scene; spend 3 Charge to draw 2 pages
+				<hr/></span>
+							<table>
+								<tr data-type="Atk" data-detail="Slash">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/></td>
+									<td class="range">3 - 7</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Blunt">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/></td>
+									<td class="range">3 - 5</td>
+									<td class="desc"></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="506007" data-rarity="Common" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>0</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/506007/"><span data-ls-key="17837" data-ls-kind="html" data-ls-default="???">Energy Cycle</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/506007/">
+								<img src="/static/assets/cards_thumb/Warp7.jpg" alt="Warp7">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25658" data-ls-kind="html"><b>On Use</b> Gain 3 Charge
+				<hr/></span>
+							<table>
+								<tr data-type="Atk" data-detail="Pierce">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/></td>
+									<td class="range">2 - 7</td>
+									<td class="desc"><span data-ls-key="28298" data-ls-kind="html"><b>On Hit</b> Restore 1 Light</span></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Blunt">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/></td>
+									<td class="range">2 - 4</td>
+									<td class="desc"></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="507001" data-rarity="Uncommon" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>3</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/507001/"><span data-ls-key="17838" data-ls-kind="html" data-ls-default="???">Deep Drag</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/507001/">
+								<img src="/static/assets/cards_thumb/Smile1.jpg" alt="Smile1">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/>
+							<img class="dice-icon" src="/static/assets/dice/DefEvade.png" alt="Evade"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25622" data-ls-kind="html"><b>On Use</b> Draw 1 page
+				<hr/></span>
+							<table>
+								<tr data-type="Atk" data-detail="Blunt">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/></td>
+									<td class="range">6 - 19</td>
+									<td class="desc"><span data-ls-key="28334" data-ls-kind="html"><b>On Hit</b> Inflict 7 Smoke</span></td>
+								</tr>
+								<tr data-type="Def" data-detail="Evade">
+									<td><img class="dice-icon" src="/static/assets/dice/DefEvade.png" alt="Evade"/></td>
+									<td class="range">1 - 9</td>
+									<td class="desc"></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="507002" data-rarity="Rare" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>2</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/507002/"><span data-ls-key="17839" data-ls-kind="html" data-ls-default="???">Flesh Fillet</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/507002/">
+								<img src="/static/assets/cards_thumb/Smile2.jpg" alt="Smile2">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25631" data-ls-kind="html"><b>On Use</b> Use 2 Smoke to boost Power of all dice on this page by +2
+				<hr/></span>
+							<table>
+								<tr data-type="Atk" data-detail="Slash">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/></td>
+									<td class="range">4 - 8</td>
+									<td class="desc"><span data-ls-key="28343" data-ls-kind="html"><b>On Hit</b> Inflict 1 Bleed next Scene</span></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Slash">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/></td>
+									<td class="range">3 - 7</td>
+									<td class="desc"><span data-ls-key="28340" data-ls-kind="html"><b>On Hit</b> Inflict 1 Bleed next Scene per 2 stacks of Smoke on target</span></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="507003" data-rarity="Uncommon" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>1</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/507003/"><span data-ls-key="17840" data-ls-kind="html" data-ls-default="???">Inhale Smoke</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/507003/">
+								<img src="/static/assets/cards_thumb/Smile3.jpg" alt="Smile3">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25613" data-ls-kind="html"><b>On Use</b> Gain 3 Smoke
+				<hr/></span>
+							<table>
+								<tr data-type="Def" data-detail="Guard">
+									<td><img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/></td>
+									<td class="range">2 - 8</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Blunt">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/></td>
+									<td class="range">3 - 8</td>
+									<td class="desc"><span data-ls-key="28337" data-ls-kind="html"><b>On Hit</b> Gain 4 Smoke</span></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="507004" data-rarity="Uncommon" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>2</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/507004/"><span data-ls-key="17841" data-ls-kind="html" data-ls-default="???">Trace of Fumes</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/507004/">
+								<img src="/static/assets/cards_thumb/Smile4.jpg" alt="Smile4">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/>
+							<img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							
+							<table>
+								<tr data-type="Atk" data-detail="Blunt">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/></td>
+									<td class="range">4 - 8</td>
+									<td class="desc"><span data-ls-key="28328" data-ls-kind="html"><b>On Hit</b> Inflict 1 Smoke</span></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Blunt">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/></td>
+									<td class="range">3 - 7</td>
+									<td class="desc"><span data-ls-key="28331" data-ls-kind="html"><b>On Hit</b> Inflict 2 Smoke</span></td>
+								</tr>
+								<tr data-type="Def" data-detail="Guard">
+									<td><img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/></td>
+									<td class="range">3 - 5</td>
+									<td class="desc"></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="507005" data-rarity="Common" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>1</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/507005/"><span data-ls-key="17842" data-ls-kind="html" data-ls-default="???">Hidden Blade</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/507005/">
+								<img src="/static/assets/cards_thumb/Smile5.jpg" alt="Smile5">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/DefEvade.png" alt="Evade"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25619" data-ls-kind="html"><b>On Use</b> Use 2 Smoke to boost Power of all dice on this page by +2
+				<hr/></span>
+							<table>
+								<tr data-type="Def" data-detail="Evade">
+									<td><img class="dice-icon" src="/static/assets/dice/DefEvade.png" alt="Evade"/></td>
+									<td class="range">2 - 9</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Slash">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/></td>
+									<td class="range">4 - 8</td>
+									<td class="desc"><span data-ls-key="32396" data-ls-kind="html"><b>On Hit</b> Inflict 2 Bleed next Scene</span></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="507006" data-rarity="Common" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>0</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/507006/"><span data-ls-key="17843" data-ls-kind="html" data-ls-default="???">Smoking Pipe</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/507006/">
+								<img src="/static/assets/cards_thumb/Smile6.jpg" alt="Smile6">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/>
+							<img class="dice-icon" src="/static/assets/dice/DefEvade.png" alt="Evade"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25628" data-ls-kind="html"><b>On Use</b> Gain 2 Smoke. Restore 1 Light
+				<hr/></span>
+							<table>
+								<tr data-type="Def" data-detail="Guard">
+									<td><img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/></td>
+									<td class="range">3 - 8</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Def" data-detail="Evade">
+									<td><img class="dice-icon" src="/static/assets/dice/DefEvade.png" alt="Evade"/></td>
+									<td class="range">1 - 6</td>
+									<td class="desc"></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="507007" data-rarity="Uncommon" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>3</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/507007/"><span data-ls-key="17844" data-ls-kind="html" data-ls-default="???">Loss of Senses</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/507007/">
+								<img src="/static/assets/cards_thumb/Smile7.jpg" alt="Smile7">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							
+							<table>
+								<tr data-type="Def" data-detail="Guard">
+									<td><img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/></td>
+									<td class="range">5 - 8</td>
+									<td class="desc"></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Blunt">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/></td>
+									<td class="range">5 - 9</td>
+									<td class="desc"><span data-ls-key="28403" data-ls-kind="html"><b>On Hit</b> If target has 7 or more Smoke, inflict 2 Paralysis and 1 Feeble</span></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Slash">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/></td>
+									<td class="range">4 - 9</td>
+									<td class="desc"><span data-ls-key="28406" data-ls-kind="html"><b>On Hit</b> If target has 3 or more Smoke, draw 2 pages</span></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="508010" data-rarity="Unique" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>4</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/508010/"><span data-ls-key="17854" data-ls-kind="html" data-ls-default="???">Blazing Strike</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/508010/">
+								<img src="/static/assets/cards_thumb/Wedge7.jpg" alt="Wedge7">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="27746" data-ls-kind="html">Can only be used at Emotion Level 3 and above
+				<hr/></span>
+							<table>
+								<tr data-type="Atk" data-detail="Blunt">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/></td>
+									<td class="range">13 - 28</td>
+									<td class="desc"><span data-ls-key="28367" data-ls-kind="html"><b>On Hit</b> Inflict 10 Burn</span></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="508011" data-rarity="Common" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>2</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/508011/"><span data-ls-key="17855" data-ls-kind="html" data-ls-default="???">Fierce Charge</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/508011/">
+								<img src="/static/assets/cards_thumb/Wedge9.jpg" alt="Wedge9">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							
+							<table>
+								<tr data-type="Atk" data-detail="Slash">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/></td>
+									<td class="range">7 - 12</td>
+									<td class="desc"><span data-ls-key="28451" data-ls-kind="html"><b>On Hit</b> Inflict 3 Burn</span></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="511001" data-rarity="Common" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>0</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/511001/"><span data-ls-key="17811" data-ls-kind="html" data-ls-default="???">Engagement</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/511001/">
+								<img src="/static/assets/cards_thumb/Seven_Engagement.jpg" alt="Seven_Engagement">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							<span data-ls-key="25661" data-ls-kind="html"><b>On Use</b> Add 'En Garde' to user's hand
+				<hr/></span>
+							<table>
+								<tr data-type="Atk" data-detail="Slash">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/></td>
+									<td class="range">1 - 8</td>
+									<td class="desc"></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="511002" data-rarity="Common" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>1</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/511002/"><span data-ls-key="17812" data-ls-kind="html" data-ls-default="???">Riposte</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/511002/">
+								<img src="/static/assets/cards_thumb/Seven_Riposte.jpg" alt="Seven_Riposte">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							
+							<table>
+								<tr data-type="Def" data-detail="Guard">
+									<td><img class="dice-icon" src="/static/assets/dice/DefGuard.png" alt="Guard"/></td>
+									<td class="range">3 - 7</td>
+									<td class="desc"><span data-ls-key="28409" data-ls-kind="html"><b>On Clash Win</b> Add +1 Power to next die</span></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Slash">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/></td>
+									<td class="range">4 - 8</td>
+									<td class="desc"></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="511003" data-rarity="Common" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>2</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/511003/"><span data-ls-key="17813" data-ls-kind="html" data-ls-default="???">Flèche</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/511003/">
+								<img src="/static/assets/cards_thumb/Seven_Fleche.jpg" alt="Seven_Fleche">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							
+							<table>
+								<tr data-type="Atk" data-detail="Pierce">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkPierce.png" alt="Pierce"/></td>
+									<td class="range">5 - 13</td>
+									<td class="desc"><span data-ls-key="28394" data-ls-kind="html"><b>On Clash Win</b> Deal 4 Stagger damage; inflict 1 Fragile next Scene</span></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+				<article>
+					
+				<lor-card class="card full" data-id="511004" data-rarity="Common" data-availability="Collectable">
+					<lor-card-front>
+						<lor-card-heading>
+							<lor-card-icon>3</lor-card-icon>
+							<lor-card-name>
+								<a href="/cards/511004/"><span data-ls-key="17814" data-ls-kind="html" data-ls-default="???">Moulinet</span></a>
+							</lor-card-name>
+							<lor-card-icon><i class="icon-range" data-range="Near" title="Melee"></i></lor-card-icon>
+						</lor-card-heading>
+						<lor-card-image>
+							<a href="/cards/511004/">
+								<img src="/static/assets/cards_thumb/Seven_Moulinet.jpg" alt="Seven_Moulinet">
+							</a>
+						</lor-card-image>
+						<lor-card-detail>
+							<img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/>
+							<img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/>
+						</lor-card-detail>
+					</lor-card-front>
+					<lor-card-back>
+						<lor-card-desc>
+							
+							<table>
+								<tr data-type="Atk" data-detail="Slash">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/></td>
+									<td class="range">5 - 9</td>
+									<td class="desc"><span data-ls-key="28412" data-ls-kind="html"><b>On Clash Win</b> Boost max roll value of last die by +2</span></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Blunt">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkBlunt.png" alt="Blunt"/></td>
+									<td class="range">5 - 9</td>
+									<td class="desc"><span data-ls-key="28415" data-ls-kind="html"><b>On Clash Win</b> Boost max roll value of last die by +2</span></td>
+								</tr>
+								<tr data-type="Atk" data-detail="Slash">
+									<td><img class="dice-icon" src="/static/assets/dice/AtkSlash.png" alt="Slash"/></td>
+									<td class="range">3 - 8</td>
+									<td class="desc"><span data-ls-key="28418" data-ls-kind="html"><b>On Clash Win</b> Inflict 2 Fragile next Scene</span></td>
+								</tr>
+							</table>
+						</lor-card-desc>
+					</lor-card-back>
+				</lor-card>
+
+				</article>
+			</div>
+
+			<div class="pagination">
+			<div class="pages">
+				<a href="/cards/?dc=1&amp;dc=2&amp;dc=3&amp;dc=4&amp;dc=5&amp;av=Collectable&amp;av=Obtainable&amp;page=6">&#8249;</a>
+				<a href="/cards/?dc=1&amp;dc=2&amp;dc=3&amp;dc=4&amp;dc=5&amp;av=Collectable&amp;av=Obtainable">1</a>
+				<span class="ellipsis">&hellip;</span>
+				<a href="/cards/?dc=1&amp;dc=2&amp;dc=3&amp;dc=4&amp;dc=5&amp;av=Collectable&amp;av=Obtainable&amp;page=5">5</a>
+				<a href="/cards/?dc=1&amp;dc=2&amp;dc=3&amp;dc=4&amp;dc=5&amp;av=Collectable&amp;av=Obtainable&amp;page=6">6</a>
+				<a href="/cards/?dc=1&amp;dc=2&amp;dc=3&amp;dc=4&amp;dc=5&amp;av=Collectable&amp;av=Obtainable&amp;page=7" class="current">7</a>
+				<a href="/cards/?dc=1&amp;dc=2&amp;dc=3&amp;dc=4&amp;dc=5&amp;av=Collectable&amp;av=Obtainable&amp;page=8">8</a>
+				<a href="/cards/?dc=1&amp;dc=2&amp;dc=3&amp;dc=4&amp;dc=5&amp;av=Collectable&amp;av=Obtainable&amp;page=9">9</a>
+				<span class="ellipsis">&hellip;</span>
+				<a href="/cards/?dc=1&amp;dc=2&amp;dc=3&amp;dc=4&amp;dc=5&amp;av=Collectable&amp;av=Obtainable&amp;page=18">18</a>
+				<a href="/cards/?dc=1&amp;dc=2&amp;dc=3&amp;dc=4&amp;dc=5&amp;av=Collectable&amp;av=Obtainable&amp;page=8">&#8250;</a>
+			</div>
+			<div class="total">
+				<span>Total: <b>540</b> items on <b>18</b> pages</span>
+			</div>
+		</div>
+
+
+		</main>
+		<script>localization = {"17801": {"en": "For the Family", "jp": "家族のために", "kr": "가족을 위하여"}, "17802": {"en": "Extract Fuel", "jp": "燃料抽出", "kr": "연료 뽑기"}, "17803": {"en": "Night in the Backstreets", "jp": "裏路地の夜", "kr": "뒷골목의 밤"}, "17804": {"en": "To Where the Prescript Points", "jp": "指令の向かう処", "kr": "지령이 향하는 곳"}, "17805": {"en": "Undertake Prescript", "jp": "指令遂行", "kr": "지령 수행"}, "17806": {"en": "Execute", "jp": "処刑", "kr": "처형"}, "17807": {"en": "Will of the Prescript", "jp": "指令の意味", "kr": "지령의 뜻"}, "17808": {"en": "Faith", "jp": "信心", "kr": "믿음"}, "17809": {"en": "Sense Quarry", "jp": "目標捕捉", "kr": "목표 포착"}, "17810": {"en": "Proselyte’s Blade", "jp": "遂行者の剣", "kr": "수행자의 검"}, "17811": {"en": "Engagement", "jp": "アンガジェマン", "kr": "앙가즈망"}, "17812": {"en": "Riposte", "jp": "リポスト", "kr": "리포스트"}, "17813": {"en": "Flèche", "jp": "フレッシュ", "kr": "플레쉬"}, "17814": {"en": "Moulinet", "jp": "ムリネ", "kr": "물리네"}, "17831": {"en": "Rip Space", "jp": "空間切断", "kr": "공간 절단"}, "17832": {"en": "Dimensional Rift", "jp": "次元の狭間", "kr": "차원의 틈"}, "17833": {"en": "Ripple", "jp": "波動", "kr": "파동"}, "17834": {"en": "Overcharge", "jp": "過充電", "kr": "과충전"}, "17835": {"en": "Rewind", "jp": "遡行", "kr": "되돌리기"}, "17836": {"en": "Leap", "jp": "跳躍", "kr": "도약"}, "17837": {"en": "Energy Cycle", "jp": "エネルギー循環", "kr": "에너지 순환"}, "17838": {"en": "Deep Drag", "jp": "深い息遣い", "kr": "깊은 숨결"}, "17839": {"en": "Flesh Fillet", "jp": "肉卸し", "kr": "포 뜨기"}, "17840": {"en": "Inhale Smoke", "jp": "煙吹かし", "kr": "연기 흡입"}, "17841": {"en": "Trace of Fumes", "jp": "煙の軌跡", "kr": "연기의 궤적"}, "17842": {"en": "Hidden Blade", "jp": "隠し刃", "kr": "숨은 칼날"}, "17843": {"en": "Smoking Pipe", "jp": "煙管", "kr": "곰방대"}, "17844": {"en": "Loss of Senses", "jp": "感覚喪失", "kr": "감각 상실"}, "17854": {"en": "Blazing Strike", "jp": "燃えたぎる一撃", "kr": "타오르는 일격"}, "17855": {"en": "Fierce Charge", "jp": "猛烈な突進", "kr": "맹렬한 돌진"}, "25577": {"en": "\u003cb\u003eOn Use\u003c/b\u003e If Singleton, draw 3 pages\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e 「唯一」状態ならページを3枚引く\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e \u0027유일\u0027상태라면 책장을 3장 뽑음\n\u003chr/\u003e"}, "25589": {"en": "\u003cb\u003eCombat Start\u003c/b\u003e Give 1 Protection to two random allies\n\u003chr/\u003e", "jp": "\u003cb\u003e戦闘開始\u003c/b\u003e ランダムな味方2名に保護1 付与\n\u003chr/\u003e", "kr": "\u003cb\u003e전투 시작\u003c/b\u003e 무작위 아군 2명에게 보호 1 부여\n\u003chr/\u003e"}, "25592": {"en": "\u003cb\u003eOn Use\u003c/b\u003e Restore 2 Light\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e 光 2 回復\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e 빛 2 회복\n\u003chr/\u003e"}, "25595": {"en": "\u003cb\u003eCombat Start\u003c/b\u003e All dice the user plays lose 2 Power for this Scene\n\u003chr/\u003e", "jp": "\u003cb\u003e戦闘開始\u003c/b\u003e 今回の幕の間、全ダイスの威力 -2\n\u003chr/\u003e", "kr": "\u003cb\u003e전투 시작\u003c/b\u003e 이번 막 동안 모든 주사위의 위력 -2\n\u003chr/\u003e"}, "25598": {"en": "\u003cb\u003eOn Use\u003c/b\u003e If Singleton, all dice on this page gain +1 Power\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e 「唯一」状態ならこのこのページのすべてのダイス威力 +1\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e \u0027유일\u0027상태라면 이 책장의 모든 주사위 위력 +1\n\u003chr/\u003e"}, "25604": {"en": "\u003cb\u003eOn Use\u003c/b\u003e Restore 1 Light\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e 光 1 回復\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e 빛 1 회복\n\u003chr/\u003e"}, "25613": {"en": "\u003cb\u003eOn Use\u003c/b\u003e Gain 3 Smoke\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e 煙3を得る\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e 연기 3을 얻음\n\u003chr/\u003e"}, "25616": {"en": "\u003cb\u003eOn Use\u003c/b\u003e If there are 7 or more pages in hand, all dice on this page gain +2 Power\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e 手元にページが7枚ある場合、このページのすべてのダイス威力 +2\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e 내 손에 책장이 7장 이상이라면, 이 책장의 모든 주사위 위력 +2\n\u003chr/\u003e"}, "25619": {"en": "\u003cb\u003eOn Use\u003c/b\u003e Use 2 Smoke to boost Power of all dice on this page by +2\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e 煙2を消耗し、このページのすべての威力+2\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e 연기 2를 소모하여 이 책장의 모든 주사위 위력+2\n\u003chr/\u003e"}, "25622": {"en": "\u003cb\u003eOn Use\u003c/b\u003e Draw 1 page\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e ページを1枚引く\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e 책장을 1장 뽑음\n\u003chr/\u003e"}, "25625": {"en": "\u003cb\u003eOn Use\u003c/b\u003e Gain 4 Charge\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e 充電4を得る\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e 충전 4를 얻음\n\u003chr/\u003e"}, "25628": {"en": "\u003cb\u003eOn Use\u003c/b\u003e Gain 2 Smoke. Restore 1 Light\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e 煙2を得る。光1 回復\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e 연기 2를 얻음. 빛 1 회복\n\u003chr/\u003e"}, "25631": {"en": "\u003cb\u003eOn Use\u003c/b\u003e Use 2 Smoke to boost Power of all dice on this page by +2\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e 煙2を消耗し、このページのすべての威力+2\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e 연기 2를 소모하여 이 책장의 모든 주사위 위력+2\n\u003chr/\u003e"}, "25634": {"en": "\u003cb\u003eOn Use\u003c/b\u003e Gain 6 Charge\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e 充電6を得る\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e 충전 6을 얻음\n\u003chr/\u003e"}, "25637": {"en": "\u003cb\u003eOn Use\u003c/b\u003e Gain 10 Charge and become Immobilized next Scene\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e 充電10を得て次の幕に行動不能状態になる。\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e 충전 10을 얻고 다음 막에 행동불가 상태가 된다\n\u003chr/\u003e"}, "25640": {"en": "\u003cb\u003eCombat Start\u003c/b\u003e All dice the user plays lose 3 Power for this Scene\n\u003chr/\u003e", "jp": "\u003cb\u003e戦闘開始\u003c/b\u003e 今回の幕の間、全ダイスの威力 -3\n\u003chr/\u003e", "kr": "\u003cb\u003e전투 시작\u003c/b\u003e 이번 막 동안 모든 주사위의 위력 -3\n\u003chr/\u003e"}, "25652": {"en": "\u003cb\u003eOn Use\u003c/b\u003e Gain 1 Haste next Scene; spend 3 Charge to draw 2 pages\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e 次の幕にクイック1を得る。充電3を消耗し、ページ2枚を引く。\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e 다음 막에 신속 1을 얻음. 충전 3을 소모하여 책장을 2장을 뽑음.\n\u003chr/\u003e"}, "25655": {"en": "\u003cb\u003eOn Use\u003c/b\u003e Spend 3 Charge to boost Power of all dice on this page by +3\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e 充電3を消耗し、このページのすべてのダイス威力 +3\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e 충전 3을 소모하여 이 책장의 모든 주사위 위력 +3\n\u003chr/\u003e"}, "25658": {"en": "\u003cb\u003eOn Use\u003c/b\u003e Gain 3 Charge\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e 充電3を得る\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e 충전 3을 얻음\n\u003chr/\u003e"}, "25661": {"en": "\u003cb\u003eOn Use\u003c/b\u003e Add \u0027En Garde\u0027 to user\u0027s hand\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e 自分の手元に「アン・ガルド」バトルページを追加\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e 자신의 손에 \u0027앙가드\u0027 전투 책장 추가\n\u003chr/\u003e"}, "27734": {"en": "\u003cb\u003eExclusive Page\u003c/b\u003e, \u003cb\u003eOn Use\u003c/b\u003e Spend all Charge; has a (Charge x 9.9)% chance to succeed.\u003cbr/\u003e\n\u003cb\u003eSuccess\u003c/b\u003e All dice on this page gain +8 Power;\u003cbr/\u003e\n\u003cb\u003eFailure\u003c/b\u003e Deal 20 damage to self\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e (充電x9.9)%の確率で成功, 充電を全て消耗。\u003cbr/\u003e\n\u003cb\u003e成功\u003c/b\u003e このページのすべてのダイス威力 +8\u003cbr/\u003e\n\u003cb\u003e失敗\u003c/b\u003e 自分に20ダメージ\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e (충전x9.9)%의 확률로 성공, 충전 모두 소모.\u003cbr/\u003e\n\u003cb\u003e성공\u003c/b\u003e 이 책장의 모든 주사위 위력 +8.\u003cbr/\u003e\n\u003cb\u003e실패\u003c/b\u003e 자신에게 피해 20\n\u003chr/\u003e"}, "27746": {"en": "Can only be used at Emotion Level 3 and above\n\u003chr/\u003e", "jp": "感情レベルが3以上のときに使用可能\n\u003chr/\u003e", "kr": "감정 단계가 3 이상일 때만 사용가능\n\u003chr/\u003e"}, "27791": {"en": "\u003cb\u003eOn Use\u003c/b\u003e If Singleton, all dice on this page gain +1 Power\n\u003chr/\u003e", "jp": "\u003cb\u003e使用時\u003c/b\u003e 「唯一」状態ならこのこのページのすべてのダイス威力 +1\n\u003chr/\u003e", "kr": "\u003cb\u003e사용시\u003c/b\u003e \u0027유일\u0027상태라면 이 책장의 모든 주사위 위력 +1\n\u003chr/\u003e"}, "28286": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Inflict 1 Bind next Scene", "jp": "\u003cb\u003e的中\u003c/b\u003e 次の幕にて、束縛1 付与", "kr": "\u003cb\u003e적중\u003c/b\u003e 다음 막에 속박 1 부여"}, "28289": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Inflict 2 Bind next Scene", "jp": "\u003cb\u003e的中\u003c/b\u003e 次の幕にて、束縛2 付与", "kr": "\u003cb\u003e적중\u003c/b\u003e 다음 막에 속박 2 부여"}, "28298": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Restore 1 Light", "jp": "\u003cb\u003e的中\u003c/b\u003e 光 1 回復", "kr": "\u003cb\u003e적중\u003c/b\u003e 빛 1 회복"}, "28301": {"en": "\u003cb\u003eOn Clash Lose\u003c/b\u003e Add +2 Power to next die", "jp": "\u003cb\u003eマッチ敗北\u003c/b\u003e 自分の次のダイスの威力+2", "kr": "\u003cb\u003e합 패배\u003c/b\u003e 자신의 다음 주사위 위력 +2"}, "28307": {"en": "\u003cb\u003eOn Clash Win\u003c/b\u003e Draw 2 pages", "jp": "\u003cb\u003eマッチ勝利\u003c/b\u003e ページを2枚引く", "kr": "\u003cb\u003e합 승리\u003c/b\u003e 책장을 2장 뽑음"}, "28322": {"en": "If Singleton, add +4 Power", "jp": "「唯一」状態なら威力 +4", "kr": "\u0027유일\u0027상태라면 위력 +4"}, "28325": {"en": "If 10 Charge was spent at once, add +2 Power", "jp": "このページで充電を10消耗すれば威力 +2", "kr": "이 책장으로 충전을 10 소모했으면 위력 +2"}, "28328": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Inflict 1 Smoke", "jp": "\u003cb\u003e的中\u003c/b\u003e 煙1付与", "kr": "\u003cb\u003e적중\u003c/b\u003e 연기 1 부여"}, "28331": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Inflict 2 Smoke", "jp": "\u003cb\u003e的中\u003c/b\u003e 煙2付与", "kr": "\u003cb\u003e적중\u003c/b\u003e 연기 2 부여"}, "28334": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Inflict 7 Smoke", "jp": "\u003cb\u003e的中\u003c/b\u003e 煙7付与", "kr": "\u003cb\u003e적중\u003c/b\u003e 연기 7 부여"}, "28337": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Gain 4 Smoke", "jp": "\u003cb\u003e的中\u003c/b\u003e 煙4を得る", "kr": "\u003cb\u003e적중\u003c/b\u003e 연기 4를 얻음"}, "28340": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Inflict 1 Bleed next Scene per 2 stacks of Smoke on target", "jp": "\u003cb\u003e的中\u003c/b\u003e 相手に付与された(煙x 0.5)だけ次の幕に出血を付与", "kr": "\u003cb\u003e적중\u003c/b\u003e 대상에게 있는 (연기 x 0.5) 만큼 출혈 부여"}, "28343": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Inflict 1 Bleed next Scene", "jp": "\u003cb\u003e的中\u003c/b\u003e 次の幕にて、出血1 付与", "kr": "\u003cb\u003e적중\u003c/b\u003e 다음 막에 출혈 1 부여"}, "28346": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Inflict 2 Bleed next Scene", "jp": "\u003cb\u003e的中\u003c/b\u003e 次の幕にて、出血2 付与", "kr": "\u003cb\u003e적중\u003c/b\u003e 다음 막에 출혈 2 부여"}, "28349": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Recover 2 HP", "jp": "\u003cb\u003e的中\u003c/b\u003e 体力 2 回復", "kr": "\u003cb\u003e적중\u003c/b\u003e 체력 2 회복"}, "28352": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Recover 3 HP", "jp": "\u003cb\u003e的中\u003c/b\u003e 体力 3 回復", "kr": "\u003cb\u003e적중\u003c/b\u003e 체력 3 회복"}, "28355": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Recover 3 HP", "jp": "\u003cb\u003e的中\u003c/b\u003e 体力 3 回復", "kr": "\u003cb\u003e적중\u003c/b\u003e 체력 3 회복"}, "28367": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Inflict 10 Burn", "jp": "\u003cb\u003e的中\u003c/b\u003e 火傷10 付与", "kr": "\u003cb\u003e적중\u003c/b\u003e 화상 10 부여"}, "28394": {"en": "\u003cb\u003eOn Clash Win\u003c/b\u003e Deal 4 Stagger damage; inflict 1 Fragile next Scene", "jp": "\u003cb\u003eマッチ勝利\u003c/b\u003e 混乱ダメージ4。脆弱1を付与", "kr": "\u003cb\u003e합 승리\u003c/b\u003e 흐트러짐 피해 4. 다음 막에 취약 1 부여"}, "28403": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e If target has 7 or more Smoke, inflict 2 Paralysis and 1 Feeble", "jp": "\u003cb\u003e的中\u003c/b\u003e 相手に煙が7以上あれば麻痺2と虚弱1を付与", "kr": "\u003cb\u003e적중\u003c/b\u003e 대상에게 연기가 7 이상 있다면 마비 2와 허약 1 부여"}, "28406": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e If target has 3 or more Smoke, draw 2 pages", "jp": "\u003cb\u003e的中\u003c/b\u003e 相手に煙が3以上あればページを2枚引く", "kr": "\u003cb\u003e적중\u003c/b\u003e 대상에게 연기가 3 이상 있다면 책장을 2장 뽑음"}, "28409": {"en": "\u003cb\u003eOn Clash Win\u003c/b\u003e Add +1 Power to next die", "jp": "\u003cb\u003eマッチ勝利\u003c/b\u003e 自分の次のダイス威力+1", "kr": "\u003cb\u003e합 승리\u003c/b\u003e 자신의 다음 주사위 위력 +1"}, "28412": {"en": "\u003cb\u003eOn Clash Win\u003c/b\u003e Boost max roll value of last die by +2", "jp": "\u003cb\u003eマッチ勝利\u003c/b\u003e 最後のダイスの最大値を+2", "kr": "\u003cb\u003e합 승리\u003c/b\u003e 마지막 주사위 최댓값 +2"}, "28415": {"en": "\u003cb\u003eOn Clash Win\u003c/b\u003e Boost max roll value of last die by +2", "jp": "\u003cb\u003eマッチ勝利\u003c/b\u003e 最後のダイスの最大値を+2", "kr": "\u003cb\u003e합 승리\u003c/b\u003e 마지막 주사위 최댓값 +2"}, "28418": {"en": "\u003cb\u003eOn Clash Win\u003c/b\u003e Inflict 2 Fragile next Scene", "jp": "\u003cb\u003eマッチ勝利\u003c/b\u003e 次の幕に脆弱2を付与", "kr": "\u003cb\u003e합 승리\u003c/b\u003e 다음 막에 취약 2 부여"}, "28451": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Inflict 3 Burn", "jp": "\u003cb\u003e的中\u003c/b\u003e 火傷3 付与", "kr": "\u003cb\u003e적중\u003c/b\u003e 화상 3 부여"}, "32336": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Inflict 1 Fragile next Scene", "jp": "\u003cb\u003e的中\u003c/b\u003e 次の幕にて、脆弱1 付与", "kr": "\u003cb\u003e적중\u003c/b\u003e 다음 막에 취약 1 부여"}, "32396": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Inflict 2 Bleed next Scene", "jp": "\u003cb\u003e的中\u003c/b\u003e 次の幕にて、出血2 付与", "kr": "\u003cb\u003e적중\u003c/b\u003e 다음 막에 출혈 2 부여"}, "32510": {"en": "\u003cb\u003eOn Hit\u003c/b\u003e Recover 2 HP", "jp": "\u003cb\u003e的中\u003c/b\u003e 体力 2 回復", "kr": "\u003cb\u003e적중\u003c/b\u003e 체력 2 회복"}}</script>
+	</body>
+</html>
