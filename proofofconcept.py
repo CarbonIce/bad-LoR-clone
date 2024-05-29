@@ -147,5 +147,49 @@ AtelierLogic = CombatPage(
         Dice("Blunt",7,12)
     ]
 )
+Durandal = CombatPage(
+    "Durandal",
+    2,
+    "Rare",
+    None,None,None,
+    [
+        Dice(
+            "Slash",
+            5,9,
+            False,
+            "On Hit: Gain 1 Strength",
+            "onHit",
+            lambda me,char,enemy : inflictStatusEffects(char, "Strength", 1)
+        ),
+        Dice(
+            "Slash",
+            5,9,
+            False,
+            "On Hit: Gain 1 Strength",
+            "onHit",
+            lambda me,char,enemy : inflictStatusEffects(char, "Strength", 1)
+        )
+    ]
+)
+def obliterateDice(me,char,enemy,enemydice,result):
+    if result:
+        enemy.activeCombatPage.removeAllDice()
+Furioso = CombatPage(
+    "Furioso",
+    5,  # This page is normally only usable after using all 9 other pages at least once
+    # Trading that in for a +2 cost
+    "Unique",
+    "On Hit: Inflict 5 Bleed, 3 Bind, and 3 Fragile",
+    "onHit",
+    lambda me,char,enemy : (inflictStatusEffects(enemy, "Bleed", 5), inflictStatusEffects(enemy, "Bind", 3), inflictStatusEffects(enemy, "Fragile", 3)),
+    Dice(
+        "Slash",
+        20,39,
+        False,
+        "On Clash Win: Destroy all of the enemies Dice",
+        "onClashEvent",
+        lambda me,char,enemy,enemydie,result : obliterateDice(me,char,enemy,enemydie,result)
+    )
+)
 # Key Pages (TESTING)
 TheBlackSilence = KeyPage()

@@ -131,6 +131,14 @@ class Dice:
         Simply rolls the die and returns the natural value.
         '''
         return randint(self.lowerBound, self.upperBound)
+class SpeedDie:
+    def __init__(self, mini, maxi):
+        self.min = mini
+        self.max = maxi
+        self.value = self.roll()
+        self.pageToUse = None
+    def roll(self):
+        return randint(self.min, self.max)
 
 
 class CombatPage:
@@ -184,7 +192,8 @@ class CombatPage:
         using = self.dice[0]
         self.dice = self.dice[1:]
         return using
-
+    def removeAllDice(self):
+        self.dice = []
     def addDie(self, die):
         '''
         Adds a die to the queue.
@@ -209,7 +218,7 @@ class Passive:  # This class handles everything about a passive ability that goe
     # OnKill (Gain strength, gain health, etc.)
     # OnDeath (Maybe just make this event run whenever anything dies, given that there are passives on any death and on ally death)
     # OnSceneStart and OnSceneEnd (Usual stuff)
-    def __init__(self, name, description, onAttribute=None, rollDie=None, onHit=None, onKill=None, onDeath=None, onSceneStart=None, onSceneEnd=None):
+    def __init__(self, name, description, onAttribute=None, rollDie=None, onHit=None, onKill=None, onDeath=None, onSceneStart=None, onSceneEnd=None, onTakeDamage=None):
         self.name = name
         self.description = description
         self.onAttribute = onAttribute
@@ -219,6 +228,7 @@ class Passive:  # This class handles everything about a passive ability that goe
         self.onDeath = onDeath
         self.onSceneStart = onSceneStart
         self.onSceneEnd = onSceneEnd
+        self.onTakeDamage = onTakeDamage
 class KeyPage:  # Key Pages are basically the character sheet; they dicate how much health, stagger resist, resistance to certain attacks, speed dice, etc. each character has.
     def __init__(self, health=30, stagger=15, physicalResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, staggerResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, speedLower=1, speedUpper=4, passives=[], lightStart=3):     # Default stats based off of the Patron Librarian key page
         self.health = health
@@ -269,10 +279,10 @@ class KeyPage:  # Key Pages are basically the character sheet; they dicate how m
 
 
 class StatusEffect(Passive): #  I had to look up a tutorial for this because i forgor. This over having to rewrite all of those events. https://realpython.com/inheritance-composition-python/
-    def __init__(self, name, description, stacks, rollDie=None, onSceneStart=None, onSceneEnd=None):
+    def __init__(self, name, description, stacks, rollDie=None, onSceneStart=None, onSceneEnd=None, onTakeDamage=None):
         # All status effects only use (I PRAY THAT THEY ONLY NEED) rollDie (Fairy, Bleed, Paralysis (Paral fucks with die bounds directly) and Erosion) onSceneEnd (Burn, Erosion, Fairy) onSceneStart (Haste and Bind), and onTakeDamage (Smoke, Commanders Mark)
         self.stacks = stacks # Stacks is how many times this status effect has been applied
-        super().__init__(name, description, rollDie=rollDie, onSceneEnd=onSceneEnd, onSceneStart=onSceneStart)
+        super().__init__(name, description, rollDie=rollDie, onSceneEnd=onSceneEnd, onSceneStart=onSceneStart, onTakeDamage=onTakeDamage)
 
 
 class Character:    # The big one.
@@ -295,7 +305,10 @@ class Character:    # The big one.
         self.keyPage.onSceneStart()
     def swapKeyPage(self, newKeyPage):
         self.keyPage = newKeyPage
-        self.speedDice = newKeyPage.speedDieCount
+        self.speedDiceCount = newKeyPage.speedDieCount
+        self.speedDice = []
+        for _ in range(self.speedDiceCount):
+            self.speedDice.append(SpeedDie(self.keyPage.speedLower, self.keyPage.speedUpper))
         self.emotionCoins = 0
         self.emotionLevel = 5 # Fucking kill me now I forgot about emotion and emotion coins
         newKeyPage.user = self  # This seems like a disaster waiting to happen. Oh well...
@@ -359,6 +372,9 @@ def strCheck(die):
     return 0
 def removeStacks(effect, amount):
     effect.stacks -= amount
+def Bind(target, amount):
+    for SpeedDie in target.speedDice:
+        SpeedDie.value = max(1, SpeedDie.value - amount)
 statusEffects = {
     "Bleed":StatusEffect("Bleed", 
                          "Take damage equal to the number of Bleed stacks on character when rolling an Offensive die, then reduce the number of stacks by 1/3.", 
@@ -367,6 +383,9 @@ statusEffects = {
     "Strength":StatusEffect("Strength",
                              "All Offensive dice gain power equal to the number of stacks",
                              1, rollDie=lambda me,target,die: me.stacks * strCheck(die),
-                             onSceneEnd=lambda me:removeStacks(me, me.stacks))
-
+                             onSceneEnd=lambda me:removeStacks(me, me.stacks)),
+    "Fragile":StatusEffect("Fragile", "Take extra true damage equal to the number of stacks from attacks",
+                           1, onTakeDamage=lambda me,type,physical,stagger : (me.stacks, 0), onSceneEnd=lambda me:removeStacks(me, me.stacks)),
+    "Bind":StatusEffect("Bind", "Lowers speed value of all speed die by number of stacks", 1, 
+                        onSceneStart=lambda me : Bind(me.target, me.stacks), onSceneEnd=lambda me:removeStacks(me, me.stacks))
 }
