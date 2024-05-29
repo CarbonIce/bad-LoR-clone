@@ -37,7 +37,7 @@ class Dice:
     '''
     Hello Matt!
     '''
-    def __init__(self, diceType: str, lowerBound: int, upperBound: int, counter=False, description=None):
+    def __init__(self, diceType: str, lowerBound: int, upperBound: int, counter=False, description=None, onEvent=None, action=None):
         '''
         A single Die on a Combat Page.
 
@@ -53,13 +53,19 @@ class Dice:
         [3] counter=False: boolean, specifies if the die is a counter die
 
         [4] description=None: string, specifies special actions to take when rolling, hitting, or winning a Clash with the die
+
+        [5] onEvent=None: string, specifies the event to run action, actually used
+
+        [6] action=None: callable, this function is run when event is called
         '''
         # Defining properties, boring
         self.type = diceType
         self.lowerBound = lowerBound
         self.upperBound = upperBound
         self.counter = counter
-        self.description = description
+        self.description = description  # UI friendly version of onEvent and action
+        self.onEvent = onEvent  # I think all dice are on Hit, on Roll, and on Clash Win / Lose, (Hit should be handeled by the key page...) god i hope there arn't any dice with >1 effects
+        self.action = action
         self.initial = ""
 
         if self.counter:  # All counter die are Yellow, regardless of type.
@@ -76,7 +82,21 @@ class Dice:
             parts = self.description.split(':')
             self.description = f"{TM.YELLOW}{parts[0]}:{STOP}{parts[1]}"
         self.initial += self.type[0]
+        self.currentValue = None    # Set when rolling die.
+        self.naturalValue = None    # Set when rolling die.
+    def onRoll(self, character, enemy, enemydie=None):
+        if self.onEvent == "onRoll":
+            self.action(self, character, enemy, enemydie)
 
+    def onClashEvent(self, character, enemy, enemydie, success=True):
+        if self.onEvent == "onClashEvent":
+            self.action(self, character, enemy, enemydie, success)
+    @property
+    def dieType(self):
+        if self.type in ['Slash', 'Pierce', 'Blunt']:
+            return "Offensive"
+        else:
+            return self.type    # Guard or Evade
     @property
     def miniStrRepr(self):
         '''
@@ -109,11 +129,8 @@ class Dice:
         return randint(self.lowerBound, self.upperBound)
 
 
-Dice()
-
-
 class CombatPage:
-    def __init__(self, name: str, rarity: str, onEvent: str, action: str, dice: list):
+    def __init__(self, name: str, light: int, rarity: str, onEvent: str, action: str, dice: list):
         '''
         A Combat Page.
 
@@ -121,25 +138,28 @@ class CombatPage:
 
         [0] name: string, the name of the combat page.
 
-        [1] rarity: string, the rarity of the page, only affects the color of the name when the Combat Page is displayed.
+        [1] light: int, the light cost of the page.
+
+        [2] rarity: string, the rarity of the page, only affects the color of the name when the Combat Page is displayed.
         Valid values are Common, Uncommon, Rare, Unique. (These corrospond to Paperback, Hardcover, Limited, and Object of Art respectively).
 
-        [2] onEvent: string, Special description of the Combat Page, detailing extra information such as action to take when the Page is played,
+        [3] onEvent: string, Special description of the Combat Page, detailing extra information such as action to take when the Page is played,
         action to take when the page is discarded, Mass Attack type, Single Use, etc. If automatic parsing fails, the entire description is dumped here.
 
-        [3] action: Action to take when onEvent condition is met. Only set if there is a single clear format of (Event) (Action)
+        [4] action: callable, Action to take when onEvent condition is met. Only set if there is a single clear format of (Event) (Action)
         such as On Play: Regain 1 Light.
 
-        [4] dice: Dice to initialize this page with. This is a queue, not a stack.
+        [5] dice: list, Dice to initialize this page with. This is a queue, not a stack.
         '''
         self.name = name
         self.rarity = rarity  # Dictates the color of the page name. Nothing else.
+        self.lightCost = light
         self.onEvent = onEvent  # This is going to be a hellhole. Events are fine, but there are so many custom actions I need to account for.
         # Prob just going to focus on the ones most critical to gameplay, namely Light Restore and Page Draw
         self.action = action  # If onEvent is defined, but action is not, treat onEvent as the entire description.
         # This project already makes me want to die and it hasn't even been 3 hours yet.
         self.dice = dice
-        match self.rarity:
+        match self.rarity:  # https://www.freecodecamp.org/news/python-switch-statement-switch-case-example/
             case "Unique":  # Object of Art
                 self.color = TM.YELLOW
             case "Rare":  # Limited
@@ -148,6 +168,9 @@ class CombatPage:
                 self.color = TM.CYAN
             case "Common":  # Paperback
                 self.color = TM.GREEN
+    def onPlay(self, user):
+        if self.onEvent == "onPlay":
+            self.action(self, user)
 
     def popTopDice(self):
         '''
@@ -162,6 +185,9 @@ class CombatPage:
         Adds a die to the queue.
         '''
         self.dice.append(die)
+    def buffDie(self, character, enemy, die):
+        if self.onEvent == "buffDie":
+            self.action(self, character, enemy, die)
 
     def __str__(self):
         # OH GOD WHY
@@ -247,8 +273,9 @@ class Character:    # The big one.
     def __init__(self, keyPage=KeyPage(), deck=[]):
         # The deck consists of 9 Combat Page elements. Most of the characters attributes are set by the Key Page.
         self.keyPage = keyPage
+        self.activeCombatPage = None    # Assume that activeCombatPage is the combat page currently being used.
         self.swapKeyPage(keyPage)
-        self.deck = deck
+        self.deck = deck # Pages that need to be drawn. This is a Queue.
     def beginAct(self):
         # Reinitialize health and stagger, purge status effects, run onSceneStart functions
         self.statusEffects = {}
@@ -256,6 +283,9 @@ class Character:    # The big one.
         self.stagger = self.keyPage.maxStagger # Almost everything can be grabbed from the key page, as they don't change* (*They probably do, but i am sure as hell not dealing with that.)
         self.light = self.keyPage.lightStart
         self.lightCapacity = self.keyPage.lightStart
+        self.Hand = []  # Pages readily accessable to use
+        # Draw 4
+        self.drawPages(4)
         self.keyPage.onSceneStart()
     def swapKeyPage(self, newKeyPage):
         self.keyPage = newKeyPage
@@ -263,12 +293,20 @@ class Character:    # The big one.
         self.emotionCoins = 0
         self.emotionLevel = 5 # Fucking kill me now I forgot about emotion and emotion coins
         newKeyPage.user = self  # This seems like a disaster waiting to happen. Oh well...
-        self.health = self.maxHealth
-        self.stagger = self.maxStagger # Almost everything can be grabbed from the key page, as they don't change* (*They probably do, but i am sure as hell not dealing with that.)
+        self.health = self.keyPage.health
+        self.stagger = self.keyPage.stagger # Almost everything can be grabbed from the key page, as they don't change* (*They probably do, but i am sure as hell not dealing with that.)
         self.statusEffects = {}
         self.keyPage.onAttribute()
+    
+    def drawPages(self, amount):
+        for _ in range(amount):
+            if len(self.deck) > 0:
+                self.Hand.append(self.deck[0]) # Draw a card
+                deck = deck[1:] # Pop that card from the deck
+    
     def gainEmotionCoins(self, count):    # Ignoring distinction between Positive and Negative coins because fuck no i'm not doing abno pages
         self.emotionCoins = min(self.emotionCoins + count, EmotionCoinRequirements[self.emotionLevel])
+
     def checkForIncrementEmotionLevel(self):
         if self.emotionLevel < 5 and self.emotionCoins == EmotionCoinRequirements[self.emotionLevel]:
             self.emotionCoins = 0
@@ -279,17 +317,24 @@ class Character:    # The big one.
             self.speedDice += 1
         # Not including an event for passives that activate on emotion level change because fuck you
         # At emotion 5, playing 2+ combat pages in a scene causes an extra draw at the start of the next scene
+
     def takeDamage(self, damageType, amountPhysical, amountStagger, truePhysical=0, trueStagger=0):   # Yes, all of these distinctions are neccesary. Yes I hate this.
-        mods = self.keyPage.onTakeDamage(damageType, amountPhysical, amountStagger)
+        if damageType in ["Slash", "Pierce", "Blunt"]:
+            mods = self.keyPage.onTakeDamage(damageType, amountPhysical, amountStagger)
+            amountPhysical += mods[0]   # I think this is proper order of operations on the stagger and physical damage???
+            amountStagger += mods[1]
+            physicalDamage = int(self.keyPage.physicalResistances[damageType] * amountPhysical) # Rounded down.
+            staggerDamage = int(self.keyPage.staggerResistances[damageType] * amountStagger)
+            self.health -= max(physicalDamage, 0)
+            self.stagger -= max(staggerDamage, 0)
         self.health -= truePhysical
         self.stagger -= trueStagger # Let's just... not... get into the abno cards that reduce max stagger. Actually, lets just not with abno cards altogether. Make them passives.
-        physicalDamage = int(self.keyPage.physicalResistances[damageType] * amountPhysical) # Rounded down.
-        staggerDamage = int(self.keyPage.staggerResistances[damageType] * amountStagger)
-        amountPhysical += mods[0]   # I think??? this is proper order of operations on the stagger and physical damage?
-        amountStagger += mods[1]
-        self.health -= max(amountPhysical, 0)
-        self.stagger -= max(amountStagger, 0)
-        
         # Insert death and stagger logic here i actually wanna die
-
+        
+    def regainLight(self, amount):
+        self.light = min(self.light + amount, self.lightCapacity)
+    def regainStats(self, health, stagger):
+        if stagger > 0:
+            self.stagger = min(self.stagger + stagger, self.keyPage.stagger)
+        self.health = min(self.health + health, self.keyPage.health)
 # Constants
