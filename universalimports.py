@@ -172,6 +172,108 @@ class CombatPage:
         else:
             return f"{self.color}{self.name}{STOP}\n" + '\n'.join([str(x) for x in self.dice])
 
+class Passive:  # This class handles everything about a passive ability that goes on a key page - namely, when to activate some arbitrary function that affects the Character using the Key Page.
+    # Unfortunetly, due to the nature of many passive abilties, there will have to be a LOT of hard coding...
+    # The most commmon events that I can find are OnAttribute (immedietly apply, do something simple like adding a speed die (Speed I through III)). Pass in 
+    # rollDie (Wedge, Swordplay, Lions Fist, etc. that buff the value of dice)
+    # OnHit (Deal extra damage, stagger, apply ailment, etc. depending on situation)
+    # OnKill (Gain strength, gain health, etc.)
+    # OnDeath (Maybe just make this event run whenever anything dies, given that there are passives on any death and on ally death)
+    # OnSceneStart and OnSceneEnd (Usual stuff)
+    def __init__(self, name, description, onAttribute=None, rollDie=None, onHit=None, onKill=None, onDeath=None, onSceneStart=None, onSceneEnd=None):
+        self.name = name
+        self.description = description
+        self.onAttribute = onAttribute
+        self.rollDie = rollDie
+        self.onHit = onHit
+        self.onKill = onKill
+        self.onDeath = onDeath
+        self.onSceneStart = onSceneStart
+        self.onSceneEnd = onSceneEnd
+class KeyPage:  # Key Pages are basically the character sheet; they dicate how much health, stagger resist, resistance to certain attacks, speed dice, etc. each character has.
+    def __init__(self, health=30, stagger=15, physicalResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, staggerResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, speedLower=1, speedUpper=4, passives=[]):     # Default stats based off of the Patron Librarian key page
+        self.health = health
+        self.stagger = stagger
+        self.physicalResistances = physicalResistances
+        self.staggerResistances = staggerResistances
+        self.speedLower = speedLower
+        self.speedUpper = speedUpper
+        self.passives = passives
+        self.speedDieCount = 1 # 1 by default. Increased by the Speed I through III passives.
+        self.user = None
+    # I'm sorry to the CS gods, but this is how I worked it out.
+    def onAttribute(self):
+        for passive in self.passives:
+            if passive.onAttribute: passive.onAttribute(self)
+    def rollDie(self, target, die):
+        modifier = 0
+        for passive in self.passives:
+            if passive.rollDie: modifier += passive.rollDie(self, target, die) # rollDie should return an integer, how much to change the dice value by.
+        return modifier
+    def onHit(self, enemy, die):    # onHit will double as onClashWin because i cant take it anymore
+        for passive in self.passives:
+            if passive.onHit: passive.onHit(self, enemy, die)
+    def onTakeDamage(self, damageType, amountPhysical, amountStagger):
+        changes = [0, 0]
+        for passive in self.passives:
+            if passive.onTakeDamage:
+                resultingMods = passive.onTakeDamage(self, damageType, amountPhysical, amountStagger)
+                changes[0] += resultingMods[0]
+                changes[1] += resultingMods[1]
+        return changes
+    def onKill(self):
+        for passive in self.passives:
+            if passive.onKill: passive.onKill(self)
+    def onDeath(self, ally=False): # Ally determines if it was an ally who died. Whaddaya know.
+        for passive in self.passives:
+            if passive.onDeath: passive.onDeath(self, ally)
+    def onSceneStart(self):
+        for passive in self.passives:
+            if passive.onSceneStart: passive.onSceneStart(self)
+    def onSceneEnd(self):
+        for passive in self.passives:
+            if passive.onSceneEnd: passive.onSceneEnd(self)
+
+
+class StatusEffect(Passive): #  I had to look up a tutorial for this because i forgor. This over having to rewrite all of those events. https://realpython.com/inheritance-composition-python/
+    def __init__(self, name, description, stacks, rollDie=None, onSceneStart=None, onSceneEnd=None):
+        # All status effects only use (I PRAY THAT THEY ONLY NEED) rollDie (Fairy, Bleed, Paralysis (Paral fucks with die bounds directly) and Erosion) onSceneEnd (Burn, Erosion, Fairy) onSceneStart (Haste and Bind), and onTakeDamage (Smoke, Commanders Mark)
+        self.stacks = stacks # Stacks is how many times this status effect has been applied
+        super().__init__(name, description, rollDie=rollDie, onSceneEnd=onSceneEnd, onSceneStart=onSceneStart)
+
+
+class Character:    # The big one.
+    def __init__(self, keyPage=KeyPage(), deck=[]):
+        # The deck consists of 9 Combat Page elements. Most of the characters attributes are set by the Key Page.
+        self.keyPage = keyPage
+        self.swapKeyPage(keyPage)
+        self.deck = deck
+    def beginAct(self):
+        # Reinitialize health and stagger, purge status effects, run onSceneStart functions
+        self.statusEffects = {}
+        self.health = self.keyPage.maxHealth
+        self.stagger = self.keyPage.maxStagger # Almost everything can be grabbed from the key page, as they don't change* (*They probably do, but i am sure as hell not dealing with that.)
+        self.keyPage.onSceneStart()
+    def swapKeyPage(self, newKeyPage):
+        self.keyPage = newKeyPage
+        self.emotionCoins = 0
+        self.emotionLevel = 5 # Fucking kill me now I forgot about emotion and emotion coinsa
+        newKeyPage.user = self  # This seems like a disaster waiting to happen. Oh well...
+        self.health = self.maxHealth
+        self.stagger = self.maxStagger # Almost everything can be grabbed from the key page, as they don't change* (*They probably do, but i am sure as hell not dealing with that.)
+        self.statusEffects = {}
+        self.keyPage.onAttribute()
+    def takeDamage(self, damageType, amountPhysical, amountStagger, truePhysical=0, trueStagger=0):   # Yes, all of these distinctions are neccesary. Yes I hate this.
+        mods = self.keyPage.onTakeDamage(damageType, amountPhysical, amountStagger)
+        self.health -= truePhysical
+        self.stagger -= trueStagger # Let's just... not... get into the abno cards that reduce max stagger. Actually, lets just not with abno cards altogether. Make them passives.
+        physicalDamage = int(self.keyPage.physicalResistances[damageType] * amountPhysical) # Rounded down.
+        staggerDamage = int(self.keyPage.staggerResistances[damageType] * amountStagger)
+        amountPhysical += mods[0]   # I think??? this is proper order of operations on the stagger and physical damage?
+        amountStagger += mods[1]
+        self.health -= max(amountPhysical, 0)
+        self.stagger -= max(amountStagger, 0)
+        
+        # Insert death and stagger logic here i actually wanna die
 
 # Constants
-CombatPage()
