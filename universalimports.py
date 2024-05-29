@@ -1,5 +1,6 @@
 from random import randint
 from math import ceil
+from time import sleep
 EmotionCoinRequirements = [3, 3, 5, 7, 9]   # From level index to index + 1
 
 class TextModifiers:  # A class containing ANSI text modifiers to make text different colors or have different effects.

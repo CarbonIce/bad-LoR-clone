@@ -216,15 +216,16 @@ char1.playCombatPage(deepcopy(RangaWorkshop), char2)
 char2.playCombatPage(deepcopy(OldBoysWorkshop), char1)
 ReceptionHandler([char1], [char2]).Clash(char1, char2, Dice("Slash", 
              3, 7,
-             False, "On Hit: Inflict 5 Bleed this scene",
+             False, 
+             "On Hit: Inflict 5 Bleed this scene",
              "onHit", lambda die,me,them: inflictStatusEffects(them,"Bleed",5)
              ), Dice(
             "Blunt",
             4,8,
             False,
-            "On Hit: Deal 3 damage to target"
+            "On Hit: Deal 3 damage to target",
             "onHit",
-            lambda a,b,c: a.recoverStats(0, 5)
+            lambda a,b,c: c.takeDamage("Slash", 0, 0, 3, 0)
         ))
 char1.miniOutputData()
 char2.miniOutputData()

@@ -16,8 +16,10 @@ class ReceptionHandler:     # I lied. This is the big one.
         dice1.naturalValue = d1
         dice2.naturalValue = d2
         # Step 2: Run             rollDice from the Key Page + StatusEffects      buffDice events from the Combat Page,                        and onRoll events from the Dice itself
-        dice1.currentValue = d1 + int(character1.keyPage.rollDie(character2, dice1) or 0) + int(character1.activeCombatPage.buffDie(character1, character2, dice1) or 0) + int(dice1.onRoll(character1, character2, dice2) or 0)
-        dice2.currentValue = d2 + int(character2.keyPage.rollDie(character1, dice2) or 0) + int(character2.activeCombatPage.buffDie(character2, character1, dice2) or 0) + int(dice1.onRoll(character2, character1, dice1) or 0)
+        dice1Modifier = int(character1.keyPage.rollDie(character2, dice1) or 0) + int(character1.activeCombatPage.buffDie(character1, character2, dice1) or 0) + int(dice1.onRoll(character1, character2, dice2) or 0)
+        dice2Modifier = int(character2.keyPage.rollDie(character1, dice2) or 0) + int(character2.activeCombatPage.buffDie(character2, character1, dice2) or 0) + int(dice1.onRoll(character2, character1, dice1) or 0)
+        dice1.currentValue = d1 + dice1Modifier
+        dice2.currentValue = d2 + dice2Modifier
         # Int conversions are to turn the None values to 0
         # Step 3: Compare the dice
         d1 = dice1.currentValue
@@ -40,7 +42,20 @@ class ReceptionHandler:     # I lied. This is the big one.
         else:
             # On a draw, both dice are consumed.
             draw = True
-        print(f"{dice1.secondaryColor}{d1}{STOP} >< {dice2.secondaryColor}{d2}{STOP}")
+        d1c2 = TM.DARK_GRAY
+        d2c2 = TM.DARK_GRAY
+        if dice1Modifier > 0:
+            d1c2 = dice1.primaryColor
+        elif dice1Modifier == 0:
+            d1c2 = dice1.secondaryColor
+        if dice2Modifier > 0:
+            d2c2 = dice2.primaryColor
+        elif dice2Modifier == 0:
+            d2c2 = dice2.secondaryColor
+        print(f"{dice1.secondaryColor}{dice1.naturalValue}{STOP} >< {dice2.secondaryColor}{dice2.naturalValue}{STOP}")
+        sleep(1)
+        print(f"{d1c2}{dice1.currentValue}{STOP} >< {d2c2}{dice2.currentValue}{STOP}")
+        sleep(0.2)
         if not draw:
             winDice.onClashEvent(winner, loser, loseDice, True)
             loseDice.onClashEvent(loser, winner, winDice, True)
