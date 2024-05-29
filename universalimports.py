@@ -1,5 +1,5 @@
 from random import randint
-
+EmotionCoinRequirements = [3, 3, 5, 7, 9]   # From level index to index + 1
 
 class TextModifiers:  # A class containing ANSI text modifiers to make text different colors or have different effects.
     BLACK = "\033[0;30m"
@@ -191,7 +191,7 @@ class Passive:  # This class handles everything about a passive ability that goe
         self.onSceneStart = onSceneStart
         self.onSceneEnd = onSceneEnd
 class KeyPage:  # Key Pages are basically the character sheet; they dicate how much health, stagger resist, resistance to certain attacks, speed dice, etc. each character has.
-    def __init__(self, health=30, stagger=15, physicalResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, staggerResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, speedLower=1, speedUpper=4, passives=[]):     # Default stats based off of the Patron Librarian key page
+    def __init__(self, health=30, stagger=15, physicalResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, staggerResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, speedLower=1, speedUpper=4, passives=[], lightStart=3):     # Default stats based off of the Patron Librarian key page
         self.health = health
         self.stagger = stagger
         self.physicalResistances = physicalResistances
@@ -199,6 +199,7 @@ class KeyPage:  # Key Pages are basically the character sheet; they dicate how m
         self.speedLower = speedLower
         self.speedUpper = speedUpper
         self.passives = passives
+        self.lightStart = lightStart    # Most likely 3 but can be 4 for high tier Star and Impurity Key Pages
         self.speedDieCount = 1 # 1 by default. Increased by the Speed I through III passives.
         self.user = None
     # I'm sorry to the CS gods, but this is how I worked it out.
@@ -253,16 +254,31 @@ class Character:    # The big one.
         self.statusEffects = {}
         self.health = self.keyPage.maxHealth
         self.stagger = self.keyPage.maxStagger # Almost everything can be grabbed from the key page, as they don't change* (*They probably do, but i am sure as hell not dealing with that.)
+        self.light = self.keyPage.lightStart
+        self.lightCapacity = self.keyPage.lightStart
         self.keyPage.onSceneStart()
     def swapKeyPage(self, newKeyPage):
         self.keyPage = newKeyPage
+        self.speedDice = newKeyPage.speedDieCount
         self.emotionCoins = 0
-        self.emotionLevel = 5 # Fucking kill me now I forgot about emotion and emotion coinsa
+        self.emotionLevel = 5 # Fucking kill me now I forgot about emotion and emotion coins
         newKeyPage.user = self  # This seems like a disaster waiting to happen. Oh well...
         self.health = self.maxHealth
         self.stagger = self.maxStagger # Almost everything can be grabbed from the key page, as they don't change* (*They probably do, but i am sure as hell not dealing with that.)
         self.statusEffects = {}
         self.keyPage.onAttribute()
+    def gainEmotionCoins(self, count):    # Ignoring distinction between Positive and Negative coins because fuck no i'm not doing abno pages
+        self.emotionCoins = min(self.emotionCoins + count, EmotionCoinRequirements[self.emotionLevel])
+    def checkForIncrementEmotionLevel(self):
+        if self.emotionLevel < 5 and self.emotionCoins == EmotionCoinRequirements[self.emotionLevel]:
+            self.emotionCoins = 0
+            self.emotionLevel += 1
+        self.lightCapacity += 1 # Increase max light by 1
+        self.light = self.lightCapacity # Regain all light
+        if self.emotionLevel == 4: # Gain an additional Speed die at Emotion Level 4
+            self.speedDice += 1
+        # Not including an event for passives that activate on emotion level change because fuck you
+        # At emotion 5, playing 2+ combat pages in a scene causes an extra draw at the start of the next scene
     def takeDamage(self, damageType, amountPhysical, amountStagger, truePhysical=0, trueStagger=0):   # Yes, all of these distinctions are neccesary. Yes I hate this.
         mods = self.keyPage.onTakeDamage(damageType, amountPhysical, amountStagger)
         self.health -= truePhysical
