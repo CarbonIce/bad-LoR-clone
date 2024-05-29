@@ -58,7 +58,7 @@ OldBoysWorkshop = CombatPage(
     "Old Boys Workshop",
     1,
     "Common", "On Use: Restore 3 Light; draw 1 page",
-    "onPlay", lambda me,user: (user.regainLight(3), user.drawPage(1)) #  used chatGPT to figure out how the hell to do this stuff using lambda functions,
+    "onPlay", lambda me,user: (user.regainLight(3), user.drawPage(1)), #  used chatGPT to figure out how the hell to do this stuff using lambda functions,
     # This solution is extremely stupid (returns a tuple of the return values from regainLight and drawPage, but whatever)
     [
         Dice(
@@ -109,6 +109,7 @@ WheelsIndustry = CombatPage(
     "Wheels Industry",
     4,
     "Rare",
+    None,
     None,
     None,
     [
@@ -191,5 +192,37 @@ Furioso = CombatPage(
         lambda me,char,enemy,enemydie,result : obliterateDice(me,char,enemy,enemydie,result)
     )
 )
-# Key Pages (TESTING)
-TheBlackSilence = KeyPage()
+BlackSilenceDeck = [AllasWorkshop, CrystalAtelier, AtelierLogic, WheelsIndustry, RangaWorkshop, Furioso, Durandal, OldBoysWorkshop, MookWorkshop, ZelkovaWorkshop]
+# Key Pages (TESTING)]
+def gainDice(user, amount):
+    user.speedDiceCount += amount
+def blackSilenceDraw(kp, first):
+    if first: kp.user.drawPages(2)
+SpeedII = Passive("Speed II", "Gain 2 Speed dice", onAttribute=lambda KP: gainDice(KP.user, 2))
+TheBlackSilencePassive = Passive("The Black Silence", "Draw 2 additional pages at the start of the Act. All dice gain +2 Power.", # This should be on every 3rd page but no because fuck you
+                                 onSceneStart=lambda kp,first : blackSilenceDraw(kp,first),
+                                 rollDie=lambda a,b,c: 2)
+TheBlackSilence = KeyPage("The Black Silence",
+                          106, 56, 
+                          {'Slash':1, "Pierce":1, "Blunt":0.5}, 
+                          {'Slash':1, "Pierce":1, "Blunt":0.5},
+                          2, 7,
+                          [SpeedII, TheBlackSilencePassive],
+                          4) # 208 lines of work for a single key page. Fucking hell
+char1 = Character("Roland", deepcopy(TheBlackSilence), deepcopy(BlackSilenceDeck))
+char2 = Character("Loland", deepcopy(TheBlackSilence), deepcopy(BlackSilenceDeck))
+char1.outputData()
+char1.playCombatPage(deepcopy(RangaWorkshop), char2)
+char2.playCombatPage(deepcopy(OldBoysWorkshop), char1)
+ReceptionHandler().Clash(char1, char2, Dice("Slash", 
+             3, 7,
+             False, "On Hit: Inflict 5 Bleed this scene",
+             "onHit", lambda me,them: inflictStatusEffects(them,"Bleed",5)
+             ), Dice(
+            "Blunt",
+            4,8,
+            False,
+            "On Hit: Deal 3 damage to target"
+            "onHit",
+            lambda a,b: a.recoverStats(0, 5)
+        ))

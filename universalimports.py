@@ -230,7 +230,8 @@ class Passive:  # This class handles everything about a passive ability that goe
         self.onSceneEnd = onSceneEnd
         self.onTakeDamage = onTakeDamage
 class KeyPage:  # Key Pages are basically the character sheet; they dicate how much health, stagger resist, resistance to certain attacks, speed dice, etc. each character has.
-    def __init__(self, health=30, stagger=15, physicalResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, staggerResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, speedLower=1, speedUpper=4, passives=[], lightStart=3):     # Default stats based off of the Patron Librarian key page
+    def __init__(self, name="Patron Librarian of Gen. Works", health=30, stagger=15, physicalResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, staggerResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, speedLower=1, speedUpper=4, passives=[], lightStart=3):     # Default stats based off of the Patron Librarian key page
+        self.name = name
         self.health = health
         self.stagger = stagger
         self.physicalResistances = physicalResistances
@@ -270,9 +271,9 @@ class KeyPage:  # Key Pages are basically the character sheet; they dicate how m
     def onDeath(self, ally=False): # Ally determines if it was an ally who died. Whaddaya know.
         for passive in self.passives:
             if passive.onDeath: passive.onDeath(self, ally)
-    def onSceneStart(self):
+    def onSceneStart(self, first=False):
         for passive in self.passives:
-            if passive.onSceneStart: passive.onSceneStart(self)
+            if passive.onSceneStart: passive.onSceneStart(self, first)
     def onSceneEnd(self):
         for passive in self.passives:
             if passive.onSceneEnd: passive.onSceneEnd(self)
@@ -286,12 +287,14 @@ class StatusEffect(Passive): #  I had to look up a tutorial for this because i f
 
 
 class Character:    # The big one.
-    def __init__(self, keyPage=KeyPage(), deck=[]):
+    def __init__(self, name, keyPage=KeyPage(), deck=[]):
         # The deck consists of 9 Combat Page elements. Most of the characters attributes are set by the Key Page.
+        self.name = name
         self.keyPage = keyPage
         self.activeCombatPage = None    # Assume that activeCombatPage is the combat page currently being used.
         self.swapKeyPage(keyPage)
         self.deck = deck # Pages that need to be drawn. This is a Queue.
+        
     def beginAct(self):
         # Reinitialize health and stagger, purge status effects, run onSceneStart functions
         self.statusEffects = {}
@@ -303,6 +306,9 @@ class Character:    # The big one.
         # Draw 4
         self.drawPages(4)
         self.keyPage.onSceneStart()
+    def playCombatPage(self, page, target):
+        self.activeCombatPage = page
+        self.target = target
     def swapKeyPage(self, newKeyPage):
         self.keyPage = newKeyPage
         self.speedDiceCount = newKeyPage.speedDieCount
@@ -310,7 +316,9 @@ class Character:    # The big one.
         for _ in range(self.speedDiceCount):
             self.speedDice.append(SpeedDie(self.keyPage.speedLower, self.keyPage.speedUpper))
         self.emotionCoins = 0
-        self.emotionLevel = 5 # Fucking kill me now I forgot about emotion and emotion coins
+        self.emotionLevel = 0 # Fucking kill me now I forgot about emotion and emotion coins
+        self.light = self.keyPage.lightStart
+        self.lightCapacity = self.keyPage.lightStart
         newKeyPage.user = self  # This seems like a disaster waiting to happen. Oh well...
         self.health = self.keyPage.health
         self.stagger = self.keyPage.stagger # Almost everything can be grabbed from the key page, as they don't change* (*They probably do, but i am sure as hell not dealing with that.)
@@ -359,7 +367,14 @@ class Character:    # The big one.
         if stagger > 0:
             self.stagger = min(self.stagger + stagger, self.keyPage.stagger)
         self.health = min(self.health + health, self.keyPage.health)
-
+    def outputData(self):
+        print(f"{self.name} - {self.keyPage.name}'s Key Page")
+        print(f"{TM.LIGHT_RED}{self.health}/{self.keyPage.health} HP{STOP}")
+        print(f"{TM.YELLOW}{self.stagger}/{self.keyPage.stagger} STGR{STOP}")
+        print(f"{TM.LIGHT_PURPLE}{self.emotionCoins}/{EmotionCoinRequirements[self.emotionLevel]} EMOTION COINS (EMOTION LEVEL {self.emotionLevel}){STOP}")
+        print(f"{TM.YELLOW}{self.light}/{self.lightCapacity} Light{STOP}")
+        for status in self.statusEffects:
+            print(f"{self.statusEffects[status].stacks} {status}")
 # Constants
 def bleedOut(effect, target, die):
     if die.type() == "Offensive":
