@@ -1,4 +1,5 @@
 from random import randint
+from math import ceil
 EmotionCoinRequirements = [3, 3, 5, 7, 9]   # From level index to index + 1
 
 class TextModifiers:  # A class containing ANSI text modifiers to make text different colors or have different effects.
@@ -86,11 +87,14 @@ class Dice:
         self.naturalValue = None    # Set when rolling die.
     def onRoll(self, character, enemy, enemydie=None):
         if self.onEvent == "onRoll":
-            self.action(self, character, enemy, enemydie)
+            return self.action(self, character, enemy, enemydie)
 
     def onClashEvent(self, character, enemy, enemydie, success=True):
         if self.onEvent == "onClashEvent":
-            self.action(self, character, enemy, enemydie, success)
+            return self.action(self, character, enemy, enemydie, success)
+    def onHit(self, character, enemy):
+        if self.onEvent == "onHit":
+            return self.action(self, character, enemy)
     @property
     def dieType(self):
         if self.type in ['Slash', 'Pierce', 'Blunt']:
@@ -130,7 +134,7 @@ class Dice:
 
 
 class CombatPage:
-    def __init__(self, name: str, light: int, rarity: str, onEvent: str, action: str, dice: list):
+    def __init__(self, name: str, light: int, rarity: str, description: str, onEvent: str, action: callable, dice: list):
         '''
         A Combat Page.
 
@@ -154,6 +158,7 @@ class CombatPage:
         self.name = name
         self.rarity = rarity  # Dictates the color of the page name. Nothing else.
         self.lightCost = light
+        self.description = description
         self.onEvent = onEvent  # This is going to be a hellhole. Events are fine, but there are so many custom actions I need to account for.
         # Prob just going to focus on the ones most critical to gameplay, namely Light Restore and Page Draw
         self.action = action  # If onEvent is defined, but action is not, treat onEvent as the entire description.
@@ -187,14 +192,12 @@ class CombatPage:
         self.dice.append(die)
     def buffDie(self, character, enemy, die):
         if self.onEvent == "buffDie":
-            self.action(self, character, enemy, die)
-
+            return self.action(self, character, enemy, die)
+        
     def __str__(self):
         # OH GOD WHY
-        if self.onEvent is not None and self.action is not None:
-            return f"{self.color}{self.name} | {TM.YELLOW}{self.onEvent}: {STOP}{self.action}\n" + '\n'.join([str(x) for x in self.dice])
-        elif self.onEvent:
-            return f"{self.color}{self.name} | {self.onEvent}\n" + '\n'.join([str(x) for x in self.dice])
+        if self.description is not None:
+            return f"{self.color}{self.name} | {self.description}\n" + '\n'.join([str(x) for x in self.dice])
         else:
             return f"{self.color}{self.name}{STOP}\n" + '\n'.join([str(x) for x in self.dice])
 
@@ -236,10 +239,13 @@ class KeyPage:  # Key Pages are basically the character sheet; they dicate how m
         modifier = 0
         for passive in self.passives:
             if passive.rollDie: modifier += passive.rollDie(self, target, die) # rollDie should return an integer, how much to change the dice value by.
+        for status in self.user.statuseffects:
+            if self.user.statuseffects[status].rollDie: modifier += self.user.statuseffects[status].rollDie(self.user, target, die)
         return modifier
     def onHit(self, enemy, die):    # onHit will double as onClashWin because i cant take it anymore
         for passive in self.passives:
-            if passive.onHit: passive.onHit(self, enemy, die)
+            if passive.onHit: mod = passive.onHit(self, enemy, die)
+        return mod
     def onTakeDamage(self, damageType, amountPhysical, amountStagger):
         changes = [0, 0]
         for passive in self.passives:
@@ -317,7 +323,10 @@ class Character:    # The big one.
             self.speedDice += 1
         # Not including an event for passives that activate on emotion level change because fuck you
         # At emotion 5, playing 2+ combat pages in a scene causes an extra draw at the start of the next scene
-
+    def cleanStatusEffects(self):
+        for status in self.statusEffects:
+            if statusEffects[status].stacks == 0:
+                statusEffects.pop(status)
     def takeDamage(self, damageType, amountPhysical, amountStagger, truePhysical=0, trueStagger=0):   # Yes, all of these distinctions are neccesary. Yes I hate this.
         if damageType in ["Slash", "Pierce", "Blunt"]:
             mods = self.keyPage.onTakeDamage(damageType, amountPhysical, amountStagger)
@@ -330,11 +339,34 @@ class Character:    # The big one.
         self.health -= truePhysical
         self.stagger -= trueStagger # Let's just... not... get into the abno cards that reduce max stagger. Actually, lets just not with abno cards altogether. Make them passives.
         # Insert death and stagger logic here i actually wanna die
-        
+
     def regainLight(self, amount):
         self.light = min(self.light + amount, self.lightCapacity)
     def regainStats(self, health, stagger):
         if stagger > 0:
             self.stagger = min(self.stagger + stagger, self.keyPage.stagger)
         self.health = min(self.health + health, self.keyPage.health)
+
 # Constants
+def bleedOut(effect, target, die):
+    if die.type() == "Offensive":
+        target.takeDamage(0, 0, effect.stacks, 0)
+        effect.stacks = ceil(effect.stacks * (2 / 3))
+    return 0
+def strCheck(die):
+    if die.type() == "Offensive":
+        return 1
+    return 0
+def removeStacks(effect, amount):
+    effect.stacks -= amount
+statusEffects = {
+    "Bleed":StatusEffect("Bleed", 
+                         "Take damage equal to the number of Bleed stacks on character when rolling an Offensive die, then reduce the number of stacks by 1/3.", 
+                         1, rollDie=lambda me,target,die:bleedOut(me,target,die),
+                         onSceneEnd=lambda me:removeStacks(me, me.stacks)),
+    "Strength":StatusEffect("Strength",
+                             "All Offensive dice gain power equal to the number of stacks",
+                             1, rollDie=lambda me,target,die: me.stacks * strCheck(die),
+                             onSceneEnd=lambda me:removeStacks(me, me.stacks))
+
+}

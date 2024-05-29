@@ -5,11 +5,18 @@ from copy import deepcopy
 def reduceEnemyDieValue(me, them, enemyDie, amount):
     enemyDie.currentValue = max(1, enemyDie.currentValue - amount)
     return 0
+def inflictStatusEffects(target, effecttype, amount):
+    if target.statusEffects[effecttype]:
+        target.statusEffects[effecttype].stacks += amount
+    else:
+        target.statusEffects[effecttype] = statusEffects['effecttype']
+        target.statusEffects[effecttype].stacks = amount    # Some status effects should apply the scene after but nope because fuck you
 # Combat Pages (TESTING)
 AllasWorkshop = CombatPage(
     "Allas Workshop",
     2,
     "Uncommon",
+    "Start of Clash: Reduce power of target's dice by 2",   # It should reduce ALL die on the enemy combat page but fuck you
     None,
     None,
     [
@@ -34,6 +41,7 @@ ZelkovaWorkshop = CombatPage(
     "Zelkova Workshop",
     0,
     "Common",
+    "On Use: Draw 1 page",
     "onPlay", lambda me,user: user.drawPage(1),
     [
         Dice(
@@ -49,7 +57,7 @@ ZelkovaWorkshop = CombatPage(
 OldBoysWorkshop = CombatPage(
     "Old Boys Workshop",
     1,
-    "Common", False,
+    "Common", "On Use: Restore 3 Light; draw 1 page",
     "onPlay", lambda me,user: (user.regainLight(3), user.drawPage(1)) #  used chatGPT to figure out how the hell to do this stuff using lambda functions,
     # This solution is extremely stupid (returns a tuple of the return values from regainLight and drawPage, but whatever)
     [
@@ -59,8 +67,84 @@ OldBoysWorkshop = CombatPage(
         ),
         Dice(
             "Blunt",
-            4,8
+            4,8,
+            False,
+            "On Hit: Deal 3 damage to target"
+            "onHit",
+            lambda a,b: a.recoverStats(0, 5)
         )
+    ]
+)
+MookWorkshop = CombatPage(
+    "Mook Workshop",
+    2,
+    "Uncommon",
+    "On Use: Restore 3 Light; draw 1 page",
+    "onPlay", lambda me,user: (user.regainLight(3), user.drawPage(1)),
+    [
+        Dice(
+            "Slash",
+            8,13,
+            False,
+
+        )
+    ]
+)
+RangaWorkshop = CombatPage(
+    "Ranga Workshop",
+    0,
+    "Common",
+    None,None,None,
+    [
+        Dice("Pierce", 3, 7),
+        Dice("Pierce", 3, 7),
+        Dice("Slash", 
+             3, 7,
+             False, "On Hit: Inflict 5 Bleed this scene",
+             "onHit", lambda me,them: inflictStatusEffects(them,"Bleed",5)
+             )
+    ]
+)
+WheelsIndustry = CombatPage(
+    "Wheels Industry",
+    4,
+    "Rare",
+    None,
+    None,
+    [
+        Dice("Blunt",
+            14,24,
+            False,
+            "On Hit: Destroy target's next die",
+            'onHit',
+            lambda me,enemy,enemydie : enemy.activeCombatPage.popTopDice()
+            ),
+        Dice(
+            "Guard",
+            5,8)
+    ]
+)
+CrystalAtelier = CombatPage(
+    "Crystal Altelier",
+    3,
+    "Uncommon",
+    None,None,None,
+    [
+        Dice("Evade",8,11),
+        Dice("Slash",7,11),
+        Dice("Slash",7,11),
+        Dice("Slash",4,8,True)
+    ]
+)
+AtelierLogic = CombatPage(
+    "Atelier Logic",
+    2,
+    "Uncommon",
+    None,None,None,
+    [
+        Dice("Pierce",4,8),
+        Dice("Pierce",5,8),
+        Dice("Blunt",7,12)
     ]
 )
 # Key Pages (TESTING)

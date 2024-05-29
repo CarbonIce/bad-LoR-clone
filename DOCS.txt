@@ -1,0 +1,21 @@
+Dice object
+diceType, lowerBound, upperBound, counter, description, onEvent, action=None
+Events:
+onRoll(character, enemy, enemyDie) [Returns the modifier for the rolled die]
+onClashEvent(character, enemy, enemydie, success) [Returns nothing]
+onHit(character, enemy) [Returns damage mod tuple]
+
+CombatPage object
+Events:
+buffDie(character, enemy, die) [Returns value to buff the die by]
+onPlay(user) [Returns nothing]
+
+Passive:
+onAttribute() [Returns nothing]
+rollDie(target, die) [Returns die modifier]
+onHit(enemy, die) [Returns a tuple of (physical damage mod, stagger damage mod)]
+onTakeDamage(damageType, amountPhysical, amountStagger) [Returns the same as onHit]
+onKill() [Returns nothing]
+onDeath(ally) [Returns nothing]
+onSceneStart() [Returns nothing]
+onSceneEnd() [Returns nothing]
