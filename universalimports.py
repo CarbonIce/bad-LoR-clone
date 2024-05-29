@@ -376,6 +376,9 @@ class Character:    # The big one.
         print(f"{TM.YELLOW}{self.light}/{self.lightCapacity} Light{STOP}")
         for status in self.statusEffects:
             print(f"{self.statusEffects[status].stacks} {status}")
+    def miniOutputData(self):
+        print(f"{self.name} | {TM.LIGHT_RED}{self.health} {TM.YELLOW}{self.stagger}{STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}")
+        print(f"{TM.YELLOW}{u'◆ ' * self.light}{u' ◇' * (self.lightCapacity-self.light)}{STOP}")
 # Constants
 def bleedOut(effect, target, die):
     if die.dieType == "Offensive":

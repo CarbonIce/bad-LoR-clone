@@ -226,5 +226,5 @@ ReceptionHandler([char1], [char2]).Clash(char1, char2, Dice("Slash",
             "onHit",
             lambda a,b,c: a.recoverStats(0, 5)
         ))
-char1.outputData()
-char2.outputData()
+char1.miniOutputData()
+char2.miniOutputData()
