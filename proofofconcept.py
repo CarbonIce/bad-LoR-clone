@@ -6,10 +6,10 @@ def reduceEnemyDieValue(me, them, enemyDie, amount):
     enemyDie.currentValue = max(1, enemyDie.currentValue - amount)
     return 0
 def inflictStatusEffects(target, effecttype, amount):
-    if target.statusEffects[effecttype]:
+    if target.statusEffects.get(effecttype, False):
         target.statusEffects[effecttype].stacks += amount
     else:
-        target.statusEffects[effecttype] = statusEffects['effecttype']
+        target.statusEffects[effecttype] = statusEffects[effecttype]
         target.statusEffects[effecttype].stacks = amount    # Some status effects should apply the scene after but nope because fuck you
 # Combat Pages (TESTING)
 AllasWorkshop = CombatPage(
@@ -214,15 +214,17 @@ char2 = Character("Loland", deepcopy(TheBlackSilence), deepcopy(BlackSilenceDeck
 char1.outputData()
 char1.playCombatPage(deepcopy(RangaWorkshop), char2)
 char2.playCombatPage(deepcopy(OldBoysWorkshop), char1)
-ReceptionHandler().Clash(char1, char2, Dice("Slash", 
+ReceptionHandler([char1], [char2]).Clash(char1, char2, Dice("Slash", 
              3, 7,
              False, "On Hit: Inflict 5 Bleed this scene",
-             "onHit", lambda me,them: inflictStatusEffects(them,"Bleed",5)
+             "onHit", lambda die,me,them: inflictStatusEffects(them,"Bleed",5)
              ), Dice(
             "Blunt",
             4,8,
             False,
             "On Hit: Deal 3 damage to target"
             "onHit",
-            lambda a,b: a.recoverStats(0, 5)
+            lambda a,b,c: a.recoverStats(0, 5)
         ))
+char1.outputData()
+char2.outputData()

@@ -250,10 +250,11 @@ class KeyPage:  # Key Pages are basically the character sheet; they dicate how m
         modifier = 0
         for passive in self.passives:
             if passive.rollDie: modifier += passive.rollDie(self, target, die) # rollDie should return an integer, how much to change the dice value by.
-        for status in self.user.statuseffects:
-            if self.user.statuseffects[status].rollDie: modifier += self.user.statuseffects[status].rollDie(self.user, target, die)
+        for status in self.user.statusEffects:
+            if self.user.statusEffects[status].rollDie: modifier += self.user.statusEffects[status].rollDie(self.user, target, die)
         return modifier
     def onHit(self, enemy, die):    # onHit will double as onClashWin because i cant take it anymore
+        mod = 0
         for passive in self.passives:
             if passive.onHit: mod = passive.onHit(self, enemy, die)
         return mod
@@ -377,12 +378,12 @@ class Character:    # The big one.
             print(f"{self.statusEffects[status].stacks} {status}")
 # Constants
 def bleedOut(effect, target, die):
-    if die.type() == "Offensive":
+    if die.dieType == "Offensive":
         target.takeDamage(0, 0, effect.stacks, 0)
         effect.stacks = ceil(effect.stacks * (2 / 3))
     return 0
 def strCheck(die):
-    if die.type() == "Offensive":
+    if die.dieType == "Offensive":
         return 1
     return 0
 def removeStacks(effect, amount):
