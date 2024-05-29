@@ -6,6 +6,8 @@ class ReceptionHandler:     # I lied. This is the big one.
         # Players and Enemies are lists of Character objects.
         self.player = players
         self.enemies = enemies
+        self.act = 1
+        self.scene = 1
     def Clash(self, character1, character2, dice1, dice2):    # NO DISTINCTION BETWEEN RANGED AND MELEE AND MASS ATTACK PAGES BECAUSE FUCK NO
         # CLASH BETWEEN DICE:
         # Step 1: Roll both die.
@@ -38,19 +40,18 @@ class ReceptionHandler:     # I lied. This is the big one.
         else:
             # On a draw, both dice are consumed.
             draw = True
-        print(d1, d2)
+        print(f"{dice1.secondaryColor}{d1}{STOP} >< {dice2.secondaryColor}{d2}{STOP}")
         if not draw:
             winDice.onClashEvent(winner, loser, loseDice, True)
             loseDice.onClashEvent(loser, winner, winDice, True)
             match winDice.dieType:
                 case "Offensive":
-                    mods = dice1.onHit(winner, loser)
+                    mods = winDice.onHit(winner, loser)
                     if mods is None or mods == 0:
                         mods = [0, 0]
                     mods2 = winner.keyPage.onHit(loser, winDice)
                     if mods2 is None or mods2 == 0:
                         mods2 = [0, 0]
-                    print(mods, mods2)
                     match loseDice.dieType:
                         case "Offensive": # Offensive > Offensive: Full damage is dealt by die 1, and die 2 is destroyed.
                             loser.takeDamage(winDice.type, winVal + mods[0] + mods2[0], winVal + mods[1] + mods2[1])
@@ -88,3 +89,6 @@ class ReceptionHandler:     # I lied. This is the big one.
             character2.activeCombatPage.popTopDice()
     def main(self):
         pass
+        # Initialize Scene
+        # for player in self.players:
+        #     player.

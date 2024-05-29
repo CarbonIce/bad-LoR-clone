@@ -378,7 +378,10 @@ class Character:    # The big one.
             print(f"{self.statusEffects[status].stacks} {status}")
     def miniOutputData(self):
         print(f"{self.name} | {TM.LIGHT_RED}{self.health} {TM.YELLOW}{self.stagger}{STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}")
-        print(f"{TM.YELLOW}{u'◆ ' * self.light}{u' ◇' * (self.lightCapacity-self.light)}{STOP}")
+        print(f"{TM.YELLOW}{u'◆ ' * self.light}{u' ◇' * (self.lightCapacity-self.light)}{STOP} | ", end="")
+        for status in self.statusEffects:
+            print(f"{statusEffectIcons[status]}{self.statusEffects[status].stacks}{STOP} ", end="")
+        print()
 # Constants
 def bleedOut(effect, target, die):
     if die.dieType == "Offensive":
@@ -407,4 +410,12 @@ statusEffects = {
                            1, onTakeDamage=lambda me,type,physical,stagger : (me.stacks, 0), onSceneEnd=lambda me:removeStacks(me, me.stacks)),
     "Bind":StatusEffect("Bind", "Lowers speed value of all speed die by number of stacks", 1, 
                         onSceneStart=lambda me : Bind(me.target, me.stacks), onSceneEnd=lambda me:removeStacks(me, me.stacks))
+}
+statusEffectIcons = {
+    "Bleed": f"{TM.RED}🩸",
+    "Strength": f"{TM.RED}🠉",
+    "Fragile": f"{TM.RED}💔",
+    "Bind": f"{TM.GREEN}↧",
+    "Haste": f"{TM.GREEN}↥",
+    "Feeble": f"{TM.RED}🠋"
 }
