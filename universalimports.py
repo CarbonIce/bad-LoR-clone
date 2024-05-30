@@ -34,6 +34,13 @@ class TextModifiers:  # A class containing ANSI text modifiers to make text diff
 TM = TextModifiers
 STOP = TM.END
 
+diceIcons = {
+    "Slash":"𐑠",
+    "Pierce":"🜚",
+    "Blunt":"⚙",
+    "Guard":"⛉",
+    "Evade":"☇"
+}
 
 class Dice:
     '''
@@ -68,10 +75,9 @@ class Dice:
         self.description = description  # UI friendly version of onEvent and action
         self.onEvent = onEvent  # I think all dice are on Hit, on Roll, and on Clash Win / Lose, (Hit should be handeled by the key page...) god i hope there arn't any dice with >1 effects
         self.action = action
-        self.initial = ""
+        self.icon = diceIcons[self.type]
 
         if self.counter:  # All counter die are Yellow, regardless of type.
-            self.initial = "C"  # Starts the intial with C, so a Counter Block dice shows as CB when viewed in mini mode
             self.primaryColor = TM.YELLOW  # Primary color is the color the dice type is highlighted in: the [S] part
             self.secondaryColor = TM.YELLOW  # Secondary color is the color used by the range: the 2 - 6 part
         elif self.type in ["Guard", "Evade"]:
@@ -83,7 +89,6 @@ class Dice:
         if self.description and ":" in self.description:  # A ":" in the description usually is a part of On Hit: do thing or On Clash Win: do thing
             parts = self.description.split(':')
             self.description = f"{TM.YELLOW}{parts[0]}:{STOP}{parts[1]}"
-        self.initial += self.type[0]
         self.currentValue = None    # Set when rolling die.
         self.naturalValue = None    # Set when rolling die.
     def onRoll(self, character, enemy, enemydie=None):
@@ -110,9 +115,9 @@ class Dice:
         [CB 2-6] On Clash Win: I...
         '''
         if self.description:
-            return f"{self.primaryColor}[{self.initial} {self.lowerBound}-{self.upperBound}]{STOP} | {self.description[:min(15, len(self.description))]}..."
+            return f"{self.primaryColor}[{self.icon}]{self.secondaryColor}{self.lowerBound}-{self.upperBound}{STOP} | {self.description[:min(15, len(self.description))]}..."
         else:
-            return f"{self.primaryColor}[{self.initial} {self.lowerBound}-{self.upperBound}]{STOP}"
+            return f"{self.primaryColor}[{self.icon}]{self.secondaryColor}{self.lowerBound}-{self.upperBound}{STOP}"
 
     def __str__(self):
         '''

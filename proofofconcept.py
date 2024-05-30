@@ -85,8 +85,7 @@ MookWorkshop = CombatPage(
         Dice(
             "Slash",
             8,13,
-            False,
-
+            False
         )
     ]
 )
@@ -211,10 +210,11 @@ TheBlackSilence = KeyPage("The Black Silence",
                           4) # 208 lines of work for a single key page. Fucking hell
 char1 = Character("Roland", deepcopy(TheBlackSilence), deepcopy(BlackSilenceDeck))
 char2 = Character("Loland", deepcopy(TheBlackSilence), deepcopy(BlackSilenceDeck))
+reception = ReceptionHandler([char1], [char2])
 char1.outputData()
 char1.playCombatPage(deepcopy(RangaWorkshop), char2)
 char2.playCombatPage(deepcopy(OldBoysWorkshop), char1)
-ReceptionHandler([char1], [char2]).Clash(char1, char2, Dice("Slash", 
+reception.Clash(char1, char2, Dice("Slash", 
              3, 7,
              False, 
              "On Hit: Inflict 5 Bleed this scene",
@@ -227,5 +227,15 @@ ReceptionHandler([char1], [char2]).Clash(char1, char2, Dice("Slash",
             "onHit",
             lambda a,b,c: c.takeDamage("Slash", 0, 0, 3, 0)
         ))
+reception.Clash(char1, char2, Dice(
+            "Guard",
+            5,8), Dice(
+            "Pierce",
+            5, 8,
+            False, None,
+            "onRoll",
+            lambda me,them,die: reduceEnemyDieValue(me,them,die,2)
+        )
+        )
 char1.miniOutputData()
 char2.miniOutputData()
