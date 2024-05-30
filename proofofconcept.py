@@ -200,7 +200,7 @@ def blackSilenceDraw(kp, first):
 SpeedII = Passive("Speed II", "Gain 2 Speed dice", onAttribute=lambda KP: gainDice(KP.user, 2))
 TheBlackSilencePassive = Passive("The Black Silence", "Draw 2 additional pages at the start of the Act. All dice gain +2 Power.", # This should be on every 3rd page but no because fuck you
                                  onSceneStart=lambda kp,first : blackSilenceDraw(kp,first),
-                                 rollDie=lambda a,b,c: 2)
+                                 rollDie=lambda a,b,c,d: 2)
 TheBlackSilence = KeyPage("The Black Silence",
                           106, 56, 
                           {'Slash':1, "Pierce":1, "Blunt":0.5}, 

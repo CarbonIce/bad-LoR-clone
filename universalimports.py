@@ -227,14 +227,39 @@ class Passive:  # This class handles everything about a passive ability that goe
     def __init__(self, name, description, onAttribute=None, rollDie=None, onHit=None, onKill=None, onDeath=None, onSceneStart=None, onSceneEnd=None, onTakeDamage=None):
         self.name = name
         self.description = description
-        self.onAttribute = onAttribute
-        self.rollDie = rollDie
-        self.onHit = onHit
-        self.onKill = onKill
-        self.onDeath = onDeath
-        self.onSceneStart = onSceneStart
-        self.onSceneEnd = onSceneEnd
-        self.onTakeDamage = onTakeDamage
+        self.onAttributeE = onAttribute
+        self.rollDieE = rollDie
+        self.onHitE = onHit
+        self.onKillE = onKill
+        self.onDeathE = onDeath
+        self.onSceneStartE = onSceneStart
+        self.onSceneEndE = onSceneEnd
+        self.onTakeDamageE = onTakeDamage
+    def onAttribute(self, kp):
+        if self.onAttributeE: self.onAttributeE(kp)
+    def rollDie(self, user, target, die):
+        if self.rollDieE: mod = self.rollDieE(self, user, target, die); return mod
+        return 0
+    def onHit(self, enemy, die):    # onHit will double as onClashWin because i cant take it anymore
+        mod = 0
+        if self.onHitE: self.onHitE(self, enemy, die)
+        return mod
+    def onTakeDamage(self, damageType, amountPhysical, amountStagger):
+        if self.onTakeDamageE:
+            changes = [0, 0]
+            resultingMods = self.onTakeDamageE(self, damageType, amountPhysical, amountStagger)
+            changes[0] += resultingMods[0]
+            changes[1] += resultingMods[1]
+            return changes
+        return [0, 0]
+    def onKill(self):
+        if self.onKillE: self.onKillE(self)
+    def onDeath(self, ally=False): # Ally determines if it was an ally who died. Whaddaya know.
+        if self.onDeathE: self.onDeathE(self, ally)
+    def onSceneStart(self, first=False):
+        if self.onSceneStartE: self.onSceneStartE(self, first)
+    def onSceneEnd(self):
+        if self.onSceneEndE: self.onSceneEndE(self)
 class KeyPage:  # Key Pages are basically the character sheet; they dicate how much health, stagger resist, resistance to certain attacks, speed dice, etc. each character has.
     def __init__(self, name="Patron Librarian of Gen. Works", health=30, stagger=15, physicalResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, staggerResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, speedLower=1, speedUpper=4, passives=[], lightStart=3):     # Default stats based off of the Patron Librarian key page
         self.name = name
@@ -255,35 +280,35 @@ class KeyPage:  # Key Pages are basically the character sheet; they dicate how m
     def rollDie(self, target, die):
         modifier = 0
         for passive in self.passives:
-            if passive.rollDie: modifier += passive.rollDie(self, target, die) # rollDie should return an integer, how much to change the dice value by.
+            if passive.rollDie: modifier += passive.rollDie(self.user, target, die) # rollDie should return an integer, how much to change the dice value by.
         for status in self.user.statusEffects:
             if self.user.statusEffects[status].rollDie: modifier += self.user.statusEffects[status].rollDie(self.user, target, die)
         return modifier
     def onHit(self, enemy, die):    # onHit will double as onClashWin because i cant take it anymore
         mod = 0
         for passive in self.passives:
-            if passive.onHit: mod = passive.onHit(self, enemy, die)
+            if passive.onHit: mod = passive.onHit(enemy, die)
         return mod
     def onTakeDamage(self, damageType, amountPhysical, amountStagger):
         changes = [0, 0]
         for passive in self.passives:
             if passive.onTakeDamage:
-                resultingMods = passive.onTakeDamage(self, damageType, amountPhysical, amountStagger)
+                resultingMods = passive.onTakeDamage(damageType, amountPhysical, amountStagger)
                 changes[0] += resultingMods[0]
                 changes[1] += resultingMods[1]
         return changes
     def onKill(self):
         for passive in self.passives:
-            if passive.onKill: passive.onKill(self)
+            if passive.onKill: passive.onKill()
     def onDeath(self, ally=False): # Ally determines if it was an ally who died. Whaddaya know.
         for passive in self.passives:
-            if passive.onDeath: passive.onDeath(self, ally)
+            if passive.onDeath: passive.onDeath(ally)
     def onSceneStart(self, first=False):
         for passive in self.passives:
-            if passive.onSceneStart: passive.onSceneStart(self, first)
+            if passive.onSceneStart: passive.onSceneStart(first)
     def onSceneEnd(self):
         for passive in self.passives:
-            if passive.onSceneEnd: passive.onSceneEnd(self)
+            if passive.onSceneEnd: passive.onSceneEnd()
 
 
 class StatusEffect(Passive): #  I had to look up a tutorial for this because i forgor. This over having to rewrite all of those events. https://realpython.com/inheritance-composition-python/
@@ -389,31 +414,34 @@ class Character:    # The big one.
             print(f"{statusEffectIcons[status]}{self.statusEffects[status].stacks}{STOP} ", end="")
         print()
 # Constants
-def bleedOut(effect, target, die):
+def bleedOut(effect, me, target, die):
     if die.dieType == "Offensive":
         target.takeDamage(0, 0, effect.stacks, 0)
         effect.stacks = ceil(effect.stacks * (2 / 3))
     return 0
+
 def strCheck(die):
     if die.dieType == "Offensive":
         return 1
     return 0
+
 def removeStacks(effect, amount):
     effect.stacks -= amount
+
 def Bind(target, amount):
     for SpeedDie in target.speedDice:
         SpeedDie.value = max(1, SpeedDie.value - amount)
 statusEffects = {
     "Bleed":StatusEffect("Bleed", 
                          "Take damage equal to the number of Bleed stacks on character when rolling an Offensive die, then reduce the number of stacks by 1/3.", 
-                         1, rollDie=lambda me,target,die:bleedOut(me,target,die),
+                         1, rollDie=lambda me,usr,target,die:bleedOut(me,usr,target,die),
                          onSceneEnd=lambda me:removeStacks(me, me.stacks)),
     "Strength":StatusEffect("Strength",
                              "All Offensive dice gain power equal to the number of stacks",
-                             1, rollDie=lambda me,target,die: me.stacks * strCheck(die),
+                             1, rollDie=lambda me,usr,target,die: me.stacks * strCheck(die),
                              onSceneEnd=lambda me:removeStacks(me, me.stacks)),
     "Fragile":StatusEffect("Fragile", "Take extra true damage equal to the number of stacks from attacks",
-                           1, onTakeDamage=lambda me,type,physical,stagger : (me.stacks, 0), onSceneEnd=lambda me:removeStacks(me, me.stacks)),
+                           1, onTakeDamage=lambda me,usr,type,physical,stagger : (me.stacks, 0), onSceneEnd=lambda me:removeStacks(me, me.stacks)),
     "Bind":StatusEffect("Bind", "Lowers speed value of all speed die by number of stacks", 1, 
                         onSceneStart=lambda me : Bind(me.target, me.stacks), onSceneEnd=lambda me:removeStacks(me, me.stacks))
 }
