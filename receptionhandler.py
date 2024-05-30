@@ -1,10 +1,28 @@
 from universalimports import *
+class Screen:   # If you want something to work, do it yourself. Actually, don't do that.
+    def __init__(self):
+        size = os.get_terminal_size()
+    def clearScreen():
+        os.system("clear")
+    def printRightAligned(toPrint):
+        size = os.get_terminal_size() # https://www.w3schools.com/python/ref_os_get_terminal_size.asp#:~:text=Python%20os.,-get_terminal_size()%20Method&text=The%20os.,the%20terminal%20window%20in%20characters.
+        columns = size.columns
+        toPrintLen = len(toPrint)
+        print(" " * (columns - toPrintLen) + toPrint)
+    def printRightandLeft(toPrintLeft, toPrintRight):
+        size = os.get_terminal_size() # https://www.w3schools.com/python/ref_os_get_terminal_size.asp#:~:text=Python%20os.,-get_terminal_size()%20Method&text=The%20os.,the%20terminal%20window%20in%20characters.
 
-
+        columns = size.columns
+        toPrintLen = len(toPrintRight) + len(toPrintLeft)
+        
+        print(toPrintLen)
+        print(len(toPrintLeft), len(toPrintRight))
+        print(toPrintLeft, end="")
+        print(f"{columns - toPrintLen}" + " " * (columns - toPrintLen) + toPrintRight)
 class ReceptionHandler:     # I lied. This is the big one.
     def __init__(self, players, enemies):
         # Players and Enemies are lists of Character objects.
-        self.player = players
+        self.players = players
         self.enemies = enemies
         self.act = 1
         self.scene = 1
@@ -26,7 +44,6 @@ class ReceptionHandler:     # I lied. This is the big one.
         # Step 2: Run             rollDice from the Key Page + StatusEffects      buffDice events from the Combat Page,                        and onRoll events from the Dice itself
         dice1Modifier = int(character1.keyPage.rollDie(character2, dice1) or 0) + int(character1.activeCombatPage.buffDie(character1, character2, dice1) or 0) + int(dice1.onRoll(character1, character2, dice2) or 0)
         dice2Modifier = int(character2.keyPage.rollDie(character1, dice2) or 0) + int(character2.activeCombatPage.buffDie(character2, character1, dice2) or 0) + int(dice1.onRoll(character2, character1, dice1) or 0)
-        print(dice1.currentValue, dice2.currentValue)
         dice1.currentValue += d1 + dice1Modifier
         dice2.currentValue += d2 + dice2Modifier
         # Int conversions are to turn the None values to 0
@@ -61,9 +78,9 @@ class ReceptionHandler:     # I lied. This is the big one.
             d2c2 = dice2.primaryColor
         elif dice2Modifier == 0:
             d2c2 = dice2.secondaryColor
-        print(f"{dice1.secondaryColor}[{dice1.icon}] {dice1.naturalValue}{STOP} >< {dice2.secondaryColor}[{dice2.icon}] {dice2.naturalValue}{STOP}")
+        Screen.print_at((0, 0), f"{character1.name} | {dice1.secondaryColor}[{dice1.icon}]{dice1.naturalValue}{STOP} >< {dice2.secondaryColor}[{dice2.icon}]{dice2.naturalValue}{STOP} | {character2.name}", end="\r") # https://stackoverflow.com/questions/18692617/how-does-r-carriage-return-work-in-python https://stackoverflow.com/questions/5419389/how-to-overwrite-the-previous-print-to-stdout
         sleep(1)
-        print(f"{d1c2}[{dice1.icon}] {dice1.currentValue}{STOP} >< {d2c2}[{dice2.icon}] {dice2.currentValue}{STOP}")
+        Screen.print_at((40, 0), f"{character1.name} | {d1c2}[{dice1.icon}] {dice1.currentValue}{STOP} >< {d2c2}[{dice2.icon}]{dice2.currentValue}{STOP} | {character2.name}", end='\033[K\n')
         sleep(0.2)
         if not draw:
             winDice.onClashEvent(winner, loser, loseDice, True)
@@ -111,6 +128,26 @@ class ReceptionHandler:     # I lied. This is the big one.
         else:
             character1.activeCombatPage.popTopDice()
             character2.activeCombatPage.popTopDice()
+        sleep(1)
+    def drawScene(self):
+        playerYindex = 10
+        enemyYindex = 10
+        for player in range(len(self.players)):
+            dataP = self.players[player].miniOutputData()
+            if player < len(self.enemies):
+                dataE = self.enemies[player].miniOutputData()
+                Screen.printRightandLeft(dataP[0], dataE[0])
+                Screen.printRightandLeft(dataP[1], dataE[1])
+                print()
+            else:
+                print(dataP[0])
+                print(dataP[1])
+        if len(self.enemies) > len(self.players):
+            for enemy in range(len(self.enemies) - len(self.players)): # enemies [0, 1, 2, 3], ally [0, 1, 2], len 4 - 3 = 1, first number will be enemy #3, then #4... 
+                data = [enemy + len(self.players) + 1].miniOutputData()
+                Screen.printRightAligned(data[0])
+                Screen.printRightAligned(data[1])
+                enemyYindex += 3
     def main(self):
         pass
         # Initialize Scene

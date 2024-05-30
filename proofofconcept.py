@@ -211,9 +211,9 @@ TheBlackSilence = KeyPage("The Black Silence",
 char1 = Character("Roland", deepcopy(TheBlackSilence), deepcopy(BlackSilenceDeck))
 char2 = Character("Loland", deepcopy(TheBlackSilence), deepcopy(BlackSilenceDeck))
 reception = ReceptionHandler([char1], [char2])
-char1.outputData()
 char1.playCombatPage(deepcopy(RangaWorkshop), char2)
 char2.playCombatPage(deepcopy(OldBoysWorkshop), char1)
+reception.drawScene()
 reception.Clash(char1, char2, Dice("Slash", 
              3, 7,
              False, 
@@ -237,5 +237,4 @@ reception.Clash(char1, char2, Dice(
             lambda me,them,die: reduceEnemyDieValue(me,them,die,2)
         )
         )
-char1.miniOutputData()
-char2.miniOutputData()
+reception.drawScene()

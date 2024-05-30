@@ -1,6 +1,8 @@
 from random import randint
 from math import ceil
 from time import sleep
+import os
+import sys
 EmotionCoinRequirements = [3, 3, 5, 7, 9]   # From level index to index + 1
 
 class TextModifiers:  # A class containing ANSI text modifiers to make text different colors or have different effects.
@@ -408,11 +410,10 @@ class Character:    # The big one.
         for status in self.statusEffects:
             print(f"{self.statusEffects[status].stacks} {status}")
     def miniOutputData(self):
-        print(f"{self.name} | {TM.LIGHT_RED}{self.health} {TM.YELLOW}{self.stagger}{STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}")
-        print(f"{TM.YELLOW}{u'◆ ' * self.light}{u' ◇' * (self.lightCapacity-self.light)}{STOP} | ", end="")
+        statusString = ""
         for status in self.statusEffects:
-            print(f"{statusEffectIcons[status]}{self.statusEffects[status].stacks}{STOP} ", end="")
-        print()
+            statusString += f"{statusEffectIcons[status]}{self.statusEffects[status].stacks}{STOP}"
+        return [f"`{self.name} | {TM.LIGHT_RED}{self.health} {TM.YELLOW}{self.stagger}{STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}`", f"{TM.YELLOW}{u'◆ ' * self.light}{u' ◇' * (self.lightCapacity-self.light)}{STOP} | " + statusString]
 # Constants
 def bleedOut(effect, me, target, die):
     if die.dieType == "Offensive":
