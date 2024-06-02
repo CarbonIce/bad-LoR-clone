@@ -3,19 +3,26 @@ class Screen:   # If you want something to work, do it yourself. Actually, don't
     def __init__(self):
         size = os.get_terminal_size()
     def clearScreen():
-        os.system("clear")
-    def printRightAligned(toPrint):
+        if os.name == 'nt':
+            os.system("clr")
+        else:
+            os.system("clear")
+    def printRightAligned(toPrint, end='\n'):
         size = os.get_terminal_size() # https://www.w3schools.com/python/ref_os_get_terminal_size.asp#:~:text=Python%20os.,-get_terminal_size()%20Method&text=The%20os.,the%20terminal%20window%20in%20characters.
         columns = size.columns
         toPrintLen = stripAnsi(len(toPrint))
-        print(" " * (columns - toPrintLen) + toPrint)
-    def printRightandLeft(toPrintLeft, toPrintRight):
+        print(" " * (columns - toPrintLen) + toPrint, end=end)
+    def printRightandLeft(toPrintLeft, toPrintRight, end='\n'):
         size = os.get_terminal_size() # https://www.w3schools.com/python/ref_os_get_terminal_size.asp#:~:text=Python%20os.,-get_terminal_size()%20Method&text=The%20os.,the%20terminal%20window%20in%20characters.
-
         columns = size.columns
         toPrintLen = len(stripAnsi(toPrintRight)) + len(stripAnsi(toPrintLeft))
-        print(toPrintLeft, end="")
-        print(f" " * (columns - toPrintLen) + toPrintRight)
+        print(toPrintLeft, end='')
+        print(" " * (columns - toPrintLen) + toPrintRight, end=end)
+    def printMiddle(toPrintMiddle, end='\n'):
+        size = os.get_terminal_size() # https://www.w3schools.com/python/ref_os_get_terminal_size.asp#:~:text=Python%20os.,-get_terminal_size()%20Method&text=The%20os.,the%20terminal%20window%20in%20characters.
+        columns = size.columns
+        toPrintLen = columns - len(stripAnsi(toPrintMiddle))
+        print(" " * (toPrintLen // 2) + toPrintMiddle + " " * (toPrintLen // 2), end=end)
 class ReceptionHandler:     # I lied. This is the big one.
     def __init__(self, players, enemies):
         # Players and Enemies are lists of Character objects.
@@ -75,9 +82,9 @@ class ReceptionHandler:     # I lied. This is the big one.
             d2c2 = dice2.primaryColor
         elif dice2Modifier == 0:
             d2c2 = dice2.secondaryColor
-        Screen.print_at((0, 0), f"{character1.name} | {dice1.secondaryColor}[{dice1.icon}]{dice1.naturalValue}{STOP} >< {dice2.secondaryColor}[{dice2.icon}]{dice2.naturalValue}{STOP} | {character2.name}", end="\r") # https://stackoverflow.com/questions/18692617/how-does-r-carriage-return-work-in-python https://stackoverflow.com/questions/5419389/how-to-overwrite-the-previous-print-to-stdout
+        Screen.printMiddle(f"{character1.name} | {dice1.secondaryColor}[{dice1.icon}]{dice1.naturalValue}{STOP} >< {dice2.secondaryColor}[{dice2.icon}]{dice2.naturalValue}{STOP} | {character2.name}", end="\r") # https://stackoverflow.com/questions/18692617/how-does-r-carriage-return-work-in-python https://stackoverflow.com/questions/5419389/how-to-overwrite-the-previous-print-to-stdout
         sleep(1)
-        Screen.print_at((40, 0), f"{character1.name} | {d1c2}[{dice1.icon}] {dice1.currentValue}{STOP} >< {d2c2}[{dice2.icon}]{dice2.currentValue}{STOP} | {character2.name}", end= '\033[K\n')
+        Screen.printMiddle(f"{character1.name} | {d1c2}[{dice1.icon}] {dice1.currentValue}{STOP} >< {d2c2}[{dice2.icon}]{dice2.currentValue}{STOP} | {character2.name}", end= '\033[K\n')
         sleep(0.2)
         if not draw:
             winDice.onClashEvent(winner, loser, loseDice, True)
@@ -127,6 +134,7 @@ class ReceptionHandler:     # I lied. This is the big one.
             character2.activeCombatPage.popTopDice()
         sleep(1)
     def drawScene(self):
+        Screen.clearScreen()
         playerYindex = 10
         enemyYindex = 10
         for player in range(len(self.players)):
