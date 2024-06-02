@@ -3,6 +3,7 @@ from math import ceil
 from time import sleep
 import os
 import sys
+from regex import sub, compile, findall
 EmotionCoinRequirements = [3, 3, 5, 7, 9]   # From level index to index + 1
 
 class TextModifiers:  # A class containing ANSI text modifiers to make text different colors or have different effects.
@@ -35,6 +36,9 @@ class TextModifiers:  # A class containing ANSI text modifiers to make text diff
 # Aliases for TextModifiers because typing out TextModifiers every time is slow and TM.END is hard to type out
 TM = TextModifiers
 STOP = TM.END
+def stripAnsi(inp): # https://stackoverflow.com/questions/37192606/python-regex-how-to-delete-all-matches-from-a-string https://www.tutorialspoint.com/How-can-I-remove-the-ANSI-escape-sequences-from-a-string-in-python#:~:text=You%20can%20use%20regexes%20to,%5B)%5B0%2D%3F%5D
+    new = sub(r"(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]", '', inp)
+    return new
 
 diceIcons = {
     "Slash":"𐑠",
@@ -413,7 +417,7 @@ class Character:    # The big one.
         statusString = ""
         for status in self.statusEffects:
             statusString += f"{statusEffectIcons[status]}{self.statusEffects[status].stacks}{STOP}"
-        return [f"`{self.name} | {TM.LIGHT_RED}{self.health} {TM.YELLOW}{self.stagger}{STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}`", f"{TM.YELLOW}{u'◆ ' * self.light}{u' ◇' * (self.lightCapacity-self.light)}{STOP} | " + statusString]
+        return [f"{self.name} | {TM.LIGHT_RED}{self.health} {TM.YELLOW}{self.stagger}{STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}", f"{TM.YELLOW}{u'◆ ' * self.light}{u' ◇' * (self.lightCapacity-self.light)}{STOP} | " + statusString]
 # Constants
 def bleedOut(effect, me, target, die):
     if die.dieType == "Offensive":
