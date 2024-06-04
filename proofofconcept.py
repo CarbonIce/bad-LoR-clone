@@ -1,8 +1,9 @@
 from universalimports import *
 from receptionhandler import *
 from copy import deepcopy
-
-def reduceEnemyDieValue(me, them, enemyDie, amount):
+# EDGE CASE: If Allas Workshop ends up in a one sided attack, it tries to lower the value of an non existant dice, and the
+# program combusts. Pls fix
+def reduceEnemyDieValue(enemyDie, amount):
     enemyDie.currentValue = max(1, enemyDie.currentValue - amount)
     return 0
 def inflictStatusEffects(target, effecttype, amount):
@@ -25,14 +26,14 @@ AllasWorkshop = CombatPage(
             5, 9,
             False, None,
             "onRoll",
-            lambda me,them,die: reduceEnemyDieValue(me,them,die,2)
+            lambda me,mechr,them,die: reduceEnemyDieValue(die,2)
         ),
         Dice(
             "Pierce",
             5, 8,
             False, None,
             "onRoll",
-            lambda me,them,die: reduceEnemyDieValue(me,them,die,2)
+            lambda me,mechr,them,die: reduceEnemyDieValue(die,2)
         )
     ]
 
@@ -69,9 +70,9 @@ OldBoysWorkshop = CombatPage(
             "Blunt",
             4,8,
             False,
-            "On Hit: Deal 3 damage to target"
+            "On Hit: Deal 3 damage to target",
             "onHit",
-            lambda a,b: a.recoverStats(0, 5)
+            lambda a,b,c: c.takeDamage("Magic", 0, 0, 3, 0, "Die Passive")
         )
     ]
 )
@@ -100,7 +101,7 @@ RangaWorkshop = CombatPage(
         Dice("Slash", 
              3, 7,
              False, "On Hit: Inflict 5 Bleed this scene",
-             "onHit", lambda me,them: inflictStatusEffects(them,"Bleed",5)
+             "onHit", lambda self,me,them: inflictStatusEffects(them,"Bleed",5)
              )
     ]
 )
@@ -117,7 +118,7 @@ WheelsIndustry = CombatPage(
             False,
             "On Hit: Destroy target's next die",
             'onHit',
-            lambda me,enemy,enemydie : enemy.activeCombatPage.popTopDice()
+            lambda me,mechr,enemy : (enemy.activeCombatPage.popTopDice() and None),
             ),
         Dice(
             "Guard",
@@ -182,14 +183,14 @@ Furioso = CombatPage(
     "On Hit: Inflict 5 Bleed, 3 Bind, and 3 Fragile",
     "onHit",
     lambda me,char,enemy : (inflictStatusEffects(enemy, "Bleed", 5), inflictStatusEffects(enemy, "Bind", 3), inflictStatusEffects(enemy, "Fragile", 3)),
-    Dice(
+    [Dice(
         "Slash",
         20,39,
         False,
         "On Clash Win: Destroy all of the enemies Dice",
         "onClashEvent",
         lambda me,char,enemy,enemydie,result : obliterateDice(me,char,enemy,enemydie,result)
-    )
+    )]
 )
 BlackSilenceDeck = [AllasWorkshop, CrystalAtelier, AtelierLogic, WheelsIndustry, RangaWorkshop, Furioso, Durandal, OldBoysWorkshop, MookWorkshop, ZelkovaWorkshop]
 # Key Pages (TESTING)]
@@ -211,21 +212,24 @@ TheBlackSilence = KeyPage("The Black Silence",
 char1 = Character("Roland", deepcopy(TheBlackSilence), deepcopy(BlackSilenceDeck))
 char2 = Character("Loland", deepcopy(TheBlackSilence), deepcopy(BlackSilenceDeck))
 reception = ReceptionHandler([char1], [char2])
-char1.playCombatPage(deepcopy(RangaWorkshop), char2)
-char2.playCombatPage(deepcopy(OldBoysWorkshop), char1)
-reception.drawScene()
+while True:
+    char1.playCombatPage(deepcopy(choice(BlackSilenceDeck)), char2)
+    char2.playCombatPage(deepcopy(choice(BlackSilenceDeck)), char1)
+    reception.drawScene()
+    reception.pageClash(char1, char2, char1.activeCombatPage, char2.activeCombatPage)
+exit()
 reception.Clash(char1, char2, Dice("Slash", 
-             3, 7,
+             3, 9,
              False, 
              "On Hit: Inflict 5 Bleed this scene",
              "onHit", lambda die,me,them: inflictStatusEffects(them,"Bleed",5)
              ), Dice(
             "Blunt",
-            4,8,
+            4,20,
             False,
             "On Hit: Deal 3 damage to target",
             "onHit",
-            lambda a,b,c: c.takeDamage("Slash", 0, 0, 3, 0)
+            lambda a,b,c: c.takeDamage("Magic", 0, 0, 3, 0, "Die Passive")
         ))
 reception.Clash(char1, char2, Dice(
             "Guard",

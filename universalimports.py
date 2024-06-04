@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, choice
 from math import ceil
 from time import sleep
 import os
@@ -39,13 +39,21 @@ STOP = TM.END
 def stripAnsi(inp): # https://stackoverflow.com/questions/37192606/python-regex-how-to-delete-all-matches-from-a-string https://www.tutorialspoint.com/How-can-I-remove-the-ANSI-escape-sequences-from-a-string-in-python#:~:text=You%20can%20use%20regexes%20to,%5B)%5B0%2D%3F%5D
     new = sub(r"(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]", '', inp)
     return new
-
+'''
 diceIcons = {
     "Slash":"𐑠",
     "Pierce":"🜚",
     "Blunt":"⚙",
     "Guard":"⛉",
     "Evade":"☇"
+}
+'''
+diceIcons = {
+    "Slash":"S",
+    "Pierce":"P",
+    "Blunt":"B",
+    "Guard":"G",
+    "Evade":"E"
 }
 
 class Dice:
@@ -118,12 +126,9 @@ class Dice:
         '''
         A shortened string representation of the dice.
         Looks like this:
-        [CB 2-6] On Clash Win: I...
+        [CB 2-6]
         '''
-        if self.description:
-            return f"{self.primaryColor}[{self.icon}]{self.secondaryColor}{self.lowerBound}-{self.upperBound}{STOP} | {self.description[:min(15, len(self.description))]}..."
-        else:
-            return f"{self.primaryColor}[{self.icon}]{self.secondaryColor}{self.lowerBound}-{self.upperBound}{STOP}"
+        return f"{self.primaryColor}[{self.icon} {self.secondaryColor}{self.lowerBound}-{self.upperBound}]{STOP}"
 
     def __str__(self):
         '''
@@ -199,13 +204,16 @@ class CombatPage:
 
     def popTopDice(self):
         '''
-        Removes and returns the first die in the queue.
+        Removes and returns the first die in the queue. If there is none, return None
         '''
-        using = self.dice[0]
-        self.dice = self.dice[1:]
-        return using
+        if len(self.dice) > 0:
+            using = self.dice[0]
+            self.dice = self.dice[1:]
+            return using
     def removeAllDice(self):
         self.dice = []
+    def __len__(self) -> int:
+        return len(self.dice)
     def addDie(self, die):
         '''
         Adds a die to the queue.
@@ -217,11 +225,14 @@ class CombatPage:
         
     def __str__(self):
         # OH GOD WHY
+        '''
         if self.description is not None:
-            return f"{self.color}{self.name} | {self.description}\n" + '\n'.join([str(x) for x in self.dice])
+            return f"{self.description} | {self.color}{self.name}{STOP} | " + ' '.join([x.miniStrRepr for x in self.dice])
         else:
-            return f"{self.color}{self.name}{STOP}\n" + '\n'.join([str(x) for x in self.dice])
-
+        '''
+        return f"{self.color}{self.name}{STOP} | " + ' '.join([x.miniStrRepr for x in self.dice])
+    def reverseStr(self):
+        return f"{self.color}{self.name}{STOP} | " + ' '.join(reversed([x.miniStrRepr for x in self.dice]))
 class Passive:  # This class handles everything about a passive ability that goes on a key page - namely, when to activate some arbitrary function that affects the Character using the Key Page.
     # Unfortunetly, due to the nature of many passive abilties, there will have to be a LOT of hard coding...
     # The most commmon events that I can find are OnAttribute (immedietly apply, do something simple like adding a speed die (Speed I through III)). Pass in 
@@ -332,7 +343,8 @@ class Character:    # The big one.
         self.activeCombatPage = None    # Assume that activeCombatPage is the combat page currently being used.
         self.swapKeyPage(keyPage)
         self.deck = deck # Pages that need to be drawn. This is a Queue.
-        
+        self.damageandReasons = [[], []] # First list is physical damage and reason, second list is stagger and reason
+        self.counterDice = []
     def beginAct(self):
         # Reinitialize health and stagger, purge status effects, run onSceneStart functions
         self.statusEffects = {}
@@ -346,6 +358,11 @@ class Character:    # The big one.
         self.keyPage.onSceneStart()
     def playCombatPage(self, page, target):
         self.activeCombatPage = page
+        print(page)
+        for die in page.dice:
+            if die.counter:
+                self.counterDice.append(die)
+                page.dice.remove(die)
         self.target = target
     def swapKeyPage(self, newKeyPage):
         self.keyPage = newKeyPage
@@ -386,7 +403,7 @@ class Character:    # The big one.
         for status in self.statusEffects:
             if statusEffects[status].stacks == 0:
                 statusEffects.pop(status)
-    def takeDamage(self, damageType, amountPhysical, amountStagger, truePhysical=0, trueStagger=0):   # Yes, all of these distinctions are neccesary. Yes I hate this.
+    def takeDamage(self, damageType, amountPhysical, amountStagger, truePhysical=0, trueStagger=0, physicalReason=None, staggerReason=None):   # Yes, all of these distinctions are neccesary. Yes I hate this.
         if damageType in ["Slash", "Pierce", "Blunt"]:
             mods = self.keyPage.onTakeDamage(damageType, amountPhysical, amountStagger)
             amountPhysical += mods[0]   # I think this is proper order of operations on the stagger and physical damage???
@@ -395,8 +412,25 @@ class Character:    # The big one.
             staggerDamage = int(self.keyPage.staggerResistances[damageType] * amountStagger)
             self.health -= max(physicalDamage, 0)
             self.stagger -= max(staggerDamage, 0)
-        self.health -= truePhysical
-        self.stagger -= trueStagger # Let's just... not... get into the abno cards that reduce max stagger. Actually, lets just not with abno cards altogether. Make them passives.
+            if not physicalReason:
+                physicalReason = resistanceToText[self.keyPage.physicalResistances[damageType]]
+            if not staggerReason:
+                staggerReason = resistanceToText[self.keyPage.staggerResistances[damageType]]
+            self.damageandReasons[0].append([physicalDamage, physicalReason])
+            self.damageandReasons[1].append([staggerDamage, staggerReason])
+        elif not (amountPhysical == 0 and amountStagger == 0):
+            raise AssertionError(f"What? {amountPhysical} {amountStagger}")
+        else:
+            self.health -= truePhysical
+            self.stagger -= trueStagger # Let's just... not... get into the abno cards that reduce max stagger. Actually, lets just not with abno cards altogether.
+            if not physicalReason:
+                self.damageandReasons[0].append([truePhysical, ""])
+            else:
+                self.damageandReasons[0].append([truePhysical, physicalReason])
+            if not staggerReason:
+                self.damageandReasons[1].append([trueStagger, ""])
+            else:
+                self.damageandReasons[1].append([trueStagger, staggerReason])
         # Insert death and stagger logic here i actually wanna die
 
     def regainLight(self, amount):
@@ -416,12 +450,24 @@ class Character:    # The big one.
     def miniOutputData(self):
         statusString = ""
         for status in self.statusEffects:
-            statusString += f"{statusEffectIcons[status]}{self.statusEffects[status].stacks}{STOP}"
-        return [f"{self.name} | {TM.LIGHT_RED}{self.health} {TM.YELLOW}{self.stagger}{STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}", f"{TM.YELLOW}{u'◆ ' * self.light}{u' ◇' * (self.lightCapacity-self.light)}{STOP} | " + statusString]
+            statusString += f"{statusEffectColors[status]}{status}({self.statusEffects[status].stacks}){STOP}"
+        physicalDamageReason = ""
+        staggerDamageReason = ""
+        if len(self.damageandReasons[0]) > 0:
+            physicalDamageReason = " ".join([f"({x[1]} {x[0]})" for x in self.damageandReasons[0] if x[0] != 0])
+        if len(self.damageandReasons[1]) > 0:
+            staggerDamageReason = " ".join([f"({x[1]} {x[0]})" for x in self.damageandReasons[1] if x[0] != 0])
+        toReturn = [f"{self.name} | {TM.LIGHT_RED}{self.health}{physicalDamageReason} {TM.YELLOW}{self.stagger}{staggerDamageReason}{STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}", f"{TM.YELLOW}{u'◆ ' * self.light}{u' ◇' * (self.lightCapacity-self.light)}{STOP} | " + statusString]
+        self.damageandReasons = [[], []]
+        return toReturn
 # Constants
+def reverseOutput(text):
+    textSplat = text.split(" | ")
+    textSplat.reverse()
+    return " | ".join(textSplat)
 def bleedOut(effect, me, target, die):
     if die.dieType == "Offensive":
-        target.takeDamage(0, 0, effect.stacks, 0)
+        me.takeDamage("Bleed", 0, 0, effect.stacks, 0, "Bleed")
         effect.stacks = ceil(effect.stacks * (2 / 3))
     return 0
 
@@ -450,11 +496,18 @@ statusEffects = {
     "Bind":StatusEffect("Bind", "Lowers speed value of all speed die by number of stacks", 1, 
                         onSceneStart=lambda me : Bind(me.target, me.stacks), onSceneEnd=lambda me:removeStacks(me, me.stacks))
 }
-statusEffectIcons = {
-    "Bleed": f"{TM.RED}🩸",
-    "Strength": f"{TM.RED}🠉",
-    "Fragile": f"{TM.RED}💔",
-    "Bind": f"{TM.GREEN}↧",
-    "Haste": f"{TM.GREEN}↥",
-    "Feeble": f"{TM.RED}🠋"
+statusEffectColors = {
+    "Bleed": f"{TM.RED}",
+    "Strength": f"{TM.RED}",
+    "Fragile": f"{TM.RED}",
+    "Bind": f"{TM.GREEN}",
+    "Haste": f"{TM.GREEN}",
+    "Feeble": f"{TM.RED}"
+}
+resistanceToText = {
+    0.25: "Ineff.",
+    0.5: "Endure",
+    1: "Normal",
+    1.5: "Weak",
+    2: "Fatal"
 }

@@ -10,12 +10,14 @@ class Screen:   # If you want something to work, do it yourself. Actually, don't
     def printRightAligned(toPrint, end='\n'):
         size = os.get_terminal_size() # https://www.w3schools.com/python/ref_os_get_terminal_size.asp#:~:text=Python%20os.,-get_terminal_size()%20Method&text=The%20os.,the%20terminal%20window%20in%20characters.
         columns = size.columns
+        toPrint = reverseOutput(toPrint)
         toPrintLen = stripAnsi(len(toPrint))
         print(" " * (columns - toPrintLen) + toPrint, end=end)
     def printRightandLeft(toPrintLeft, toPrintRight, end='\n'):
         size = os.get_terminal_size() # https://www.w3schools.com/python/ref_os_get_terminal_size.asp#:~:text=Python%20os.,-get_terminal_size()%20Method&text=The%20os.,the%20terminal%20window%20in%20characters.
         columns = size.columns
         toPrintLen = len(stripAnsi(toPrintRight)) + len(stripAnsi(toPrintLeft))
+        toPrintRight = reverseOutput(toPrintRight)
         print(toPrintLeft, end='')
         print(" " * (columns - toPrintLen) + toPrintRight, end=end)
     def printMiddle(toPrintMiddle, end='\n'):
@@ -82,10 +84,20 @@ class ReceptionHandler:     # I lied. This is the big one.
             d2c2 = dice2.primaryColor
         elif dice2Modifier == 0:
             d2c2 = dice2.secondaryColor
-        Screen.printMiddle(f"{character1.name} | {dice1.secondaryColor}[{dice1.icon}]{dice1.naturalValue}{STOP} >< {dice2.secondaryColor}[{dice2.icon}]{dice2.naturalValue}{STOP} | {character2.name}", end="\r") # https://stackoverflow.com/questions/18692617/how-does-r-carriage-return-work-in-python https://stackoverflow.com/questions/5419389/how-to-overwrite-the-previous-print-to-stdout
+        combatString = f"{character1.name} | {dice1.miniStrRepr} {dice1.secondaryColor}{dice1.naturalValue}{STOP} >< {dice2.secondaryColor}{dice2.naturalValue} {dice2.miniStrRepr}{STOP} | {character2.name}"
+        if dice1.description:
+            combatString = TM.YELLOW + dice1.description + STOP + " | " + combatString
+        if dice2.description:
+            combatString = combatString + " | " + TM.YELLOW + dice2.description + STOP
+        Screen.printMiddle(combatString, end="\r") # https://stackoverflow.com/questions/18692617/how-does-r-carriage-return-work-in-python https://stackoverflow.com/questions/5419389/how-to-overwrite-the-previous-print-to-stdout
         sleep(1)
-        Screen.printMiddle(f"{character1.name} | {d1c2}[{dice1.icon}] {dice1.currentValue}{STOP} >< {d2c2}[{dice2.icon}]{dice2.currentValue}{STOP} | {character2.name}", end= '\033[K\n')
-        sleep(0.2)
+        cS2 = f"{character1.name} | {dice1.miniStrRepr} {d1c2}{dice1.currentValue}{STOP} >< {d2c2}{dice2.currentValue} {dice2.miniStrRepr}{STOP} | {character2.name}"
+        if dice1.description:
+            cS2 = TM.YELLOW + dice1.description + STOP + " | " + cS2
+        if dice2.description:
+            cS2 = cS2 + " | " + TM.YELLOW + dice2.description + STOP
+        Screen.printMiddle(cS2, end= '\033[K\n')
+        sleep(2)
         if not draw:
             winDice.onClashEvent(winner, loser, loseDice, True)
             loseDice.onClashEvent(loser, winner, winDice, True)
@@ -110,11 +122,11 @@ class ReceptionHandler:     # I lied. This is the big one.
                 case "Guard":
                     match loseDice.dieType:
                         case "Offensive": # Guard > Offensive: Guard value - Offensive value true stagger damage is dealt to loser
-                            loser.takeDamage(winDice.type, 0, 0, 0, winVal - loseVal)
+                            loser.takeDamage(winDice.type, 0, 0, 0, winVal - loseVal, staggerReason="Blocked")
                         case "Guard": # Guard > Guard: Die 1 value true stagger damage is dealt to character 2
-                            loser.takeDamage(winDice.type, 0, 0, 0, winVal)
+                            loser.takeDamage(winDice.type, 0, 0, 0, winVal, staggerReason="Blocked")
                         case "Evade": # Guard > Evade: Die 1 value true stagger damage is dealt to character 2
-                            loser.takeDamage(winDice.type, 0, 0, 0, winVal)
+                            loser.takeDamage(winDice.type, 0, 0, 0, winVal, staggerReason="Blocked")
                 case "Evade":
                     match loseDice.dieType:
                         case "Offensive": # Evade > Offensive: Die2 is destroyed; character 1 regains stagger equal to Evade dice value, EVADE DIE IS RECYCLED
@@ -132,7 +144,10 @@ class ReceptionHandler:     # I lied. This is the big one.
         else:
             character1.activeCombatPage.popTopDice()
             character2.activeCombatPage.popTopDice()
-        sleep(1)
+        self.drawScene()
+        Screen.printMiddle(cS2, end= '\n')
+        sleep(3)
+        self.drawScene()
     def drawScene(self):
         Screen.clearScreen()
         playerYindex = 10
@@ -153,6 +168,93 @@ class ReceptionHandler:     # I lied. This is the big one.
                 Screen.printRightAligned(data[0])
                 Screen.printRightAligned(data[1])
                 enemyYindex += 3
+    def pageClash(self, p1, p2, page1, page2):
+        while len(page1) > 0 or len(page2) > 0:
+            Screen.printMiddle(f"{page1.reverseStr()} >< {reverseOutput(str(page2))}")
+            sleep(1)
+            if len(page1) == 0:
+                dice = page2.popTopDice() 
+                if dice.dieType != "Offensive":
+                    continue
+                else:
+                    d1 = dice.roll()
+                    dice.naturalValue = d1
+                    dice.currentValue = 0
+                    if d1 == dice.upperBound or d1 == dice.lowerBound:
+                        p2.gainEmotionCoins(1)
+                    # Step 2: Run             rollDice from the Key Page + StatusEffects      buffDice events from the Combat Page,                        and onRoll events from the Dice itself
+                    diceModifier = int(p2.keyPage.rollDie(p1, dice) or 0) + int(p2.activeCombatPage.buffDie(p2, p1, dice) or 0) + int(dice.onRoll(p2, p1, dice) or 0)
+                    dice.currentValue += d1 + diceModifier
+                    # Int conversions are to turn the None values to 0
+                    d1 = dice.currentValue
+                    mods = dice.onHit(p2, p1)
+                    if mods is None or mods == 0:
+                        mods = [0, 0]
+                    mods2 = p2.keyPage.onHit(p1, dice)
+                    if mods2 is None or mods2 == 0:
+                        mods2 = [0, 0]
+                    # Print
+                    c2 = TM.DARK_GRAY
+                    if diceModifier > 0:
+                        c2 = dice.primaryColor
+                    elif diceModifier == 0:
+                        c2 = dice.secondaryColor
+                    combatString = f"{dice.miniStrRepr} {dice.secondaryColor}{dice.naturalValue}{STOP} | {p2.name}"
+                    if dice.description:
+                        combatString = combatString + " | " + TM.YELLOW + dice.description + STOP
+                    # self.drawScene()
+                    Screen.printMiddle(combatString, end="\r") # https://stackoverflow.com/questions/18692617/how-does-r-carriage-return-work-in-python https://stackoverflow.com/questions/5419389/how-to-overwrite-the-previous-print-to-stdout
+                    sleep(1)
+                    cS2 = f"{dice.miniStrRepr} {c2}{dice.currentValue}{STOP} | {p2.name}"
+                    if dice.description:
+                        cS2 = cS2 + " | " + TM.YELLOW + dice.description + STOP
+                    Screen.printMiddle(cS2, end= '\033[K\n')
+                    p1.takeDamage(dice.type, d1 + mods[0] + mods2[0], d1 + mods[1] + mods2[1])
+                    sleep(2)
+                #    Page 2 Unapposed
+            elif len(page2) == 0:
+                dice = page1.popTopDice()
+                if dice.dieType != "Offensive":
+                    continue
+                else:
+                    d1 = dice.roll()
+                    dice.naturalValue = d1
+                    dice.currentValue = 0
+                    if d1 == dice.upperBound or d1 == dice.lowerBound:
+                        p1.gainEmotionCoins(1)
+                    # Step 2: Run             rollDice from the Key Page + StatusEffects      buffDice events from the Combat Page,                        and onRoll events from the Dice itself
+                    diceModifier = int(p1.keyPage.rollDie(p2, dice) or 0) + int(p1.activeCombatPage.buffDie(p1, p2, dice) or 0) + int(dice.onRoll(p1, p2, dice) or 0)
+                    dice.currentValue += d1 + diceModifier
+                    # Int conversions are to turn the None values to 0
+                    d1 = dice.currentValue
+                    mods = dice.onHit(p1, p2)
+                    if mods is None or mods == 0:
+                        mods = [0, 0]
+                    mods2 = p1.keyPage.onHit(p2, dice)
+                    if mods2 is None or mods2 == 0:
+                        mods2 = [0, 0]
+                    # Print
+                    c2 = TM.DARK_GRAY
+                    if diceModifier > 0:
+                        c2 = dice.primaryColor
+                    elif diceModifier == 0:
+                        c2 = dice.secondaryColor
+                    combatString = f"{p1.name} | {dice.miniStrRepr} {dice.secondaryColor}{dice.naturalValue}{STOP}"
+                    if dice.description:
+                        combatString = combatString + " | " + TM.YELLOW + dice.description + STOP
+                    # self.drawScene()
+                    Screen.printMiddle(combatString, end="\r") # https://stackoverflow.com/questions/18692617/how-does-r-carriage-return-work-in-python https://stackoverflow.com/questions/5419389/how-to-overwrite-the-previous-print-to-stdout
+                    sleep(1)
+                    cS2 = f"{p1.name} | {dice.miniStrRepr} {c2}{dice.currentValue}{STOP}"
+                    if dice.description:
+                        cS2 = cS2 + " | " + TM.YELLOW + dice.description + STOP
+                    Screen.printMiddle(cS2, end= '\033[K\n')
+                    p2.takeDamage(dice.type, d1 + mods[0] + mods2[0], d1 + mods[1] + mods2[1])
+                    sleep(2)
+                #    Page 1 Unapposed
+            else:
+                self.Clash(p1, p2, page1.dice[0], page2.dice[0])
+            self.drawScene()
     def main(self):
         pass
         # Initialize Scene
