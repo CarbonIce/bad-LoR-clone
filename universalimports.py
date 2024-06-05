@@ -396,7 +396,8 @@ class Character:    # The big one.
         self.lightCapacity += 1 # Increase max light by 1
         self.light = self.lightCapacity # Regain all light
         if self.emotionLevel == 4: # Gain an additional Speed die at Emotion Level 4
-            self.speedDice += 1
+            self.speedDiceCount += 1
+            self.speedDice.append(SpeedDie(self.keyPage.speedLower, self.keyPage.speedUpper))
         # Not including an event for passives that activate on emotion level change because fuck you
         # At emotion 5, playing 2+ combat pages in a scene causes an extra draw at the start of the next scene
     def cleanStatusEffects(self):
@@ -450,14 +451,14 @@ class Character:    # The big one.
     def miniOutputData(self):
         statusString = ""
         for status in self.statusEffects:
-            statusString += f"{statusEffectColors[status]}{status}({self.statusEffects[status].stacks}){STOP}"
+            statusString += f" {statusEffectColors[status]}{status}({self.statusEffects[status].stacks}){STOP}"
         physicalDamageReason = ""
         staggerDamageReason = ""
         if len(self.damageandReasons[0]) > 0:
             physicalDamageReason = " ".join([f"({x[1]} {x[0]})" for x in self.damageandReasons[0] if x[0] != 0])
         if len(self.damageandReasons[1]) > 0:
             staggerDamageReason = " ".join([f"({x[1]} {x[0]})" for x in self.damageandReasons[1] if x[0] != 0])
-        toReturn = [f"{self.name} | {TM.LIGHT_RED}{self.health}{physicalDamageReason} {TM.YELLOW}{self.stagger}{staggerDamageReason}{STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}", f"{TM.YELLOW}{u'◆ ' * self.light}{u' ◇' * (self.lightCapacity-self.light)}{STOP} | " + statusString]
+        toReturn = [f"{self.name} | {TM.LIGHT_RED}{self.health}{physicalDamageReason} {TM.YELLOW}{self.stagger}{staggerDamageReason}{STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}", f"{TM.YELLOW}{u'◆ ' * self.light}{u' ◇' * (self.lightCapacity-self.light)}{STOP} |" + statusString]
         self.damageandReasons = [[], []]
         return toReturn
 # Constants

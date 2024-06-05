@@ -4,7 +4,7 @@ class Screen:   # If you want something to work, do it yourself. Actually, don't
         size = os.get_terminal_size()
     def clearScreen():
         if os.name == 'nt':
-            os.system("clr")
+            os.system("cls")
         else:
             os.system("clear")
     def printRightAligned(toPrint, end='\n'):
@@ -97,6 +97,10 @@ class ReceptionHandler:     # I lied. This is the big one.
         if dice2.description:
             cS2 = cS2 + " | " + TM.YELLOW + dice2.description + STOP
         Screen.printMiddle(cS2, end= '\033[K\n')
+        if not draw:
+            Screen.printMiddle(winner.name[0].upper() + winner.name[1:] + " wins the clash")
+        else:
+            Screen.printMiddle("Draw")
         sleep(2)
         if not draw:
             winDice.onClashEvent(winner, loser, loseDice, True)
@@ -255,8 +259,14 @@ class ReceptionHandler:     # I lied. This is the big one.
             else:
                 self.Clash(p1, p2, page1.dice[0], page2.dice[0])
             self.drawScene()
-    def main(self):
-        pass
-        # Initialize Scene
-        # for player in self.players:
-        #     player.
+    def Scene(self):
+        # Run OnSceneStart effects from KeyPage passives and Status Effects
+        for character in self.players:
+            # All characters draw a page, restore a light, etc.
+            character.drawPages(1)
+            character.restoreLight(1)
+        # Have user choose combat pages and target them
+        # Begin Combat
+        # Fastest speed die goes first, and prompt the targeted die to play it's combat page
+        # Continue until all speed die with pages attributed have clashed or one sided attacked
+        # Run OnSceneEnd effects from KeyPage, Character, Status Effects, etc.
