@@ -282,8 +282,14 @@ class ReceptionHandler:     # I lied. This is the big one.
             character.keyPage.onSceneStart(character, (self.scene == 1))
         # Have enemies target random speed die of yours
         for enemy in self.enemies:
-            # Just chooses the most expensive page that can be used and puts it in the fastest speed die
-            
+            # Just chooses the most expensive page that can be used and puts it in the fastest speed die (and target a random speed die of an ally)
+            speedDiceSelected = enemy.speedDiceCount - 1
+            for page in enemy.Hand:
+                if page.lightCost <= enemy.light:
+                    target = choice(choice(self.characters).speedDice)
+                    enemy.assignPageToSpeedDice(speedDiceSelected, page, target)
+        
+
         # Redraw Scene
         # Have user choose combat pages and target them
         while True: # https://stackoverflow.com/questions/24072790/how-to-detect-key-presses

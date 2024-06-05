@@ -154,6 +154,7 @@ class SpeedDie:
         self.min = mini
         self.max = maxi
         self.value = self.roll()
+        self.target = None
         self.pageToUse = None
 
     def roll(self):
@@ -467,7 +468,21 @@ class Character:    # The big one.
             else:
                 self.damageandReasons[1].append([trueStagger, staggerReason])
         # Insert death and stagger logic here i actually wanna die
-
+    def assignPageToSpeedDice(self, page, speedDiceID, target):
+        if self.light < page.lightCost:
+            raise ValueError("No Light?")
+        if self.speedDice[speedDiceID].pageToUse != None:
+            self.removePageFromSpeedDice(speedDiceID)
+        self.speedDice[speedDiceID].target = target
+        self.light -= page.lightCost
+        self.speedDice[speedDiceID].pageToUse = page
+        self.Hand.remove(page)
+    def removePageFromSpeedDice(self, speedDiceID):
+        thePage = self.speedDice[speedDiceID].pageToUse
+        self.Hand.append(thePage)
+        self.light += thePage.lightCost
+        self.speedDice[speedDiceID].pageToUse = None
+        self.speedDice[speedDiceID].target = None
     def regainLight(self, amount):
         self.light = min(self.light + amount, self.lightCapacity)
     def regainStats(self, health, stagger):
