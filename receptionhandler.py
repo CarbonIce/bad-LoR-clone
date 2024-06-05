@@ -30,8 +30,8 @@ class ReceptionHandler:     # I lied. This is the big one.
         # Players and Enemies are lists of Character objects.
         self.players = players
         self.enemies = enemies
-        self.act = 1
-        self.scene = 1
+        self.act = 0
+        self.scene = 0
     def Clash(self, character1, character2, dice1, dice2):    # NO DISTINCTION BETWEEN RANGED AND MELEE AND MASS ATTACK PAGES BECAUSE FUCK NO
         # CLASH BETWEEN DICE:
         # Step 1: Roll both die.
@@ -90,7 +90,7 @@ class ReceptionHandler:     # I lied. This is the big one.
         if dice2.description:
             combatString = combatString + " | " + TM.YELLOW + dice2.description + STOP
         Screen.printMiddle(combatString, end="\r") # https://stackoverflow.com/questions/18692617/how-does-r-carriage-return-work-in-python https://stackoverflow.com/questions/5419389/how-to-overwrite-the-previous-print-to-stdout
-        sleep(1)
+        sleep(0.5)
         cS2 = f"{character1.name} | {dice1.miniStrRepr} {d1c2}{dice1.currentValue}{STOP} >< {d2c2}{dice2.currentValue} {dice2.miniStrRepr}{STOP} | {character2.name}"
         if dice1.description:
             cS2 = TM.YELLOW + dice1.description + STOP + " | " + cS2
@@ -113,15 +113,16 @@ class ReceptionHandler:     # I lied. This is the big one.
                     mods2 = winner.keyPage.onHit(loser, winDice)
                     if mods2 is None or mods2 == 0:
                         mods2 = [0, 0]
+                    mods3 = winner.activeCombatPage.onHit(winner, loser)
                     match loseDice.dieType:
                         case "Offensive": # Offensive > Offensive: Full damage is dealt by die 1, and die 2 is destroyed.
-                            loser.takeDamage(winDice.type, winVal + mods[0] + mods2[0], winVal + mods[1] + mods2[1])
+                            loser.takeDamage(winDice.type, winVal + mods[0] + mods2[0] + mods3[0], winVal + mods[1] + mods2[1] + mods3[1])
                             winner.keyPage.onHit(loser, winDice)
                         case "Guard": # Offensive > Guard: Die 1 deals damage reduced by die 2's value
-                            loser.takeDamage(winDice.type, winVal - loseVal + mods[0] + mods2[0], winVal - loseVal+ mods[1] + mods2[1])
+                            loser.takeDamage(winDice.type, winVal - loseVal + mods[0] + mods2[0] + mods3[0], winVal - loseVal+ mods[1] + mods2[1] + mods3[1])
                             winner.keyPage.onHit(loser, winDice)
                         case "Evade": # Offensive > Evade: Full damage is dealt by die 1, and die 2 is destroyed.
-                            loser.takeDamage(winDice.type, winVal + mods[0] + mods2[0], winVal + mods[1] + mods2[1])
+                            loser.takeDamage(winDice.type, winVal + mods[0] + mods2[0] + mods3[0], winVal + mods[1] + mods2[1] + mods3[1])
                             winner.keyPage.onHit(loser, winDice)
                 case "Guard":
                     match loseDice.dieType:
@@ -135,8 +136,10 @@ class ReceptionHandler:     # I lied. This is the big one.
                     match loseDice.dieType:
                         case "Offensive": # Evade > Offensive: Die2 is destroyed; character 1 regains stagger equal to Evade dice value, EVADE DIE IS RECYCLED
                             winner.regainStats(0, winVal)
+                            winner.damageAndReasons[1].append([f"+{winVal}", "Evade"])
                         case "Guard": # Evade > Guard: Die2 is destroyed; character 1 regains stagger equal to Evade die value. THE DIE IS NOT RECYCLED
                             winner.regainStats(0, winVal)
+                            winner.damageAndReasons[1].append([f"+{winVal}", "Evade"])
                         case "Evade": # Nothing happens. Both die are destroyed.
                             pass
             # Blow up both die, unles the winning die was an Evade die and the losing die was an Offensive die
@@ -149,8 +152,8 @@ class ReceptionHandler:     # I lied. This is the big one.
             character1.activeCombatPage.popTopDice()
             character2.activeCombatPage.popTopDice()
         self.drawScene()
-        Screen.printMiddle(cS2, end= '\n')
-        sleep(3)
+        # Screen.printMiddle(cS2, end= '\n')
+        sleep(2)
         self.drawScene()
     def drawScene(self):
         Screen.clearScreen()
@@ -197,6 +200,7 @@ class ReceptionHandler:     # I lied. This is the big one.
                     mods2 = p2.keyPage.onHit(p1, dice)
                     if mods2 is None or mods2 == 0:
                         mods2 = [0, 0]
+                    mods3 = page1.onHit(p2, p1) # Returns [0, 0] if invalid output from the lambda function
                     # Print
                     c2 = TM.DARK_GRAY
                     if diceModifier > 0:
@@ -213,7 +217,8 @@ class ReceptionHandler:     # I lied. This is the big one.
                     if dice.description:
                         cS2 = cS2 + " | " + TM.YELLOW + dice.description + STOP
                     Screen.printMiddle(cS2, end= '\033[K\n')
-                    p1.takeDamage(dice.type, d1 + mods[0] + mods2[0], d1 + mods[1] + mods2[1])
+                    page2.onHit(p2, p1)
+                    p1.takeDamage(dice.type, d1 + mods[0] + mods2[0] + mods3[0], d1 + mods[1] + mods2[1] + mods3[1])
                     sleep(2)
                 #    Page 2 Unapposed
             elif len(page2) == 0:
@@ -237,6 +242,7 @@ class ReceptionHandler:     # I lied. This is the big one.
                     mods2 = p1.keyPage.onHit(p2, dice)
                     if mods2 is None or mods2 == 0:
                         mods2 = [0, 0]
+                    mods3 = page1.onHit(p2, p1)
                     # Print
                     c2 = TM.DARK_GRAY
                     if diceModifier > 0:
@@ -253,30 +259,38 @@ class ReceptionHandler:     # I lied. This is the big one.
                     if dice.description:
                         cS2 = cS2 + " | " + TM.YELLOW + dice.description + STOP
                     Screen.printMiddle(cS2, end= '\033[K\n')
-                    p2.takeDamage(dice.type, d1 + mods[0] + mods2[0], d1 + mods[1] + mods2[1])
+                    p2.takeDamage(dice.type, d1 + mods[0] + mods2[0] + mods3[0], d1 + mods[1] + mods2[1] + mods3[0])
                     sleep(2)
                 #    Page 1 Unapposed
             else:
                 self.Clash(p1, p2, page1.dice[0], page2.dice[0])
             self.drawScene()
     def Scene(self):
+        self.scene += 1
         # Roll Speed
         for character in self.players:
             character.rollSpeedDice()
             # All characters draw a page, restore a light
             character.drawPages(1)
-            character.restoreLight(1)
+            character.regainLight(1)
             # Run OnSceneStart effects from KeyPage passives and Status Effects
-            character.keyPage.onSceneStart()
+            character.keyPage.onSceneStart(character, (self.scene == 1))
         for character in self.enemies:
             character.rollSpeedDice()
             character.drawPages(1)
-            character.restoreLight(1)
-            character.keyPage.onSceneStart()
+            character.regainLight(1)
+            character.keyPage.onSceneStart(character, (self.scene == 1))
+        # Have enemies target random speed die of yours
+        for enemy in self.enemies:
+            # Just chooses the most expensive page that can be used and puts it in the fastest speed die
+            
         # Redraw Scene
-        self.drawScene()
         # Have user choose combat pages and target them
-        
+        while True: # https://stackoverflow.com/questions/24072790/how-to-detect-key-presses
+            self.drawScene()
+            event = keyboard.read_event()
+            print(event)
+            exit()
         
         # Begin Combat
         
@@ -288,3 +302,13 @@ class ReceptionHandler:     # I lied. This is the big one.
         
         
         # Run OnSceneEnd effects from KeyPage, Character, Status Effects, etc.
+    def Act(self, characters, enemies):
+        self.act += 1
+        self.characters = characters
+        self.enemies = enemies
+        for char in self.characters:
+            char.beginAct()
+        for enemy in self.enemies:
+            enemy.beginAct()
+        while True in [x.health > 0 for x in self.characters] and True in [x.health > 0 for x in self.enemies]:
+            self.Scene()

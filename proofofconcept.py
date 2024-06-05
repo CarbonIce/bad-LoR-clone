@@ -196,11 +196,11 @@ BlackSilenceDeck = [AllasWorkshop, CrystalAtelier, AtelierLogic, WheelsIndustry,
 # Key Pages (TESTING)]
 def gainDice(user, amount):
     user.speedDiceCount += amount
-def blackSilenceDraw(kp, first):
-    if first: kp.user.drawPages(2)
+def blackSilenceDraw(char, first):
+    if first: char.drawPages(2)
 SpeedII = Passive("Speed II", "Gain 2 Speed dice", onAttribute=lambda KP: KP.gainSpeedDice(2))
 TheBlackSilencePassive = Passive("The Black Silence", "Draw 2 additional pages at the start of the Act. All dice gain +2 Power.", # This should be on every 3rd page but no because fuck you (Actually I'm gonna remove gaining 2 power.)
-                                 onSceneStart=lambda kp,first : blackSilenceDraw(kp,first))
+                                 onSceneStart=lambda me,char,first : blackSilenceDraw(char,first))
                                  #, rollDie=lambda a,b,c,d: 2)
 TheBlackSilence = KeyPage("The Black Silence",
                           106, 56, 
@@ -212,6 +212,7 @@ TheBlackSilence = KeyPage("The Black Silence",
 char1 = Character("Roland", deepcopy(TheBlackSilence), deepcopy(BlackSilenceDeck))
 char2 = Character("Loland", deepcopy(TheBlackSilence), deepcopy(BlackSilenceDeck))
 reception = ReceptionHandler([char1], [char2])
+reception.Act([char1], [char2])
 while True:
     char1.playCombatPage(deepcopy(choice(BlackSilenceDeck)), char2)
     char2.playCombatPage(deepcopy(choice(BlackSilenceDeck)), char1)
