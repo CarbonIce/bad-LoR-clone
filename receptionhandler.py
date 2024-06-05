@@ -260,13 +260,31 @@ class ReceptionHandler:     # I lied. This is the big one.
                 self.Clash(p1, p2, page1.dice[0], page2.dice[0])
             self.drawScene()
     def Scene(self):
-        # Run OnSceneStart effects from KeyPage passives and Status Effects
+        # Roll Speed
         for character in self.players:
-            # All characters draw a page, restore a light, etc.
+            character.rollSpeedDice()
+            # All characters draw a page, restore a light
             character.drawPages(1)
             character.restoreLight(1)
+            # Run OnSceneStart effects from KeyPage passives and Status Effects
+            character.keyPage.onSceneStart()
+        for character in self.enemies:
+            character.rollSpeedDice()
+            character.drawPages(1)
+            character.restoreLight(1)
+            character.keyPage.onSceneStart()
+        # Redraw Scene
+        self.drawScene()
         # Have user choose combat pages and target them
+        
+        
         # Begin Combat
+        
+        
         # Fastest speed die goes first, and prompt the targeted die to play it's combat page
+        
+        
         # Continue until all speed die with pages attributed have clashed or one sided attacked
+        
+        
         # Run OnSceneEnd effects from KeyPage, Character, Status Effects, etc.

@@ -154,8 +154,12 @@ class SpeedDie:
         self.max = maxi
         self.value = self.roll()
         self.pageToUse = None
+
     def roll(self):
         return randint(self.min, self.max)
+    
+    def __repr__(self):
+        return f"[{self.value}]"
 
 
 class CombatPage:
@@ -290,10 +294,16 @@ class KeyPage:  # Key Pages are basically the character sheet; they dicate how m
         self.lightStart = lightStart    # Most likely 3 but can be 4 for high tier Star and Impurity Key Pages
         self.speedDieCount = 1 # 1 by default. Increased by the Speed I through III passives.
         self.user = None
+        self.onAttribute()
+    
+    def gainSpeedDice(self, amount):
+        self.speedDieCount += amount
+    
     # I'm sorry to the CS gods, but this is how I worked it out.
     def onAttribute(self):
         for passive in self.passives:
             if passive.onAttribute: passive.onAttribute(self)
+
     def rollDie(self, target, die):
         modifier = 0
         for passive in self.passives:
@@ -323,9 +333,13 @@ class KeyPage:  # Key Pages are basically the character sheet; they dicate how m
     def onSceneStart(self, first=False):
         for passive in self.passives:
             if passive.onSceneStart: passive.onSceneStart(first)
+        for status in self.user.statusEffects:
+            if self.user.statusEffects[status].onSceneStart: self.user.statusEffects[status].onSceneStart()
     def onSceneEnd(self):
         for passive in self.passives:
             if passive.onSceneEnd: passive.onSceneEnd()
+        for status in self.user.statusEffects:
+            if self.user.statusEffects[status].onSceneEnd: self.user.statusEffects[status].onSceneEnd()
 
 
 class StatusEffect(Passive): #  I had to look up a tutorial for this because i forgor. This over having to rewrite all of those events. https://realpython.com/inheritance-composition-python/
@@ -355,15 +369,15 @@ class Character:    # The big one.
         self.Hand = []  # Pages readily accessable to use
         # Draw 4
         self.drawPages(4)
-        self.keyPage.onSceneStart()
+        self.keyPage.onSceneStart(True)
     def playCombatPage(self, page, target):
         self.activeCombatPage = page
-        print(page)
         for die in page.dice:
             if die.counter:
                 self.counterDice.append(die)
                 page.dice.remove(die)
         self.target = target
+
     def swapKeyPage(self, newKeyPage):
         self.keyPage = newKeyPage
         self.speedDiceCount = newKeyPage.speedDieCount
@@ -380,6 +394,11 @@ class Character:    # The big one.
         self.statusEffects = {}
         self.keyPage.onAttribute()
     
+    def rollSpeedDice(self):
+        for die in self.speedDice:
+            die.roll()
+        self.speedDice.sort(key=lambda x: x.value)
+
     def drawPages(self, amount):
         for _ in range(amount):
             if len(self.deck) > 0:
@@ -452,13 +471,15 @@ class Character:    # The big one.
         statusString = ""
         for status in self.statusEffects:
             statusString += f" {statusEffectColors[status]}{status}({self.statusEffects[status].stacks}){STOP}"
+        if statusString == "":
+            statusString = " "  # So that my formatting methods work because theres a " | " not a " |"
         physicalDamageReason = ""
         staggerDamageReason = ""
         if len(self.damageandReasons[0]) > 0:
             physicalDamageReason = " ".join([f"({x[1]} {x[0]})" for x in self.damageandReasons[0] if x[0] != 0])
         if len(self.damageandReasons[1]) > 0:
             staggerDamageReason = " ".join([f"({x[1]} {x[0]})" for x in self.damageandReasons[1] if x[0] != 0])
-        toReturn = [f"{self.name} | {TM.LIGHT_RED}{self.health}{physicalDamageReason} {TM.YELLOW}{self.stagger}{staggerDamageReason}{STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}", f"{TM.YELLOW}{u'◆ ' * self.light}{u' ◇' * (self.lightCapacity-self.light)}{STOP} |" + statusString]
+        toReturn = [f"{self.name} | {TM.LIGHT_RED}{self.health}{physicalDamageReason} {TM.YELLOW}{self.stagger}{staggerDamageReason}{STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}", f"{TM.YELLOW}{u'◆ ' * self.light}{u' ◇' * (self.lightCapacity-self.light)}{STOP} | " + TM.YELLOW + " ".join([str(x) for x in self.speedDice]) + STOP + " |" + statusString]
         self.damageandReasons = [[], []]
         return toReturn
 # Constants
