@@ -472,7 +472,10 @@ class Character:    # The big one.
         # Insert death and stagger logic here i actually wanna die
     def assignPageToSpeedDice(self, speedDiceID, pageID, target, targetDie):
         page = self.Hand[pageID]
-        if self.light < page.lightCost:
+        add = 0
+        if self.speedDice[speedDiceID].pageToUse != None:
+            add = self.speedDice[speedDiceID].pageToUse.lightCost
+        if self.light + add < page.lightCost :
             raise ValueError("No Light?")
         if self.speedDice[speedDiceID].pageToUse != None:
             self.removePageFromSpeedDice(speedDiceID)

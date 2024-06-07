@@ -282,7 +282,7 @@ class ReceptionHandler:     # I lied. This is the big one.
             character.keyPage.onSceneStart(character, (self.scene == 1))
         # Have enemies target random speed die of yours
         for enemy in self.enemies:
-            # Just chooses the most expensive page that can be used and puts it in the fastest speed die (and target a random speed die of an ally)
+            # Just chooses a random page that can be used and puts it in the fastest speed die (and target a random speed die of an ally)
             speedDiceSelected = 0
             index = 0
             for page in enemy.Hand:
@@ -385,6 +385,14 @@ class ReceptionHandler:     # I lied. This is the big one.
                 if event.name == 'left':
                     selectedPage -= 1
                 if event.name == 'space':
+                    add = 0
+                    if char.speedDice[selectedDie].pageToUse != None:
+                        add = char.speedDice[selectedDie].pageToUse.lightCost
+                    if char.Hand[selectedPage].lightCost > char.light + add:
+                        print("Not enough light...")
+                        event = None
+                        sleep(1)
+                        continue
                     break
                 if event.name == 'escape':
                     StopTime = False
@@ -414,7 +422,7 @@ class ReceptionHandler:     # I lied. This is the big one.
                 selectedEnemy = selectedEnemy % len(self.enemies)
                 selectedEnemyDie = selectedEnemyDie % self.enemies[selectedEnemy].speedDiceCount
                 event=None
-            self.characters[selectedCharacter].assignPageToSpeedDice(selectedDie, selectedPage, selectedEnemy, selectedEnemyDie)
+            char.assignPageToSpeedDice(selectedDie, selectedPage, selectedEnemy, selectedEnemyDie)
             event = None
         # Begin Combat
         
