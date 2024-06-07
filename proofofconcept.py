@@ -217,28 +217,3 @@ while True:
     char2.playCombatPage(deepcopy(choice(BlackSilenceDeck)), char1)
     reception.drawScene()
     reception.pageClash(char1, char2, char1.activeCombatPage, char2.activeCombatPage)
-exit()
-reception.Clash(char1, char2, Dice("Slash", 
-             3, 9,
-             False, 
-             "On Hit: Inflict 5 Bleed this scene",
-             "onHit", lambda die,me,them: inflictStatusEffects(them,"Bleed",5)
-             ), Dice(
-            "Blunt",
-            4,20,
-            False,
-            "On Hit: Deal 3 damage to target",
-            "onHit",
-            lambda a,b,c: c.takeDamage("Magic", 0, 0, 3, 0, "Die Passive")
-        ))
-reception.Clash(char1, char2, Dice(
-            "Guard",
-            5,8), Dice(
-            "Pierce",
-            5, 8,
-            False, None,
-            "onRoll",
-            lambda me,them,die: reduceEnemyDieValue(me,them,die,2)
-        )
-        )
-reception.drawScene()
