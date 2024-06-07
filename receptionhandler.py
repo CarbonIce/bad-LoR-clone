@@ -342,7 +342,8 @@ class ReceptionHandler:     # I lied. This is the big one.
                         elif die[1].speedDice[die[0].targetDie].target is None:
                             # One sided attack
                             print(f"{TM.YELLOW}{die[1].name}'s die index {die[2]} <-> {die[1].speedDice[die[0].targetDie].target.name}'s die index {die[0].targetDie}{STOP}")
-                        elif die[1].speedDice[die[0].targetDie].target == die[0] and die[0].target == die[1].speedDice[die[0].targetDie]
+                        elif die[1].speedDice[die[0].targetDie].target == die[0] and die[0].target == die[1].speedDice[die[0].targetDie]:
+                            pass
                 print("(Use arrow keys to navigate speed dice, press space to select the die)")
                 print(f"Currently selecting {TM.YELLOW}{self.characters[selectedCharacter].name}{STOP}'s dice number {TM.YELLOW}{selectedDie}{STOP} (Die numbers are the numbers outside of the paranthases within the square brackets)")
                 while not event or event.event_type != 'down' or event.name not in 'up down right left space'.split(" "):
