@@ -156,7 +156,7 @@ class SpeedDie:
         self.value = self.roll()
         self.target = None
         self.pageToUse = None
-
+        self.targetDie = None
     def roll(self):
         return randint(self.min, self.max)
     
@@ -245,7 +245,9 @@ class CombatPage:
         return f"{self.color}{self.name}{STOP} | " + ' '.join([x.miniStrRepr for x in self.dice])
     def reverseStr(self):
         return f"{self.color}{self.name}{STOP} | " + ' '.join(reversed([x.miniStrRepr for x in self.dice]))
-class Passive:  # This class handles everything about a passive ability that goes on a key page - namely, when to activate some arbitrary function that affects the Character using the Key Page.
+    def longPrint(self):
+        return f"{self.color}{self.name}{STOP}\n" + "\n".join([str(x) for x in self.dice])
+class Passive:  # This class handles everything about a passive ability that goes on a key page - namely, when to activate some arbitrary function that affects the Character using the Key Page.}
     # Unfortunetly, due to the nature of many passive abilties, there will have to be a LOT of hard coding...
     # The most commmon events that I can find are OnAttribute (immedietly apply, do something simple like adding a speed die (Speed I through III)). Pass in 
     # rollDie (Wedge, Swordplay, Lions Fist, etc. that buff the value of dice)
@@ -468,12 +470,15 @@ class Character:    # The big one.
             else:
                 self.damageandReasons[1].append([trueStagger, staggerReason])
         # Insert death and stagger logic here i actually wanna die
-    def assignPageToSpeedDice(self, page, speedDiceID, target):
+    def assignPageToSpeedDice(self, speedDiceID, pageID, target, targetDie):
+        page = self.Hand[pageID]
         if self.light < page.lightCost:
             raise ValueError("No Light?")
         if self.speedDice[speedDiceID].pageToUse != None:
             self.removePageFromSpeedDice(speedDiceID)
+        print(page)
         self.speedDice[speedDiceID].target = target
+        self.speedDice[speedDiceID].targetDie = targetDie
         self.light -= page.lightCost
         self.speedDice[speedDiceID].pageToUse = page
         self.Hand.remove(page)
@@ -510,7 +515,7 @@ class Character:    # The big one.
         if len(self.damageandReasons[1]) > 0:
             staggerDamageReason = " ".join([f"({x[1]} {x[0]})" for x in self.damageandReasons[1] if x[0] != 0])
         toReturn = [f"{self.name} | {TM.LIGHT_RED}{self.health}{physicalDamageReason} {TM.YELLOW}{self.stagger}{staggerDamageReason}{STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}",
-                     f"{TM.YELLOW}{u'◆ ' * self.light}{u' ◇' * (self.lightCapacity-self.light)}{STOP} | " + TM.YELLOW + " ".join([f"[{x} ({str(self.speedDice[x])})]" for x in range(len(self.speedDice))]) + STOP + " |" + statusString]
+                     f"{TM.YELLOW}{u'◆ ' * self.light}{TM.DARK_GRAY}{u'◇ ' * (self.lightCapacity-self.light)}{STOP} | " + TM.YELLOW + " ".join([f"{TM.YELLOW}[{x} ({str(self.speedDice[x])})]{STOP}" if self.speedDice[x].target != None else f"{TM.DARK_GRAY}[{x} ({str(self.speedDice[x])})]" for x in range(len(self.speedDice))]) + STOP + " |" + statusString]
         self.damageandReasons = [[], []]
         return toReturn
 # Constants

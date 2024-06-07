@@ -283,21 +283,125 @@ class ReceptionHandler:     # I lied. This is the big one.
         # Have enemies target random speed die of yours
         for enemy in self.enemies:
             # Just chooses the most expensive page that can be used and puts it in the fastest speed die (and target a random speed die of an ally)
-            speedDiceSelected = enemy.speedDiceCount - 1
+            speedDiceSelected = 0
+            index = 0
             for page in enemy.Hand:
-                if page.lightCost <= enemy.light:
-                    target = choice(choice(self.characters).speedDice)
-                    enemy.assignPageToSpeedDice(speedDiceSelected, page, target)
-        
+                if speedDiceSelected < enemy.speedDiceCount - 1:
+                    if page.lightCost <= enemy.light:
+                        target = choice(self.characters)
+                        targetDie = randint(0, target.speedDiceCount)
+                        print(index)
+                        print(speedDiceSelected)
+                        enemy.assignPageToSpeedDice(speedDiceSelected, index, target, targetDie)
+                else:
+                    break
+                index += 1
+                speedDiceSelected += 1
 
         # Redraw Scene
         # Have user choose combat pages and target them
-        while True: # https://stackoverflow.com/questions/24072790/how-to-detect-key-presses
-            self.drawScene()
-            event = keyboard.read_event()
-            print(event)
-            exit()
-        
+        event = None
+        while True:
+            CharacterDiceSortedBySpeed = []
+            EnemyDiceSortedBySpeed = []
+            selectedCharacter = 0
+            selectedDie = 0
+            for character in self.characters:
+                index = 0
+                for speedDie in character.speedDice:
+                    CharacterDiceSortedBySpeed.append([speedDie, character, index])
+                    index += 1
+            for enemy in self.enemies:
+                index = 0
+                for speedDie in enemy.speedDice:
+                    EnemyDiceSortedBySpeed.append([speedDie, enemy, index])
+                    index += 1
+            allDice = []
+            for die in CharacterDiceSortedBySpeed:
+                die.append("character")
+                allDice.append(die)
+            for die in EnemyDiceSortedBySpeed:
+                die.append("enemy")
+                allDice.append(die)
+            while True: # https://stackoverflow.com/questions/24072790/how-to-detect-key-presses
+                self.drawScene()
+                for die in allDice:
+                    if die[0].target != None:
+                        if die[1].speedDice[die[0].targetDie].target != die[0]:
+                            if die[3] == "enemy":
+                                print(f"{TM.RED}{die[1].name}'s die index {die[2]} -> {die[1].speedDice[die[0].targetDie].target.name}'s die index {die[0].targetDie}{STOP}")
+                            else:
+                                print(f"{TM.BLUE}{die[1].name}'s die index {die[2]} -> {die[1].speedDice[die[0].targetDie].target.name}'s die index {die[0].targetDie}{STOP}")
+                        else:
+                            print(f"{TM.YELLOW}{die[1].name}'s die index {die[2]} <-> {die[1].speedDice[die[0].targetDie].target.name}'s die index {die[0].targetDie}{STOP}")
+                print("(Use arrow keys to navigate speed dice, press space to select the die)")
+                print(f"Currently selecting {TM.YELLOW}{self.characters[selectedCharacter].name}{STOP}'s dice number {TM.YELLOW}{selectedDie}{STOP} (Die numbers are the numbers outside of the paranthases within the square brackets)")
+                while not event or event.event_type != 'down' or event.name not in 'up down right left space'.split(" "):
+                    event = keyboard.read_event()
+                if event.event_type == "down":
+                    if event.name == 'up':
+                        selectedCharacter -= 1
+                    if event.name == 'down':
+                        selectedCharacter += 1
+                    if event.name == 'right':
+                        selectedDie += 1
+                    if event.name == 'left':
+                        selectedDie -= 1
+                    if event.name == 'space':
+                        break
+                selectedCharacter = selectedCharacter % len(self.characters)
+                selectedDie = selectedDie % self.characters[selectedCharacter].speedDiceCount
+                event=None
+
+            char = self.characters[selectedCharacter]
+            selectedPage = 0
+            event=None
+            while True: # Page select
+                self.drawScene()
+                print("Selected:", char.Hand[selectedPage].longPrint())
+                index = 0
+                for page in char.Hand:
+                    if index == selectedPage:
+                        print(f"{page.color}{page.name}{STOP} {TM.YELLOW}{page.lightCost}{STOP}", end=" | ")
+                    else:
+                        print(f"{TM.DARK_GRAY}{page.name} {page.lightCost}{STOP}", end=" | ")
+                    index += 1
+                print("Use right and left arrow to navigate combat pages, space to select, escape to cancel")
+                while not event or event.event_type != 'down' or event.name not in 'right left space'.split(" "):
+                    event = keyboard.read_event()
+                if event.name == 'right':
+                    selectedPage += 1
+                if event.name == 'left':
+                    selectedPage -= 1
+                if event.name == 'space':
+                    break
+                selectedPage = selectedPage % len(char.Hand)
+                event = None
+            event = None
+            selectedEnemy = 0
+            selectedEnemyDie = 0
+            while True: # https://stackoverflow.com/questions/24072790/how-to-detect-key-presses
+                self.drawScene()
+                print("(Use arrow keys and space to navigate enemy speed dice")
+                print(f"Currently selecting {TM.YELLOW}{self.enemies[selectedEnemy].name}{STOP}'s dice number {TM.YELLOW}{selectedEnemyDie}{STOP} (Die numbers are the numbers outside of the paranthases within the square brackets)")
+                while not event or event.event_type != 'down' or event.name not in 'up down right left space'.split(" "):
+                    event = keyboard.read_event()
+                if event.event_type == "down":
+                    if event.name == 'up':
+                        selectedEnemy -= 1
+                    if event.name == 'down':
+                        selectedEnemy += 1
+                    if event.name == 'right':
+                        selectedEnemyDie += 1
+                    if event.name == 'left':
+                        selectedEnemyDie -= 1
+                    if event.name == 'space':
+                        break
+                selectedEnemy = selectedEnemy % len(self.enemies)
+                selectedEnemyDie = selectedEnemyDie % self.enemies[selectedEnemy].speedDiceCount
+                event=None
+            self.characters[selectedCharacter].assignPageToSpeedDice(selectedDie, selectedPage, selectedEnemy, selectedEnemyDie)
+            event = None
         # Begin Combat
         
         
