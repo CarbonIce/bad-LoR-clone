@@ -317,23 +317,32 @@ class ReceptionHandler:     # I lied. This is the big one.
                     EnemyDiceSortedBySpeed.append([speedDie, enemy, index])
                     index += 1
             allDice = []
+            CharacterDiceSortedBySpeed.sort(key=lambda x: x[0].value)
+            EnemyDiceSortedBySpeed.sort(key=lambda x: x[0].value)
+            # Higher speed character die overwrite the targetting of enemy dice
             for die in CharacterDiceSortedBySpeed:
                 die.append("character")
                 allDice.append(die)
             for die in EnemyDiceSortedBySpeed:
                 die.append("enemy")
                 allDice.append(die)
+            targeting = {}
             while True: # https://stackoverflow.com/questions/24072790/how-to-detect-key-presses
                 self.drawScene()
-                for die in allDice:
+                for die in CharacterDiceSortedBySpeed:
                     if die[0].target != None:
-                        if die[1].speedDice[die[0].targetDie].target != die[0]:
+                        print(die[1].speedDice[die[0].targetDie].value)
+                        # Redirected Clash
+                        if die[0].value > die[1].speedDice[die[0].targetDie].value and die[1].speedDice[die[0].targetDie].target is not None:
+                            targeting[die[0]]
                             if die[3] == "enemy":
                                 print(f"{TM.RED}{die[1].name}'s die index {die[2]} -> {die[1].speedDice[die[0].targetDie].target.name}'s die index {die[0].targetDie}{STOP}")
                             else:
                                 print(f"{TM.BLUE}{die[1].name}'s die index {die[2]} -> {die[1].speedDice[die[0].targetDie].target.name}'s die index {die[0].targetDie}{STOP}")
-                        else:
+                        elif die[1].speedDice[die[0].targetDie].target is None:
+                            # One sided attack
                             print(f"{TM.YELLOW}{die[1].name}'s die index {die[2]} <-> {die[1].speedDice[die[0].targetDie].target.name}'s die index {die[0].targetDie}{STOP}")
+                        elif die[1].speedDice[die[0].targetDie].target == die[0] and die[0].target == die[1].speedDice[die[0].targetDie]
                 print("(Use arrow keys to navigate speed dice, press space to select the die)")
                 print(f"Currently selecting {TM.YELLOW}{self.characters[selectedCharacter].name}{STOP}'s dice number {TM.YELLOW}{selectedDie}{STOP} (Die numbers are the numbers outside of the paranthases within the square brackets)")
                 while not event or event.event_type != 'down' or event.name not in 'up down right left space'.split(" "):
@@ -356,7 +365,8 @@ class ReceptionHandler:     # I lied. This is the big one.
             char = self.characters[selectedCharacter]
             selectedPage = 0
             event=None
-            while True: # Page select
+            StopTime = True
+            while StopTime: # Page select
                 self.drawScene()
                 print("Selected:", char.Hand[selectedPage].longPrint())
                 index = 0
@@ -375,12 +385,15 @@ class ReceptionHandler:     # I lied. This is the big one.
                     selectedPage -= 1
                 if event.name == 'space':
                     break
+                if event.name == 'escape':
+                    StopTime = False
+                    break
                 selectedPage = selectedPage % len(char.Hand)
                 event = None
             event = None
             selectedEnemy = 0
             selectedEnemyDie = 0
-            while True: # https://stackoverflow.com/questions/24072790/how-to-detect-key-presses
+            while StopTime: # https://stackoverflow.com/questions/24072790/how-to-detect-key-presses
                 self.drawScene()
                 print("(Use arrow keys and space to navigate enemy speed dice")
                 print(f"Currently selecting {TM.YELLOW}{self.enemies[selectedEnemy].name}{STOP}'s dice number {TM.YELLOW}{selectedEnemyDie}{STOP} (Die numbers are the numbers outside of the paranthases within the square brackets)")
