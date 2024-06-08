@@ -212,8 +212,3 @@ char1 = Character("Roland", deepcopy(TheBlackSilence), deepcopy(BlackSilenceDeck
 char2 = Character("Loland", deepcopy(TheBlackSilence), deepcopy(BlackSilenceDeck))
 reception = ReceptionHandler([char1], [char2])
 reception.Act([char1], [char2])
-while True:
-    char1.playCombatPage(deepcopy(choice(BlackSilenceDeck)), char2)
-    char2.playCombatPage(deepcopy(choice(BlackSilenceDeck)), char1)
-    reception.drawScene()
-    reception.pageClash(char1, char2, char1.activeCombatPage, char2.activeCombatPage)

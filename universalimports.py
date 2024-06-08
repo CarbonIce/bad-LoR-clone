@@ -459,8 +459,8 @@ class Character:    # The big one.
         if self.emotionLevel < 5 and self.emotionCoins == EmotionCoinRequirements[self.emotionLevel]:
             self.emotionCoins = 0
             self.emotionLevel += 1
-        self.lightCapacity += 1 # Increase max light by 1
-        self.light = self.lightCapacity # Regain all light
+            self.lightCapacity += 1 # Increase max light by 1
+            self.light = self.lightCapacity # Regain all light
         if self.emotionLevel == 4: # Gain an additional Speed die at Emotion Level 4
             self.speedDiceCount += 1
             self.speedDice.append(SpeedDie(self.keyPage.speedLower, self.keyPage.speedUpper, self))
