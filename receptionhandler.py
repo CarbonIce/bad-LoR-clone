@@ -358,12 +358,12 @@ class ReceptionHandler:     # I lied. This is the big one.
     def dieClash(self, die1, die2):
         p1 = die1.owner
         p2 = die2.owner
-        p1.playCombatPage(die1.pageToPlay, p2)
+        p1.playCombatPage(die1.pageToUse, p2)
         if die2.target != None:
-            p2.playCombatPage(die2.pageToPlay, p1)
-            self.pageClash(p1, p2, die1.pageToPlay, die2.pageToPlay)
+            p2.playCombatPage(die2.pageToUse, p1)
+            self.pageClash(p1, p2, die1.pageToUse, die2.pageToUse)
         else:
-            self.pageClash(p1, p2, die1.pageToPlay, p2.counterDice)
+            self.pageClash(p1, p2, die1.pageToUse, p2.counterDice)
 
     def Scene(self):
         self.scene += 1
@@ -402,25 +402,66 @@ class ReceptionHandler:     # I lied. This is the big one.
         while True:
             selectedCharacter = 0
             selectedDie = 0
-            option = True
+            option = 0
             COMBATTIME = False
+            REMOVEPAGE = False
+            char = self.characters[selectedCharacter]
             while True:
                 self.drawSceneExtendedData()
-                print(f"{TM.DARK_GRAY if not option else TM.LIGHT_GRAY}Assign Combat Page {STOP}| {TM.DARK_GRAY if option else TM.LIGHT_GRAY}Begin Scene{STOP}")
+                print(f"{TM.DARK_GRAY if option != 0 else TM.LIGHT_GRAY}Assign Combat Page {STOP}| {TM.DARK_GRAY if option != 1 else TM.LIGHT_GRAY}Remove Combat Page{STOP} | {TM.DARK_GRAY if option != 2 else TM.LIGHT_GRAY}Begin Scene{STOP}")
                 print("(Use right and left arrows to select options, press space to confirm)")
                 while not event or event.event_type != 'down' or event.name not in 'right left space'.split(" "):
                     event = keyboard.read_event()
                 if event.name == 'space':
-                    if not option:
+                    if option == 2:
                         COMBATTIME = True
+                    elif option == 1:
+                        REMOVEPAGE = True
                     break
                 else:
-                    option = not option
+                    if event.name == 'left':
+                        option -= 1
+                    else:
+                        option += 1
+                option = option % 3
                 event = None
-            if COMBATTIME:
-                break
             event = None
             StopTime = True
+            if COMBATTIME:
+                break
+            if REMOVEPAGE:
+                stoptime = True
+                while stoptime:
+                    self.drawSceneExtendedData(selectedCharacter, False, selectedDie)
+                    print("(Use arrow keys to navigate speed dice, press space to select the die, or escape to go back)")
+                    print(f"Removing combat page from {TM.YELLOW}{self.characters[selectedCharacter].name}{STOP}'s dice number {TM.YELLOW}{selectedDie}{STOP} (Die numbers are the numbers outside of the paranthases within the square brackets)")
+                    while not event or event.event_type != 'down' or event.name not in 'up down right left space esc'.split(" "):
+                        event = keyboard.read_event()
+                    if event.event_type == "down":
+                        if event.name == 'up':
+                            selectedCharacter -= 1
+                        if event.name == 'down':
+                            selectedCharacter += 1
+                        if event.name == 'right':
+                            selectedDie += 1
+                        if event.name == 'left':
+                            selectedDie -= 1
+                        if event.name == 'space':
+                            if char.speedDice[selectedDie].target is None:
+                                print("There is no combat page assigned to that die.")
+                                sleep(1)
+                                continue
+                            break
+                        if event.name == 'esc':
+                            stoptime = False
+                            break
+                    selectedCharacter = selectedCharacter % len(self.characters)
+                    selectedDie = selectedDie % self.characters[selectedCharacter].speedDiceCount
+                    event=None
+                if stoptime:
+                    char.removePageFromSpeedDice(selectedDie)
+                event = None
+                continue
             while StopTime: # https://stackoverflow.com/questions/24072790/how-to-detect-key-presses
                 self.drawSceneExtendedData(selectedCharacter, False, selectedDie)
                 print("(Use arrow keys to navigate speed dice, press space to select the die, or escape to go back)")
