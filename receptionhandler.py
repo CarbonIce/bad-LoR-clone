@@ -36,13 +36,11 @@ class ReceptionHandler:     # I lied. This is the big one.
     def calculateTargeting(self):
         CharacterDiceSortedBySpeed = []
         EnemyDiceSortedBySpeed = []
-        AllDice = []
         for character in range(len(self.characters)):
                 index = 0
                 for speedDie in self.characters[character].speedDice:
                     CharacterDiceSortedBySpeed.append([speedDie, character, index]) # These lists are the SpeedDie Object, the index of the User of the speed die, and the index of the speed die of the user.
                     index += 1
-                    AllDice.append([speedDie, character, index, "character"])
         for enemy in range(len(self.enemies)):
             index = 0
             for speedDie in self.enemies[enemy].speedDice:
@@ -61,7 +59,7 @@ class ReceptionHandler:     # I lied. This is the big one.
         '''
         for die in CharacterDiceSortedBySpeed:
             if die[0] not in testedCharacterDice:
-                if die[0].target is not None and die[0].target == die[0] and die[0].target not in testedEnemyDice:   # Both dice are clashing against each other. This is a clash, and thats that (and this is this).
+                if die[0].target is not None and die[0].target.target == die[0] and die[0].target not in testedEnemyDice:   # Both dice are clashing against each other. This is a clash, and thats that (and this is this).
                     testedCharacterDice.append(die[0])
                     testedEnemyDice.append(die[0].target)
                     Clashes.append([die[0], die[0].target])
