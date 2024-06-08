@@ -1,4 +1,4 @@
-from random import randint, choice
+from random import randint, choice, shuffle
 from math import ceil
 from time import sleep
 import os
@@ -309,7 +309,6 @@ class Passive:  # This class handles everything about a passive ability that goe
         if self.onSceneStartE: self.onSceneStartE(self, char, first)
 
     def onSceneEnd(self, char):
-
         if self.onSceneEndE: self.onSceneEndE(self, char)
 
 class KeyPage:  # Key Pages are basically the character sheet; they dicate how much health, stagger resist, resistance to certain attacks, speed dice, etc. each character has.
@@ -366,17 +365,17 @@ class KeyPage:  # Key Pages are basically the character sheet; they dicate how m
         for passive in self.passives:
             if passive.onDeath: passive.onDeath(ally)
 
-    def onSceneStart(self, char=None, first=False):
+    def onSceneStart(self, first=False):
         for passive in self.passives:
-            if passive.onSceneStart: passive.onSceneStart(char, first)
+            if passive.onSceneStart: passive.onSceneStart(self.user, first)
         for status in self.user.statusEffects:
-            if self.user.statusEffects[status].onSceneStart: self.user.statusEffects[status].onSceneStart(char)
+            if self.user.statusEffects[status].onSceneStart: self.user.statusEffects[status].onSceneStart(self.user)
 
-    def onSceneEnd(self, char=None):
+    def onSceneEnd(self):
         for passive in self.passives:
-            if passive.onSceneEnd: passive.onSceneEnd()
+            if passive.onSceneEnd: passive.onSceneEnd(self.user)
         for status in self.user.statusEffects:
-            if self.user.statusEffects[status].onSceneEnd: self.user.statusEffects[status].onSceneEnd(char)
+            if self.user.statusEffects[status].onSceneEnd: self.user.statusEffects[status].onSceneEnd(self.user)
 
 class StatusEffect(Passive): #  I had to look up a tutorial for this because i forgor. This over having to rewrite all of those events. https://realpython.com/inheritance-composition-python/
     def __init__(self, name, description, stacks, rollDie=None, onSceneStart=None, onSceneEnd=None, onTakeDamage=None):
@@ -404,7 +403,8 @@ class Character:    # The big one.
         self.swapKeyPage(keyPage)
         self.deck = deck # Pages that need to be drawn. This is a Queue.
         self.damageandReasons = [[], []] # First list is physical damage and reason, second list is stagger and reason
-        self.counterDice = CombatPage("None", 0, "Common", None, None, None, [])
+        self.counterDice = CombatPage("Counter Dice", 0, "Common", None, None, None, [])
+        self.startingStaggered = False
     def beginAct(self):
         # Reinitialize health and stagger, purge status effects, run onSceneStart functions
         self.statusEffects = {}
@@ -413,6 +413,7 @@ class Character:    # The big one.
         self.light = self.keyPage.lightStart
         self.lightCapacity = self.keyPage.lightStart
         self.Hand = []  # Pages readily accessable to use
+        shuffle(self.deck)
         # Draw 4
         self.drawPages(3)
 
@@ -527,8 +528,8 @@ class Character:    # The big one.
 
     def regainStats(self, health, stagger):
         if stagger > 0:
-            self.stagger = min(self.stagger + stagger, self.keyPage.stagger)
-        self.health = min(self.health + health, self.keyPage.health)
+            self.stagger = min(self.stagger + stagger, self.keyPage.maxStagger)
+        self.health = min(self.health + health, self.keyPage.maxHealth)
     
     def outputData(self, selected):
         statusString = ""
@@ -601,15 +602,15 @@ statusEffects = {
     "Bleed":StatusEffect("Bleed", 
                          "Take damage equal to the number of Bleed stacks on character when rolling an Offensive die, then reduce the number of stacks by 1/3.", 
                          1, rollDie=lambda me,usr,target,die: bleedOut(me,usr,target,die) if not me.justApplied else 0,
-                         onSceneEnd=lambda me: removeStacks(me, me.stacks) if not me.justApplied else int(me.Apply())), # To convert None to 0
+                         onSceneEnd=lambda me,usr: removeStacks(me, me.stacks) if not me.justApplied else int(me.Apply())), # To convert None to 0
     "Strength":StatusEffect("Strength",
                              "All Offensive dice gain power equal to the number of stacks",
                              1, rollDie=lambda me,usr,target,die: me.stacks * strCheck(die) if not me.justApplied else 0,
-                             onSceneEnd=lambda me:removeStacks(me, me.stacks) if not me.justApplied else int(me.Apply())),
+                             onSceneEnd=lambda me,usr:removeStacks(me, me.stacks) if not me.justApplied else int(me.Apply())),
     "Fragile":StatusEffect("Fragile", "Take extra true damage equal to the number of stacks from attacks",
                            1, onTakeDamage=lambda me,usr,type,physical,stagger : (me.stacks, 0), onSceneEnd=lambda me:removeStacks(me, me.stacks ) if not me.justApplied else me.Apply()),
     "Bind":StatusEffect("Bind", "Lowers speed value of all speed die by number of stacks", 1, 
-                        onSceneStart=lambda me : Bind(me.target, me.stacks) if not me.justApplied else None, onSceneEnd=lambda me:removeStacks(me, me.stacks) if not me.justApplied else me.Apply())
+                        onSceneStart=lambda me,usr: Bind(usr, me.stacks) if not me.justApplied else None, onSceneEnd=lambda me,usr:removeStacks(me, me.stacks) if not me.justApplied else me.Apply())
 }
 
 statusEffectColors = {

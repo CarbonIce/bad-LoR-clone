@@ -26,6 +26,10 @@ class Screen:   # If you want something to work, do it yourself. Actually, don't
         columns = size.columns
         toPrintLen = columns - len(stripAnsi(toPrintMiddle))
         print(" " * (toPrintLen // 2) + toPrintMiddle + " " * (toPrintLen // 2), end=end)
+    def printDivider():
+        size = os.get_terminal_size() # https://www.w3schools.com/python/ref_os_get_terminal_size.asp#:~:text=Python%20os.,-get_terminal_size()%20Method&text=The%20os.,the%20terminal%20window%20in%20characters.
+        columns = size.columns
+        print("-" * columns)
 class ReceptionHandler:     # I lied. This is the big one.
     def __init__(self, players, enemies):
         # Players and Enemies are lists of Character objects.
@@ -187,10 +191,10 @@ class ReceptionHandler:     # I lied. This is the big one.
                     match loseDice.dieType:
                         case "Offensive": # Evade > Offensive: Die2 is destroyed; character 1 regains stagger equal to Evade dice value, EVADE DIE IS RECYCLED
                             winner.regainStats(0, winVal)
-                            winner.damageAndReasons[1].append([f"+{winVal}", "Evade"])
+                            winner.damageandReasons[1].append([f"+{winVal}", "Evade"])
                         case "Guard": # Evade > Guard: Die2 is destroyed; character 1 regains stagger equal to Evade die value. THE DIE IS NOT RECYCLED
                             winner.regainStats(0, winVal)
-                            winner.damageAndReasons[1].append([f"+{winVal}", "Evade"])
+                            winner.damageandReasons[1].append([f"+{winVal}", "Evade"])
                         case "Evade": # Nothing happens. Both die are destroyed.
                             pass
             # Blow up both die, unles the winning die was an Evade die and the losing die was an Offensive die (or if the winning die was a Counter die)
@@ -202,10 +206,10 @@ class ReceptionHandler:     # I lied. This is the big one.
         else:
             character1.activeCombatPage.popTopDice()
             character2.activeCombatPage.popTopDice()
-        self.drawScene()
+        self.drawSceneExtendedData()
         # Screen.printMiddle(cS2, end= '\n')
         sleep(2)
-        self.drawScene()
+        self.drawSceneExtendedData()
     def drawScene(self):
         Screen.clearScreen()
         for player in range(len(self.players)):
@@ -253,14 +257,17 @@ class ReceptionHandler:     # I lied. This is the big one.
                 Screen.printRightAligned(data[0])
                 Screen.printRightAligned(data[1])
             pindex += 1
+        Screen.printMiddle(f"{TM.YELLOW}TARGETING{STOP}")
+        Screen.printDivider()
         for Clash in Clashes:
-            Screen.printMiddle(f"{Clash[0].owner.name}'s die {TM.YELLOW}#{Clash[0].owner.speedDice.index(Clash[0])}{STOP} ({Clash[0].pageToUse}){TM.YELLOW} -> <- {STOP}{Clash[1].owner.name}'s die {TM.YELLOW}#{Clash[1].owner.speedDice.index(Clash[1])}{STOP} ({Clash[1].pageToUse})")
+            Screen.printMiddle(f"{Clash[0].owner.name}'s die {TM.YELLOW}#{Clash[0].owner.speedDice.index(Clash[0])} (Speed {Clash[0]}){STOP} ({Clash[0].pageToUse}){TM.YELLOW} -> <- {STOP}{Clash[1].owner.name}'s die {TM.YELLOW}#{Clash[1].owner.speedDice.index(Clash[1])} (Speed {Clash[1]}){STOP} ({Clash[1].pageToUse})")
         for oneSidedAttack in oneSided:
             if oneSidedAttack[1]:
-                print(f"{TM.LIGHT_CYAN if oneSidedAttack[1] else TM.LIGHT_RED}{oneSidedAttack[0].owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].owner.speedDice.index(oneSidedAttack[0])} {STOP}({oneSidedAttack[0].pageToUse}){TM.LIGHT_CYAN if oneSidedAttack[1] else TM.LIGHT_RED} -> {oneSidedAttack[0].target.owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].target.owner.speedDice.index(oneSidedAttack[0].target)}{STOP}")
+                print(f"{TM.LIGHT_CYAN if oneSidedAttack[1] else TM.LIGHT_RED}{oneSidedAttack[0].owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].owner.speedDice.index(oneSidedAttack[0])} (Speed {oneSidedAttack[0]}) {STOP}({oneSidedAttack[0].pageToUse}){TM.LIGHT_CYAN if oneSidedAttack[1] else TM.LIGHT_RED} -> {oneSidedAttack[0].target.owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].target.owner.speedDice.index(oneSidedAttack[0].target)}{STOP}")
             else:
                 # print(f"{TM.LIGHT_RED}{oneSidedAttack[0].target.owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].target.owner.speedDice.index(oneSidedAttack[0].target)}{TM.LIGHT_RED} <- {STOP}({oneSidedAttack[0].pageToUse.reverseStr()}){TM.LIGHT_RED} {oneSidedAttack[0].owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].owner.speedDice.index(oneSidedAttack[0])}{STOP}")
-                Screen.printRightAligned(f"{TM.LIGHT_RED}{oneSidedAttack[0].target.owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].target.owner.speedDice.index(oneSidedAttack[0].target)}{TM.LIGHT_RED} <- {STOP}({oneSidedAttack[0].pageToUse.reverseStr()}){TM.LIGHT_RED} {oneSidedAttack[0].owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].owner.speedDice.index(oneSidedAttack[0])}{STOP}")
+                Screen.printRightAligned(f"{TM.LIGHT_RED}{oneSidedAttack[0].target.owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].target.owner.speedDice.index(oneSidedAttack[0].target)}{TM.LIGHT_RED} <- {STOP}({oneSidedAttack[0].pageToUse.reverseStr()}){TM.LIGHT_RED} (Speed {oneSidedAttack[0]}) {oneSidedAttack[0].owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].owner.speedDice.index(oneSidedAttack[0])}{STOP}")
+        Screen.printDivider()
     def pageClash(self, p1, p2, page1, page2):
         while len(page1) > 0 or len(page2) > 0:
             if p1.stagger == 0: # If either character is staggaered, destroy all dice on their page.
@@ -354,7 +361,7 @@ class ReceptionHandler:     # I lied. This is the big one.
                 #    Page 1 Unapposed
             else:
                 self.Clash(p1, p2, page1.dice[0], page2.dice[0])
-            self.drawScene()
+            self.drawSceneExtendedData()
     def dieClash(self, die1, die2):
         p1 = die1.owner
         p2 = die2.owner
@@ -362,9 +369,12 @@ class ReceptionHandler:     # I lied. This is the big one.
         if die2.target != None:
             p2.playCombatPage(die2.pageToUse, p1)
             self.pageClash(p1, p2, die1.pageToUse, die2.pageToUse)
+            die2.pageTouse = None
+            die2.target = None
         else:
             self.pageClash(p1, p2, die1.pageToUse, p2.counterDice)
-
+        die1.pageTouse = None
+        die1.target = None
     def Scene(self):
         self.scene += 1
         # Roll Speed
@@ -374,12 +384,12 @@ class ReceptionHandler:     # I lied. This is the big one.
             character.drawPages(1)
             character.regainLight(1)
             # Run OnSceneStart effects from KeyPage passives and Status Effects
-            character.keyPage.onSceneStart(character, (self.scene == 1))
+            character.keyPage.onSceneStart(self.scene == 1)
         for character in self.enemies:
             character.rollSpeedDice()
             character.drawPages(1)
             character.regainLight(1)
-            character.keyPage.onSceneStart(character, (self.scene == 1))
+            character.keyPage.onSceneStart(self.scene == 1)
         # Have enemies target random speed die of yours
         for enemy in self.enemies:
             # Just chooses a random page that can be used and puts it in the fastest speed die (and target a random speed die of an ally)
@@ -465,7 +475,7 @@ class ReceptionHandler:     # I lied. This is the big one.
             while StopTime: # https://stackoverflow.com/questions/24072790/how-to-detect-key-presses
                 self.drawSceneExtendedData(selectedCharacter, False, selectedDie)
                 print("(Use arrow keys to navigate speed dice, press space to select the die, or escape to go back)")
-                print(f"Currently selecting {TM.YELLOW}{self.characters[selectedCharacter].name}{STOP}'s dice number {TM.YELLOW}{selectedDie}{STOP} (Die numbers are the numbers outside of the paranthases within the square brackets)")
+                print(f"Currently selecting {TM.YELLOW}{self.characters[selectedCharacter].name}{STOP}'s dice number {TM.YELLOW}{selectedDie} (Speed {self.characters[selectedCharacter].speedDice[selectedDie]}){STOP} (Die numbers are the numbers outside of the paranthases within the square brackets)")
                 while not event or event.event_type != 'down' or event.name not in 'up down right left space esc'.split(" "):
                     event = keyboard.read_event()
                 if event.event_type == "down":
@@ -491,7 +501,7 @@ class ReceptionHandler:     # I lied. This is the big one.
             event=None
             while StopTime: # Page select
                 self.drawSceneExtendedData()
-                print(f"{TM.YELLOW}{self.characters[selectedCharacter].name}{STOP}'s dice number {TM.YELLOW}{selectedDie}{STOP},")
+                print(f"{TM.YELLOW}{self.characters[selectedCharacter].name}{STOP}'s dice number {TM.YELLOW}{selectedDie} (Speed {self.characters[selectedCharacter].speedDice[selectedDie]}){STOP},")
                 print("Selected:", char.Hand[selectedPage].longPrint())
                 index = 0
                 for page in char.Hand:
@@ -527,9 +537,9 @@ class ReceptionHandler:     # I lied. This is the big one.
             selectedEnemyDie = 0
             while StopTime: # https://stackoverflow.com/questions/24072790/how-to-detect-key-presses
                 self.drawSceneExtendedData(selectedEnemy, True, selectedEnemyDie)
-                print(f"{TM.YELLOW}{self.characters[selectedCharacter].name}{STOP}'s dice number {TM.YELLOW}{selectedDie}{STOP}, using {char.Hand[selectedPage]}")
-                print("(Use arrow keys and space to navigate enemy speed dice")
-                print(f"Currently selecting {TM.YELLOW}{self.enemies[selectedEnemy].name}{STOP}'s dice number {TM.YELLOW}{selectedEnemyDie}{STOP} (Die numbers are the numbers outside of the paranthases within the square brackets)")
+                print(f"{TM.YELLOW}{self.characters[selectedCharacter].name}{STOP}'s dice number {TM.YELLOW}{selectedDie} (Speed {self.characters[selectedCharacter].speedDice[selectedDie]}){STOP}, using {char.Hand[selectedPage]}")
+                print("(Use arrow keys to navigate enemy speed dice, space to select, escape to go back)")
+                print(f"Currently selecting {TM.YELLOW}{self.enemies[selectedEnemy].name}{STOP}'s dice number {TM.YELLOW}{selectedEnemyDie} (Speed {self.enemies[selectedEnemy].speedDice[selectedEnemyDie]}){STOP} (Die numbers are the numbers outside of the paranthases within the square brackets)")
                 while not event or event.event_type != 'down' or event.name not in 'up down right left space'.split(" "):
                     event = keyboard.read_event()
                 if event.event_type == "down":
@@ -563,8 +573,10 @@ class ReceptionHandler:     # I lied. This is the big one.
                 AllDiceSortedBySpeed.append(speedDie)
                 index += 1
         AllDiceSortedBySpeed.sort(key=lambda x: x.value)
-        print(AllDiceSortedBySpeed)
         usedDice = []
+        
+        # Fastest speed die goes first, and prompt the targeted die to play it's combat page
+        
         for die in AllDiceSortedBySpeed:
             if die not in usedDice:
                 if die in ClashingDice:
@@ -581,15 +593,26 @@ class ReceptionHandler:     # I lied. This is the big one.
                 elif die in OneSidedDice:
                     usedDice.append(die)
                     self.dieClash(die, die.target)
-        exit()
-        
-        # Fastest speed die goes first, and prompt the targeted die to play it's combat page
-        
-        
-        # Continue until all speed die with pages attributed have clashed or one sided attacked
-        
-        
+        # Continue until all speed die with pages attributed have clashed or one sided attacked (or failed to do anything due to stagger)
+
+
         # Run OnSceneEnd effects from KeyPage, Character, Status Effects, etc.
+        for chara in self.characters:
+            chara.keyPage.onSceneEnd()
+            if not chara.startingStaggered and chara.stagger == 0:
+                chara.startingStaggered = True
+            elif chara.startingStaggered:
+                chara.startingStaggered = False
+                chara.stagger = chara.keyPage.maxStagger
+            chara.checkForIncrementEmotionLevel()
+        for chara in self.enemies:
+            chara.keyPage.onSceneEnd()
+            if not chara.startingStaggered and chara.stagger == 0:
+                chara.startingStaggered = True
+            elif chara.startingStaggered:
+                chara.startingStaggered = False
+                chara.stagger = chara.keyPage.maxStagger
+            chara.checkForIncrementEmotionLevel()
     def Act(self, characters, enemies):
         self.act += 1
         self.characters = characters
