@@ -533,13 +533,23 @@ class Character:    # The big one.
         self.health = min(self.health + health, self.keyPage.health)
     
     def outputData(self):
-        print(f"{self.name} - {self.keyPage.name}'s Key Page")
-        print(f"{TM.LIGHT_RED}{self.health}/{self.keyPage.health} HP{STOP}")
-        print(f"{TM.YELLOW}{self.stagger}/{self.keyPage.stagger} STGR{STOP}")
-        print(f"{TM.LIGHT_PURPLE}{self.emotionCoins}/{EmotionCoinRequirements[self.emotionLevel]} EMOTION COINS (EMOTION LEVEL {self.emotionLevel}){STOP}")
-        print(f"{TM.YELLOW}{self.light}/{self.lightCapacity} Light{STOP}")
+        statusString = ""
         for status in self.statusEffects:
-            print(f"{self.statusEffects[status].stacks} {status}")
+            statusString += f" {statusEffects[status]}"
+        if statusString == "":
+            statusString = " "  # So that my formatting methods work because theres a " | " not a " |"
+        physicalDamageReason = ""
+        staggerDamageReason = ""
+        if len(self.damageandReasons[0]) > 0:
+            physicalDamageReason = " ".join([f"({x[1]} {x[0]})" for x in self.damageandReasons[0] if x[0] != 0])
+        if len(self.damageandReasons[1]) > 0:
+            staggerDamageReason = " ".join([f"({x[1]} {x[0]})" for x in self.damageandReasons[1] if x[0] != 0])
+        
+        toReturn = [f"{self.name} | {TM.LIGHT_RED}{self.health}{physicalDamageReason} {TM.YELLOW}{self.stagger}{staggerDamageReason}{STOP} | {TM.LIGHT_RED}({resistanceToColorPhysical[self.keyPage.physicalResistances['Slash']]}S:{resistanceToText[self.keyPage.physicalResistances['Slash']]} {resistanceToColorPhysical[self.keyPage.physicalResistances['Pierce']]}P:{resistanceToText[self.keyPage.physicalResistances['Pierce']]} {resistanceToColorPhysical[self.keyPage.physicalResistances['Blunt']]}B:{resistanceToText[self.keyPage.physicalResistances['Blunt']]}{TM.LIGHT_RED}){STOP} {TM.YELLOW}({resistanceToColorStagger[self.keyPage.staggerResistances['Slash']]}S:{resistanceToText[self.keyPage.staggerResistances['Slash']]} {resistanceToColorStagger[self.keyPage.staggerResistances['Pierce']]}P:{resistanceToText[self.keyPage.staggerResistances['Pierce']]} {resistanceToColorStagger[self.keyPage.staggerResistances['Blunt']]}B:{resistanceToText[self.keyPage.staggerResistances['Blunt']]}{TM.YELLOW}){STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}",
+                     f"{TM.YELLOW}{u'◆ ' * self.light}{TM.DARK_GRAY}{u'◇ ' * (self.lightCapacity-self.light)}{STOP} | {TM.YELLOW}{" ".join([f"{TM.YELLOW}[{x} ({str(self.speedDice[x])})]{STOP}" if self.speedDice[x].target != None else f"{TM.DARK_GRAY}[{x} ({str(self.speedDice[x])})]" for x in range(len(self.speedDice))])}{STOP} |{(statusString if len(statusString) > 1 else f" {TM.DARK_GRAY}no status effects{STOP}")}"]
+        
+        self.damageandReasons = [[], []]
+        return toReturn
     
     def miniOutputData(self):
         statusString = ""
@@ -555,7 +565,7 @@ class Character:    # The big one.
             staggerDamageReason = " ".join([f"({x[1]} {x[0]})" for x in self.damageandReasons[1] if x[0] != 0])
         
         toReturn = [f"{self.name} | {TM.LIGHT_RED}{self.health}{physicalDamageReason} {TM.YELLOW}{self.stagger}{staggerDamageReason}{STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}",
-                     f"{TM.YELLOW}{u'◆ ' * self.light}{TM.DARK_GRAY}{u'◇ ' * (self.lightCapacity-self.light)}{STOP} | " + TM.YELLOW + " ".join([f"{TM.YELLOW}[{x} ({str(self.speedDice[x])})]{STOP}" if self.speedDice[x].target != None else f"{TM.DARK_GRAY}[{x} ({str(self.speedDice[x])})]" for x in range(len(self.speedDice))]) + STOP + " |" + statusString]
+                     f"{TM.YELLOW}{u'◆ ' * self.light}{TM.DARK_GRAY}{u'◇ ' * (self.lightCapacity-self.light)}{STOP} | {TM.YELLOW}{" ".join([f"{TM.YELLOW}[{x} ({str(self.speedDice[x])})]{STOP}" if self.speedDice[x].target != None else f"{TM.DARK_GRAY}[{x} ({str(self.speedDice[x])})]" for x in range(len(self.speedDice))])}{STOP} |{(statusString if len(statusString) > 1 else f" {TM.DARK_GRAY}no status effects{STOP}")}"]
         
         self.damageandReasons = [[], []]
         return toReturn
@@ -614,4 +624,18 @@ resistanceToText = {
     1: "Normal",
     1.5: "Weak",
     2: "Fatal"
+}
+resistanceToColorPhysical = {
+    0.25: TM.DARK_GRAY,
+    0.5: TM.DARK_GRAY,
+    1: TM.RED,
+    1.5: TM.LIGHT_RED,
+    2: TM.LIGHT_RED
+}
+resistanceToColorStagger = {
+    0.25: TM.DARK_GRAY,
+    0.5: TM.DARK_GRAY,
+    1: TM.YELLOW,
+    1.5: TM.YELLOW,
+    2: TM.YELLOW
 }
