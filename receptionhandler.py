@@ -10,8 +10,9 @@ class Screen:   # If you want something to work, do it yourself. Actually, don't
     def printRightAligned(toPrint, end='\n'):
         size = os.get_terminal_size() # https://www.w3schools.com/python/ref_os_get_terminal_size.asp#:~:text=Python%20os.,-get_terminal_size()%20Method&text=The%20os.,the%20terminal%20window%20in%20characters.
         columns = size.columns
-        toPrint = reverseOutput(toPrint)
-        toPrintLen = stripAnsi(len(toPrint))
+        if "<-" not in toPrint: # Awful workaround, but I'm dying over here
+            toPrint = reverseOutput(toPrint)
+        toPrintLen = len(stripAnsi(toPrint))
         print(" " * (columns - toPrintLen) + toPrint, end=end)
     def printRightandLeft(toPrintLeft, toPrintRight, end='\n'):
         size = os.get_terminal_size() # https://www.w3schools.com/python/ref_os_get_terminal_size.asp#:~:text=Python%20os.,-get_terminal_size()%20Method&text=The%20os.,the%20terminal%20window%20in%20characters.
@@ -246,9 +247,13 @@ class ReceptionHandler:     # I lied. This is the big one.
                 Screen.printRightAligned(data[1])
             pindex += 1
         for Clash in Clashes:
-            print(f"{Clash[0].owner.name}'s die {TM.YELLOW}#{Clash[0].owner.speedDice.index(Clash[0])}{STOP} ({Clash[0].pageToUse}){TM.YELLOW} -> <- {STOP}{Clash[1].owner.name}'s die {TM.YELLOW}#{Clash[1].owner.speedDice.index(Clash[1])}{STOP} ({Clash[1].pageToUse})")
+            Screen.printMiddle(f"{Clash[0].owner.name}'s die {TM.YELLOW}#{Clash[0].owner.speedDice.index(Clash[0])}{STOP} ({Clash[0].pageToUse}){TM.YELLOW} -> <- {STOP}{Clash[1].owner.name}'s die {TM.YELLOW}#{Clash[1].owner.speedDice.index(Clash[1])}{STOP} ({Clash[1].pageToUse})")
         for oneSidedAttack in oneSided:
-            print(f"{TM.LIGHT_CYAN if oneSidedAttack[1] else TM.LIGHT_RED}{oneSidedAttack[0].owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].owner.speedDice.index(oneSidedAttack[0])} {STOP}({oneSidedAttack[0].pageToUse}){TM.LIGHT_CYAN if oneSidedAttack[1] else TM.LIGHT_RED} -> {oneSidedAttack[0].target.owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].target.owner.speedDice.index(oneSidedAttack[0].target)}{STOP}")
+            if oneSidedAttack[1]:
+                print(f"{TM.LIGHT_CYAN if oneSidedAttack[1] else TM.LIGHT_RED}{oneSidedAttack[0].owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].owner.speedDice.index(oneSidedAttack[0])} {STOP}({oneSidedAttack[0].pageToUse}){TM.LIGHT_CYAN if oneSidedAttack[1] else TM.LIGHT_RED} -> {oneSidedAttack[0].target.owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].target.owner.speedDice.index(oneSidedAttack[0].target)}{STOP}")
+            else:
+                print(f"{TM.LIGHT_RED}{oneSidedAttack[0].target.owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].target.owner.speedDice.index(oneSidedAttack[0].target)}{TM.LIGHT_RED} <- {STOP}({oneSidedAttack[0].pageToUse.reverseStr()}){TM.LIGHT_RED} {oneSidedAttack[0].owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].owner.speedDice.index(oneSidedAttack[0])}{STOP}")
+                Screen.printRightAligned(f"{TM.LIGHT_RED}{oneSidedAttack[0].target.owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].target.owner.speedDice.index(oneSidedAttack[0].target)}{TM.LIGHT_RED} <- {STOP}({oneSidedAttack[0].pageToUse.reverseStr()}){TM.LIGHT_RED} {oneSidedAttack[0].owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].owner.speedDice.index(oneSidedAttack[0])}{STOP}")
     def pageClash(self, p1, p2, page1, page2):
         while len(page1) > 0 or len(page2) > 0:
             Screen.printMiddle(f"{page1.reverseStr()} >< {reverseOutput(str(page2))}")
