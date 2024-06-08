@@ -53,6 +53,8 @@ class ReceptionHandler:     # I lied. This is the big one.
         testedEnemyDice = []
         Clashes = []
         OneSidedAttacks = []
+        clashingDice = []
+        oneSidedDice = []
         '''
         1. Check for dice that target each other. These dice clash, no matter what.
         2. Check for dice that target a dice that has a lower speed and an assigned page. These dice clash, and if multiple dice are targetting the same lower speed die, the higher speed targetting dice will clash.
@@ -64,18 +66,23 @@ class ReceptionHandler:     # I lied. This is the big one.
                     testedCharacterDice.append(die[0])
                     testedEnemyDice.append(die[0].target)
                     Clashes.append([die[0], die[0].target])
+                    clashingDice.append(die[0])
+                    clashingDice.append(die[0].target)
                 elif die[0].target is not None and die[0].target.value < die[0].value and die[0].target not in testedEnemyDice:  # Enemy die is slower, redirection of Clash
                     testedCharacterDice.append(die[0])
                     testedEnemyDice.append(die[0].target)
                     Clashes.append([die[0], die[0].target])
+                    clashingDice.append(die[0])
+                    clashingDice.append(die[0].target)
                 elif die[0].target is not None:
                     testedCharacterDice.append(die[0])  # The biggest advantage the player has over the enemy is that the enemy cannot redirect.
                     OneSidedAttacks.append([die[0], True]) # The second bool is a indication of if the one sided attack is from a Character or an Enemy
-
+                    oneSidedDice.append(die[0])
         for die in EnemyDiceSortedBySpeed:
             if die[0] not in testedEnemyDice and die[0].target is not None:
                 OneSidedAttacks.append([die[0], False]) # The second bool is a indication of if the one sided attack is from a Character or an Enemy
-        return Clashes, OneSidedAttacks
+                oneSidedDice.append(die[0])
+        return Clashes, OneSidedAttacks, clashingDice, oneSidedDice
     def Clash(self, character1, character2, dice1, dice2):    # NO DISTINCTION BETWEEN RANGED AND MELEE AND MASS ATTACK PAGES BECAUSE FUCK NO
         # CLASH BETWEEN DICE:
         # Step 1: Roll both die.
@@ -186,8 +193,8 @@ class ReceptionHandler:     # I lied. This is the big one.
                             winner.damageAndReasons[1].append([f"+{winVal}", "Evade"])
                         case "Evade": # Nothing happens. Both die are destroyed.
                             pass
-            # Blow up both die, unles the winning die was an Evade die and the losing die was an Offensive die
-            if winDice.dieType == "Evade" and loseDice.dieType == "Offensive":
+            # Blow up both die, unles the winning die was an Evade die and the losing die was an Offensive die (or if the winning die was a Counter die)
+            if (winDice.dieType == "Evade" and loseDice.dieType == "Offensive") or winDice.counter:
                 loser.activeCombatPage.popTopDice()
             else:
                 winner.activeCombatPage.popTopDice()
@@ -217,7 +224,7 @@ class ReceptionHandler:     # I lied. This is the big one.
                 Screen.printRightAligned(data[0])
                 Screen.printRightAligned(data[1])
     def drawSceneExtendedData(self, selectedCharIndex=-1, enemyTrueelseFalse=False, hoverDie=-1):
-        Clashes, oneSided = self.calculateTargeting()
+        Clashes, oneSided, _, _ = self.calculateTargeting()
         Screen.clearScreen()
         pindex = 0
         for player in range(len(self.players)):
@@ -256,6 +263,10 @@ class ReceptionHandler:     # I lied. This is the big one.
                 Screen.printRightAligned(f"{TM.LIGHT_RED}{oneSidedAttack[0].target.owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].target.owner.speedDice.index(oneSidedAttack[0].target)}{TM.LIGHT_RED} <- {STOP}({oneSidedAttack[0].pageToUse.reverseStr()}){TM.LIGHT_RED} {oneSidedAttack[0].owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].owner.speedDice.index(oneSidedAttack[0])}{STOP}")
     def pageClash(self, p1, p2, page1, page2):
         while len(page1) > 0 or len(page2) > 0:
+            if p1.stagger == 0: # If either character is staggaered, destroy all dice on their page.
+                page1.dice = []
+            if p2.stagger == 0:
+                page2.dice = []
             Screen.printMiddle(f"{page1.reverseStr()} >< {reverseOutput(str(page2))}")
             sleep(1)
             if len(page1) == 0:
@@ -344,6 +355,16 @@ class ReceptionHandler:     # I lied. This is the big one.
             else:
                 self.Clash(p1, p2, page1.dice[0], page2.dice[0])
             self.drawScene()
+    def dieClash(self, die1, die2):
+        p1 = die1.owner
+        p2 = die2.owner
+        p1.playCombatPage(die1.pageToPlay, p2)
+        if die2.target != None:
+            p2.playCombatPage(die2.pageToPlay, p1)
+            self.pageClash(p1, p2, die1.pageToPlay, die2.pageToPlay)
+        else:
+            self.pageClash(p1, p2, die1.pageToPlay, p2.counterDice)
+
     def Scene(self):
         self.scene += 1
         # Roll Speed
@@ -488,6 +509,37 @@ class ReceptionHandler:     # I lied. This is the big one.
                 char.assignPageToSpeedDice(selectedDie, selectedPage, self.enemies[selectedEnemy].speedDice[selectedEnemyDie])
             event = None
         # Begin Combat
+        ClashesFinal, OneSidedFinal, ClashingDice, OneSidedDice = self.calculateTargeting()
+        AllDiceSortedBySpeed = []
+        for character in range(len(self.characters)):
+                index = 0
+                for speedDie in self.characters[character].speedDice:
+                    AllDiceSortedBySpeed.append(speedDie)
+                    index += 1
+        for enemy in range(len(self.enemies)):
+            index = 0
+            for speedDie in self.enemies[enemy].speedDice:
+                AllDiceSortedBySpeed.append(speedDie)
+                index += 1
+        AllDiceSortedBySpeed.sort(key=lambda x: x.value)
+        print(AllDiceSortedBySpeed)
+        usedDice = []
+        for die in AllDiceSortedBySpeed:
+            if die not in usedDice:
+                if die in ClashingDice:
+                    clashFinal = None
+                    for clash in ClashesFinal:
+                        if die in clash:
+                            clashFinal = clash
+                            break
+                    clashFinal[0].target = clashFinal[1]
+                    clashFinal[1].target = clashFinal[0]
+                    usedDice.append(clashFinal[0])
+                    usedDice.append(clashFinal[1])
+                    self.dieClash(clashFinal[0], clashFinal[1])
+                elif die in OneSidedDice:
+                    usedDice.append(die)
+                    self.dieClash(die, die.target)
         exit()
         
         # Fastest speed die goes first, and prompt the targeted die to play it's combat page

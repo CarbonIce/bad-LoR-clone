@@ -404,7 +404,7 @@ class Character:    # The big one.
         self.swapKeyPage(keyPage)
         self.deck = deck # Pages that need to be drawn. This is a Queue.
         self.damageandReasons = [[], []] # First list is physical damage and reason, second list is stagger and reason
-        self.counterDice = []
+        self.counterDice = CombatPage("None", 0, "Common", None, None, None, [])
     def beginAct(self):
         # Reinitialize health and stagger, purge status effects, run onSceneStart functions
         self.statusEffects = {}
@@ -420,7 +420,7 @@ class Character:    # The big one.
         self.activeCombatPage = page
         for die in page.dice:
             if die.counter:
-                self.counterDice.append(die)
+                self.counterDice.dice.append(die)
                 page.dice.remove(die)
         self.target = target
 
