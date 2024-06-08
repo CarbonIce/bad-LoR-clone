@@ -216,7 +216,7 @@ class ReceptionHandler:     # I lied. This is the big one.
                 data = self.enemies[enemy + len(self.players) + 1].miniOutputData()
                 Screen.printRightAligned(data[0])
                 Screen.printRightAligned(data[1])
-    def drawSceneExtendedData(self, selectedCharIndex, enemyTrueelseFalse, hoverDie):
+    def drawSceneExtendedData(self, selectedCharIndex=-1, enemyTrueelseFalse=False, hoverDie=-1):
         Clashes, oneSided = self.calculateTargeting()
         Screen.clearScreen()
         pindex = 0
@@ -252,7 +252,7 @@ class ReceptionHandler:     # I lied. This is the big one.
             if oneSidedAttack[1]:
                 print(f"{TM.LIGHT_CYAN if oneSidedAttack[1] else TM.LIGHT_RED}{oneSidedAttack[0].owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].owner.speedDice.index(oneSidedAttack[0])} {STOP}({oneSidedAttack[0].pageToUse}){TM.LIGHT_CYAN if oneSidedAttack[1] else TM.LIGHT_RED} -> {oneSidedAttack[0].target.owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].target.owner.speedDice.index(oneSidedAttack[0].target)}{STOP}")
             else:
-                print(f"{TM.LIGHT_RED}{oneSidedAttack[0].target.owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].target.owner.speedDice.index(oneSidedAttack[0].target)}{TM.LIGHT_RED} <- {STOP}({oneSidedAttack[0].pageToUse.reverseStr()}){TM.LIGHT_RED} {oneSidedAttack[0].owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].owner.speedDice.index(oneSidedAttack[0])}{STOP}")
+                # print(f"{TM.LIGHT_RED}{oneSidedAttack[0].target.owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].target.owner.speedDice.index(oneSidedAttack[0].target)}{TM.LIGHT_RED} <- {STOP}({oneSidedAttack[0].pageToUse.reverseStr()}){TM.LIGHT_RED} {oneSidedAttack[0].owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].owner.speedDice.index(oneSidedAttack[0])}{STOP}")
                 Screen.printRightAligned(f"{TM.LIGHT_RED}{oneSidedAttack[0].target.owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].target.owner.speedDice.index(oneSidedAttack[0].target)}{TM.LIGHT_RED} <- {STOP}({oneSidedAttack[0].pageToUse.reverseStr()}){TM.LIGHT_RED} {oneSidedAttack[0].owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].owner.speedDice.index(oneSidedAttack[0])}{STOP}")
     def pageClash(self, p1, p2, page1, page2):
         while len(page1) > 0 or len(page2) > 0:
@@ -384,7 +384,7 @@ class ReceptionHandler:     # I lied. This is the big one.
             option = True
             COMBATTIME = False
             while True:
-                self.drawScene()
+                self.drawSceneExtendedData()
                 print(f"{TM.DARK_GRAY if not option else TM.LIGHT_GRAY}Assign Combat Page {STOP}| {TM.DARK_GRAY if option else TM.LIGHT_GRAY}Begin Scene{STOP}")
                 print("(Use right and left arrows to select options, press space to confirm)")
                 while not event or event.event_type != 'down' or event.name not in 'right left space'.split(" "):
@@ -428,7 +428,7 @@ class ReceptionHandler:     # I lied. This is the big one.
             selectedPage = 0
             event=None
             while StopTime: # Page select
-                self.drawSceneExtendedData(-1, False, -1)
+                self.drawSceneExtendedData()
                 print(f"{TM.YELLOW}{self.characters[selectedCharacter].name}{STOP}'s dice number {TM.YELLOW}{selectedDie}{STOP},")
                 print("Selected:", char.Hand[selectedPage].longPrint())
                 index = 0
