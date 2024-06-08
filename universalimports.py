@@ -1,6 +1,7 @@
 from random import randint, choice, shuffle
 from math import ceil
 from time import sleep
+from copy import deepcopy
 import os
 import sys
 import keyboard
@@ -513,15 +514,21 @@ class Character:    # The big one.
             self.removePageFromSpeedDice(speedDiceID)
         self.speedDice[speedDiceID].target = targetDie
         self.light -= page.lightCost
-        self.speedDice[speedDiceID].pageToUse = page
+        self.speedDice[speedDiceID].pageToUse = deepcopy(page)
         self.Hand.remove(page)
+        self.deck.append(page)
 
     def removePageFromSpeedDice(self, speedDiceID):
         thePage = self.speedDice[speedDiceID].pageToUse
-        self.Hand.append(thePage)
-        self.light += thePage.lightCost
-        self.speedDice[speedDiceID].pageToUse = None
-        self.speedDice[speedDiceID].target = None
+        if thePage:
+            self.light += thePage.lightCost
+            self.speedDice[speedDiceID].pageToUse = None
+            self.speedDice[speedDiceID].target = None
+            for page in self.deck:
+                if page.name == thePage.name:
+                    self.Hand.append(page)
+                    self.deck.remove(page)
+                    break
 
     def regainLight(self, amount):
         self.light = min(self.light + amount, self.lightCapacity)
@@ -602,11 +609,11 @@ statusEffects = {
     "Bleed":StatusEffect("Bleed", 
                          "Take damage equal to the number of Bleed stacks on character when rolling an Offensive die, then reduce the number of stacks by 1/3.", 
                          1, rollDie=lambda me,usr,target,die: bleedOut(me,usr,target,die) if not me.justApplied else 0,
-                         onSceneEnd=lambda me,usr: removeStacks(me, me.stacks) if not me.justApplied else int(me.Apply())), # To convert None to 0
+                         onSceneEnd=lambda me,usr: removeStacks(me, me.stacks) if not me.justApplied else int(me.Apply() or 0)), # To convert None to 0
     "Strength":StatusEffect("Strength",
                              "All Offensive dice gain power equal to the number of stacks",
                              1, rollDie=lambda me,usr,target,die: me.stacks * strCheck(die) if not me.justApplied else 0,
-                             onSceneEnd=lambda me,usr:removeStacks(me, me.stacks) if not me.justApplied else int(me.Apply())),
+                             onSceneEnd=lambda me,usr:removeStacks(me, me.stacks) if not me.justApplied else int(me.Apply() or 0)),
     "Fragile":StatusEffect("Fragile", "Take extra true damage equal to the number of stacks from attacks",
                            1, onTakeDamage=lambda me,usr,type,physical,stagger : (me.stacks, 0), onSceneEnd=lambda me:removeStacks(me, me.stacks ) if not me.justApplied else me.Apply()),
     "Bind":StatusEffect("Bind", "Lowers speed value of all speed die by number of stacks", 1, 

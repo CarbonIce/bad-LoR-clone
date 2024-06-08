@@ -372,6 +372,7 @@ class ReceptionHandler:     # I lied. This is the big one.
             die2.pageTouse = None
             die2.target = None
         else:
+            p2.playCombatPage(p2.counterDice, p1)
             self.pageClash(p1, p2, die1.pageToUse, p2.counterDice)
         die1.pageTouse = None
         die1.target = None
