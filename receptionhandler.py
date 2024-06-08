@@ -248,7 +248,7 @@ class ReceptionHandler:     # I lied. This is the big one.
                 Screen.printRightAligned(data[1])
             pindex += 1
         for Clash in Clashes:
-            print(f"{Clash[0].owner.name}'s die {TM.YELLOW}#{Clash[0].owner.speedDice.index(Clash[0])}{STOP} ({Clash[0].pageToUse}){TM.YELLOW} -> <- {STOP}{Clash[0].owner.name}'s die {TM.YELLOW}#{Clash[1].owner.speedDice.index(Clash[1])}{STOP} ({Clash[1].pageToUse})")
+            print(f"{Clash[0].owner.name}'s die {TM.YELLOW}#{Clash[0].owner.speedDice.index(Clash[0])}{STOP} ({Clash[0].pageToUse}){TM.YELLOW} -> <- {STOP}{Clash[1].owner.name}'s die {TM.YELLOW}#{Clash[1].owner.speedDice.index(Clash[1])}{STOP} ({Clash[1].pageToUse})")
         for oneSidedAttack in oneSided:
             print(f"{TM.LIGHT_CYAN if oneSidedAttack[1] else TM.LIGHT_RED}{oneSidedAttack[0].owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].owner.speedDice.index(oneSidedAttack[0])} {STOP}({oneSidedAttack[0].pageToUse}){TM.LIGHT_CYAN if oneSidedAttack[1] else TM.LIGHT_RED} -> {oneSidedAttack[0].target.owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].target.owner.speedDice.index(oneSidedAttack[0].target)}{STOP}")
     def pageClash(self, p1, p2, page1, page2):
@@ -396,7 +396,8 @@ class ReceptionHandler:     # I lied. This is the big one.
             if COMBATTIME:
                 break
             event = None
-            while True: # https://stackoverflow.com/questions/24072790/how-to-detect-key-presses
+            StopTime = True
+            while StopTime: # https://stackoverflow.com/questions/24072790/how-to-detect-key-presses
                 self.drawSceneExtendedData(selectedCharacter, False, selectedDie)
                 print("(Use arrow keys to navigate speed dice, press space to select the die, or escape to go back)")
                 print(f"Currently selecting {TM.YELLOW}{self.characters[selectedCharacter].name}{STOP}'s dice number {TM.YELLOW}{selectedDie}{STOP} (Die numbers are the numbers outside of the paranthases within the square brackets)")
@@ -423,9 +424,9 @@ class ReceptionHandler:     # I lied. This is the big one.
             char = self.characters[selectedCharacter]
             selectedPage = 0
             event=None
-            StopTime = True
             while StopTime: # Page select
                 self.drawSceneExtendedData(-1, False, -1)
+                print(f"{TM.YELLOW}{self.characters[selectedCharacter].name}{STOP}'s dice number {TM.YELLOW}{selectedDie}{STOP},")
                 print("Selected:", char.Hand[selectedPage].longPrint())
                 index = 0
                 for page in char.Hand:
@@ -461,6 +462,7 @@ class ReceptionHandler:     # I lied. This is the big one.
             selectedEnemyDie = 0
             while StopTime: # https://stackoverflow.com/questions/24072790/how-to-detect-key-presses
                 self.drawSceneExtendedData(selectedEnemy, True, selectedEnemyDie)
+                print(f"{TM.YELLOW}{self.characters[selectedCharacter].name}{STOP}'s dice number {TM.YELLOW}{selectedDie}{STOP}, using {char.Hand[selectedPage]}")
                 print("(Use arrow keys and space to navigate enemy speed dice")
                 print(f"Currently selecting {TM.YELLOW}{self.enemies[selectedEnemy].name}{STOP}'s dice number {TM.YELLOW}{selectedEnemyDie}{STOP} (Die numbers are the numbers outside of the paranthases within the square brackets)")
                 while not event or event.event_type != 'down' or event.name not in 'up down right left space'.split(" "):
