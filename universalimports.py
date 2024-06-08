@@ -106,6 +106,7 @@ class Dice:
             self.description = f"{TM.YELLOW}{parts[0]}:{STOP}{parts[1]}"
         self.currentValue = None    # Set when rolling die.
         self.naturalValue = None    # Set when rolling die.
+
     def onRoll(self, character, enemy, enemydie=None):
         if self.onEvent == "onRoll":
             return self.action(self, character, enemy, enemydie)
@@ -113,6 +114,7 @@ class Dice:
     def onClashEvent(self, character, enemy, enemydie, success=True):
         if self.onEvent == "onClashEvent":
             return self.action(self, character, enemy, enemydie, success)
+
     def onHit(self, character, enemy):
         if self.onEvent == "onHit":
             return self.action(self, character, enemy)
@@ -154,9 +156,10 @@ class SpeedDie:
         self.min = mini
         self.max = maxi
         self.value = self.roll()
-        self.target = None
+        self.target = None  # Target character [Character object]
         self.pageToUse = None
-        self.targetDie = None
+        self.targetDie = None   # Index of the targeted die in the Target Characters SpeedDice list
+
     def roll(self):
         return randint(self.min, self.max)
     
@@ -204,6 +207,7 @@ class CombatPage:
                 self.color = TM.CYAN
             case "Common":  # Paperback
                 self.color = TM.GREEN
+
     def onPlay(self, user):
         if self.onEvent == "onPlay":
             self.action(self, user)
@@ -216,18 +220,23 @@ class CombatPage:
             using = self.dice[0]
             self.dice = self.dice[1:]
             return using
+
     def removeAllDice(self):
         self.dice = []
+
     def __len__(self) -> int:
         return len(self.dice)
+
     def addDie(self, die):
         '''
         Adds a die to the queue.
         '''
         self.dice.append(die)
+
     def buffDie(self, character, enemy, die):
         if self.onEvent == "buffDie":
             return self.action(self, character, enemy, die)
+
     def onHit(self, user, hit):
         if self.onEvent == "onHit":
             out = self.action(self, user, hit)
@@ -235,6 +244,7 @@ class CombatPage:
                 return [0, 0]
             return self.action(self, user, hit)
         return [0, 0]
+
     def __str__(self):
         # OH GOD WHY
         '''
@@ -243,10 +253,13 @@ class CombatPage:
         else:
         '''
         return f"{self.color}{self.name}{STOP} | " + ' '.join([x.miniStrRepr for x in self.dice])
+
     def reverseStr(self):
         return f"{self.color}{self.name}{STOP} | " + ' '.join(reversed([x.miniStrRepr for x in self.dice]))
+
     def longPrint(self):
         return f"{self.color}{self.name}{STOP}\n" + "\n".join([str(x) for x in self.dice])
+
 class Passive:  # This class handles everything about a passive ability that goes on a key page - namely, when to activate some arbitrary function that affects the Character using the Key Page.}
     # Unfortunetly, due to the nature of many passive abilties, there will have to be a LOT of hard coding...
     # The most commmon events that I can find are OnAttribute (immedietly apply, do something simple like adding a speed die (Speed I through III)). Pass in 
@@ -268,13 +281,16 @@ class Passive:  # This class handles everything about a passive ability that goe
         self.onTakeDamageE = onTakeDamage
     def onAttribute(self, kp):
         if self.onAttributeE: self.onAttributeE(kp)
+
     def rollDie(self, user, target, die):
         if self.rollDieE: mod = self.rollDieE(self, user, target, die); return mod
         return 0
+
     def onHit(self, enemy, die):    # onHit will double as onClashWin because i cant take it anymore
         mod = 0
         if self.onHitE: self.onHitE(self, enemy, die)
         return mod
+
     def onTakeDamage(self, damageType, amountPhysical, amountStagger):
         if self.onTakeDamageE:
             changes = [0, 0]
@@ -283,14 +299,20 @@ class Passive:  # This class handles everything about a passive ability that goe
             changes[1] += resultingMods[1]
             return changes
         return [0, 0]
+
     def onKill(self):
         if self.onKillE: self.onKillE(self)
+
     def onDeath(self, ally=False): # Ally determines if it was an ally who died. Whaddaya know.
         if self.onDeathE: self.onDeathE(self, ally)
+
     def onSceneStart(self, char, first=False):
         if self.onSceneStartE: self.onSceneStartE(self, char, first)
+
     def onSceneEnd(self, char):
+
         if self.onSceneEndE: self.onSceneEndE(self, char)
+
 class KeyPage:  # Key Pages are basically the character sheet; they dicate how much health, stagger resist, resistance to certain attacks, speed dice, etc. each character has.
     def __init__(self, name="Patron Librarian of Gen. Works", health=30, stagger=15, physicalResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, staggerResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, speedLower=1, speedUpper=4, passives=[], lightStart=3):     # Default stats based off of the Patron Librarian key page
         self.name = name
@@ -321,11 +343,13 @@ class KeyPage:  # Key Pages are basically the character sheet; they dicate how m
         for status in self.user.statusEffects:
             if self.user.statusEffects[status].rollDie: modifier += self.user.statusEffects[status].rollDie(self.user, target, die)
         return modifier
+
     def onHit(self, enemy, die):    # onHit will double as onClashWin because i cant take it anymore
         mod = 0
         for passive in self.passives:
             if passive.onHit: mod = passive.onHit(enemy, die)
         return mod
+
     def onTakeDamage(self, damageType, amountPhysical, amountStagger):
         changes = [0, 0]
         for passive in self.passives:
@@ -334,23 +358,26 @@ class KeyPage:  # Key Pages are basically the character sheet; they dicate how m
                 changes[0] += resultingMods[0]
                 changes[1] += resultingMods[1]
         return changes
+
     def onKill(self):
         for passive in self.passives:
             if passive.onKill: passive.onKill()
+
     def onDeath(self, ally=False): # Ally determines if it was an ally who died. Whaddaya know.
         for passive in self.passives:
             if passive.onDeath: passive.onDeath(ally)
+
     def onSceneStart(self, char=None, first=False):
         for passive in self.passives:
             if passive.onSceneStart: passive.onSceneStart(char, first)
         for status in self.user.statusEffects:
             if self.user.statusEffects[status].onSceneStart: self.user.statusEffects[status].onSceneStart(char)
+
     def onSceneEnd(self, char=None):
         for passive in self.passives:
             if passive.onSceneEnd: passive.onSceneEnd()
         for status in self.user.statusEffects:
             if self.user.statusEffects[status].onSceneEnd: self.user.statusEffects[status].onSceneEnd(char)
-
 
 class StatusEffect(Passive): #  I had to look up a tutorial for this because i forgor. This over having to rewrite all of those events. https://realpython.com/inheritance-composition-python/
     def __init__(self, name, description, stacks, rollDie=None, onSceneStart=None, onSceneEnd=None, onTakeDamage=None):
@@ -358,15 +385,16 @@ class StatusEffect(Passive): #  I had to look up a tutorial for this because i f
         self.stacks = stacks # Stacks is how many times this status effect has been applied
         self.justApplied = True
         super().__init__(name, description, rollDie=rollDie, onSceneEnd=onSceneEnd, onSceneStart=onSceneStart, onTakeDamage=onTakeDamage)
+
     def __str__(self):
         if self.justApplied:
             color = TM.DARK_GRAY
         else:
             color = statusEffectColors[self.name]
         return f"{color}{self.name}({self.stacks}){STOP}"
+
     def Apply(self):
         self.justApplied = False
-
 
 class Character:    # The big one.
     def __init__(self, name, keyPage=KeyPage(), deck=[]):
@@ -388,6 +416,7 @@ class Character:    # The big one.
         self.Hand = []  # Pages readily accessable to use
         # Draw 4
         self.drawPages(3)
+
     def playCombatPage(self, page, target):
         self.activeCombatPage = page
         for die in page.dice:
@@ -437,10 +466,12 @@ class Character:    # The big one.
             self.speedDice.append(SpeedDie(self.keyPage.speedLower, self.keyPage.speedUpper))
         # Not including an event for passives that activate on emotion level change because fuck you
         # At emotion 5, playing 2+ combat pages in a scene causes an extra draw at the start of the next scene
+
     def cleanStatusEffects(self):
         for status in self.statusEffects:
             if statusEffects[status].stacks == 0:
                 statusEffects.pop(status)
+
     def takeDamage(self, damageType, amountPhysical, amountStagger, truePhysical=0, trueStagger=0, physicalReason=None, staggerReason=None):   # Yes, all of these distinctions are neccesary. Yes I hate this.
         if damageType in ["Slash", "Pierce", "Blunt"]:
             mods = self.keyPage.onTakeDamage(damageType, amountPhysical, amountStagger)
@@ -470,6 +501,7 @@ class Character:    # The big one.
             else:
                 self.damageandReasons[1].append([trueStagger, staggerReason])
         # Insert death and stagger logic here i actually wanna die
+
     def assignPageToSpeedDice(self, speedDiceID, pageID, target, targetDie):
         page = self.Hand[pageID]
         add = 0
@@ -479,24 +511,27 @@ class Character:    # The big one.
             raise ValueError("No Light?")
         if self.speedDice[speedDiceID].pageToUse != None:
             self.removePageFromSpeedDice(speedDiceID)
-        print(page)
         self.speedDice[speedDiceID].target = target
         self.speedDice[speedDiceID].targetDie = targetDie
         self.light -= page.lightCost
         self.speedDice[speedDiceID].pageToUse = page
         self.Hand.remove(page)
+
     def removePageFromSpeedDice(self, speedDiceID):
         thePage = self.speedDice[speedDiceID].pageToUse
         self.Hand.append(thePage)
         self.light += thePage.lightCost
         self.speedDice[speedDiceID].pageToUse = None
         self.speedDice[speedDiceID].target = None
+
     def regainLight(self, amount):
         self.light = min(self.light + amount, self.lightCapacity)
+
     def regainStats(self, health, stagger):
         if stagger > 0:
             self.stagger = min(self.stagger + stagger, self.keyPage.stagger)
         self.health = min(self.health + health, self.keyPage.health)
+    
     def outputData(self):
         print(f"{self.name} - {self.keyPage.name}'s Key Page")
         print(f"{TM.LIGHT_RED}{self.health}/{self.keyPage.health} HP{STOP}")
@@ -505,6 +540,7 @@ class Character:    # The big one.
         print(f"{TM.YELLOW}{self.light}/{self.lightCapacity} Light{STOP}")
         for status in self.statusEffects:
             print(f"{self.statusEffects[status].stacks} {status}")
+    
     def miniOutputData(self):
         statusString = ""
         for status in self.statusEffects:
@@ -517,15 +553,19 @@ class Character:    # The big one.
             physicalDamageReason = " ".join([f"({x[1]} {x[0]})" for x in self.damageandReasons[0] if x[0] != 0])
         if len(self.damageandReasons[1]) > 0:
             staggerDamageReason = " ".join([f"({x[1]} {x[0]})" for x in self.damageandReasons[1] if x[0] != 0])
+        
         toReturn = [f"{self.name} | {TM.LIGHT_RED}{self.health}{physicalDamageReason} {TM.YELLOW}{self.stagger}{staggerDamageReason}{STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}",
                      f"{TM.YELLOW}{u'◆ ' * self.light}{TM.DARK_GRAY}{u'◇ ' * (self.lightCapacity-self.light)}{STOP} | " + TM.YELLOW + " ".join([f"{TM.YELLOW}[{x} ({str(self.speedDice[x])})]{STOP}" if self.speedDice[x].target != None else f"{TM.DARK_GRAY}[{x} ({str(self.speedDice[x])})]" for x in range(len(self.speedDice))]) + STOP + " |" + statusString]
+        
         self.damageandReasons = [[], []]
         return toReturn
+    
 # Constants
 def reverseOutput(text):
     textSplat = text.split(" | ")
     textSplat.reverse()
     return " | ".join(textSplat)
+
 def bleedOut(effect, me, target, die):
     if die.dieType == "Offensive":
         me.takeDamage("Bleed", 0, 0, effect.stacks, 0, "Bleed")
@@ -543,6 +583,7 @@ def removeStacks(effect, amount):
 def Bind(target, amount):
     for SpeedDie in target.speedDice:
         SpeedDie.value = max(1, SpeedDie.value - amount)
+
 statusEffects = {
     "Bleed":StatusEffect("Bleed", 
                          "Take damage equal to the number of Bleed stacks on character when rolling an Offensive die, then reduce the number of stacks by 1/3.", 
@@ -557,6 +598,7 @@ statusEffects = {
     "Bind":StatusEffect("Bind", "Lowers speed value of all speed die by number of stacks", 1, 
                         onSceneStart=lambda me : Bind(me.target, me.stacks) if not me.justApplied else None, onSceneEnd=lambda me:removeStacks(me, me.stacks) if not me.justApplied else me.Apply())
 }
+
 statusEffectColors = {
     "Bleed": f"{TM.RED}",
     "Strength": f"{TM.RED}",
@@ -565,6 +607,7 @@ statusEffectColors = {
     "Haste": f"{TM.GREEN}",
     "Feeble": f"{TM.RED}"
 }
+
 resistanceToText = {
     0.25: "Ineff.",
     0.5: "Endure",
