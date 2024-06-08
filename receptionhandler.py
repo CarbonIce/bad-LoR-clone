@@ -37,34 +37,46 @@ class ReceptionHandler:     # I lied. This is the big one.
         CharacterDiceSortedBySpeed = []
         EnemyDiceSortedBySpeed = []
         AllDice = []
-        for character in self.characters:
+        for character in range(len(self.characters)):
                 index = 0
-                for speedDie in character.speedDice:
-                    CharacterDiceSortedBySpeed.append([speedDie, character, index]) # These lists are the SpeedDie Object, the User of the speed die, and the index of the speed die of the user.
+                for speedDie in self.characters[character].speedDice:
+                    CharacterDiceSortedBySpeed.append([speedDie, character, index]) # These lists are the SpeedDie Object, the index of the User of the speed die, and the index of the speed die of the user.
                     index += 1
                     AllDice.append([speedDie, character, index, "character"])
-        for enemy in self.enemies:
+        for enemy in range(len(self.enemies)):
             index = 0
-            for speedDie in enemy.speedDice:
+            for speedDie in self.enemies[enemy].speedDice:
                 EnemyDiceSortedBySpeed.append([speedDie, enemy, index])
                 index += 1
         CharacterDiceSortedBySpeed.sort(key=lambda x: x[0].value)
         EnemyDiceSortedBySpeed.sort(key=lambda x: x[0].value)
-
+        testedCharacterDice = []    # lIST OF SPEEDDICE OBJECTS
+        testedEnemyDice = []
+        Clashes = []
+        OneSidedAttacks = []
+        '''
+        1. Check for dice that target each other. These dice clash, no matter what.
+        2. Check for dice that target a dice that has a lower speed and an assigned page. These dice clash, and if multiple dice are targetting the same lower speed die, the higher speed targetting dice will clash.
+        3. Check for one sided attacks
+        '''
         for die in CharacterDiceSortedBySpeed:
-                if die[0].target != None:
-                    print(die[1].speedDice[die[0].targetDie].value)
-                    # Redirected Clash
-                    if die[0].value > die[1].speedDice[die[0].targetDie].value and die[1].speedDice[die[0].targetDie].target is not None:
-                        if die[3] == "enemy":
-                            print(f"{TM.RED}{die[1].name}'s die index {die[2]} -> {die[1].speedDice[die[0].targetDie].target.name}'s die index {die[0].targetDie}{STOP}")
-                        else:
-                            print(f"{TM.BLUE}{die[1].name}'s die index {die[2]} -> {die[1].speedDice[die[0].targetDie].target.name}'s die index {die[0].targetDie}{STOP}")
-                    elif die[1].speedDice[die[0].targetDie].target is None:
-                        # One sided attack
-                        print(f"{TM.YELLOW}{die[1].name}'s die index {die[2]} <-> {die[1].speedDice[die[0].targetDie].target.name}'s die index {die[0].targetDie}{STOP}")
-                    elif die[1].speedDice[die[0].targetDie].target == die[0] and die[0].target == die[1].speedDice[die[0].targetDie]:
-                        pass
+            if die[0] not in testedCharacterDice:
+                if die[0].target is not None and die[0].target == die[0] and die[0].target not in testedEnemyDice:   # Both dice are clashing against each other. This is a clash, and thats that (and this is this).
+                    testedCharacterDice.append(die[0])
+                    testedEnemyDice.append(die[0].target)
+                    Clashes.append([die[0], die[0].target])
+                elif die[0].target is not None and die[0].target.value < die[0].value and die[0].target not in testedEnemyDice:  # Enemy die is slower, redirection of Clash
+                    testedCharacterDice.append(die[0])
+                    testedEnemyDice.append(die[0].target)
+                    Clashes.append([die[0], die[0].target])
+                elif die[0].target is not None:
+                    testedCharacterDice.append(die[0])  # The biggest advantage the player has over the enemy is that the enemy cannot redirect.
+                    OneSidedAttacks.append([die[0], True]) # The second bool is a indication of if the one sided attack is from a Character or an Enemy
+
+        for die in EnemyDiceSortedBySpeed:
+            if die[0] not in testedEnemyDice and die[0].target is not None:
+                OneSidedAttacks.append([die[0], False]) # The second bool is a indication of if the one sided attack is from a Character or an Enemy
+        return Clashes, OneSidedAttacks
     def Clash(self, character1, character2, dice1, dice2):    # NO DISTINCTION BETWEEN RANGED AND MELEE AND MASS ATTACK PAGES BECAUSE FUCK NO
         # CLASH BETWEEN DICE:
         # Step 1: Roll both die.
@@ -202,10 +214,11 @@ class ReceptionHandler:     # I lied. This is the big one.
                 print(dataP[1])
         if len(self.enemies) > len(self.players):
             for enemy in range(len(self.enemies) - len(self.players)): # enemies [0, 1, 2, 3], ally [0, 1, 2], len 4 - 3 = 1, first number will be enemy #3, then #4... 
-                data = [enemy + len(self.players) + 1].miniOutputData()
+                data = self.enemies[enemy + len(self.players) + 1].miniOutputData()
                 Screen.printRightAligned(data[0])
                 Screen.printRightAligned(data[1])
     def drawSceneExtendedData(self, selectedCharIndex, enemyTrueelseFalse, hoverDie):
+        Clashes, oneSided = self.calculateTargeting()
         Screen.clearScreen()
         pindex = 0
         for player in range(len(self.players)):
@@ -234,6 +247,10 @@ class ReceptionHandler:     # I lied. This is the big one.
                 Screen.printRightAligned(data[0])
                 Screen.printRightAligned(data[1])
             pindex += 1
+        for Clash in Clashes:
+            print(f"{Clash[0].owner.name}'s die {TM.YELLOW}#{Clash[0].owner.speedDice.index(Clash[0])}{STOP} ({Clash[0].pageToUse}){TM.YELLOW} -> <- {STOP}{Clash[0].owner.name}'s die {TM.YELLOW}#{Clash[1].owner.speedDice.index(Clash[1])}{STOP} ({Clash[1].pageToUse})")
+        for oneSidedAttack in oneSided:
+            print(f"{TM.LIGHT_CYAN if oneSidedAttack[1] else TM.LIGHT_RED}{oneSidedAttack[0].owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].owner.speedDice.index(oneSidedAttack[0])} {STOP}({oneSidedAttack[0].pageToUse}){TM.LIGHT_CYAN if oneSidedAttack[1] else TM.LIGHT_RED} -> {oneSidedAttack[0].target.owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].target.owner.speedDice.index(oneSidedAttack[0].target)}{STOP}")
     def pageClash(self, p1, p2, page1, page2):
         while len(page1) > 0 or len(page2) > 0:
             Screen.printMiddle(f"{page1.reverseStr()} >< {reverseOutput(str(page2))}")
@@ -348,8 +365,8 @@ class ReceptionHandler:     # I lied. This is the big one.
                 if speedDiceSelected < enemy.speedDiceCount - 1:
                     if page.lightCost <= enemy.light:
                         target = choice(self.characters)
-                        targetDie = randint(0, target.speedDiceCount)
-                        enemy.assignPageToSpeedDice(speedDiceSelected, index, target, targetDie)
+                        targetDie = randint(0, target.speedDiceCount - 1)
+                        enemy.assignPageToSpeedDice(speedDiceSelected, index, target.speedDice[targetDie])
                 else:
                     break
                 index += 1
@@ -363,7 +380,6 @@ class ReceptionHandler:     # I lied. This is the big one.
             selectedDie = 0
             option = True
             COMBATTIME = False
-            # Higher speed character die overwrite the targetting of enemy dice
             while True:
                 self.drawScene()
                 print(f"{TM.DARK_GRAY if not option else TM.LIGHT_GRAY}Assign Combat Page {STOP}| {TM.DARK_GRAY if option else TM.LIGHT_GRAY}Begin Scene{STOP}")
@@ -381,7 +397,7 @@ class ReceptionHandler:     # I lied. This is the big one.
                 break
             event = None
             while True: # https://stackoverflow.com/questions/24072790/how-to-detect-key-presses
-                self.drawScene()
+                self.drawSceneExtendedData(selectedCharacter, False, selectedDie)
                 print("(Use arrow keys to navigate speed dice, press space to select the die, or escape to go back)")
                 print(f"Currently selecting {TM.YELLOW}{self.characters[selectedCharacter].name}{STOP}'s dice number {TM.YELLOW}{selectedDie}{STOP} (Die numbers are the numbers outside of the paranthases within the square brackets)")
                 while not event or event.event_type != 'down' or event.name not in 'up down right left space esc'.split(" "):
@@ -409,7 +425,7 @@ class ReceptionHandler:     # I lied. This is the big one.
             event=None
             StopTime = True
             while StopTime: # Page select
-                self.drawScene()
+                self.drawSceneExtendedData(-1, False, -1)
                 print("Selected:", char.Hand[selectedPage].longPrint())
                 index = 0
                 for page in char.Hand:
@@ -444,7 +460,7 @@ class ReceptionHandler:     # I lied. This is the big one.
             selectedEnemy = 0
             selectedEnemyDie = 0
             while StopTime: # https://stackoverflow.com/questions/24072790/how-to-detect-key-presses
-                self.drawScene()
+                self.drawSceneExtendedData(selectedEnemy, True, selectedEnemyDie)
                 print("(Use arrow keys and space to navigate enemy speed dice")
                 print(f"Currently selecting {TM.YELLOW}{self.enemies[selectedEnemy].name}{STOP}'s dice number {TM.YELLOW}{selectedEnemyDie}{STOP} (Die numbers are the numbers outside of the paranthases within the square brackets)")
                 while not event or event.event_type != 'down' or event.name not in 'up down right left space'.split(" "):
@@ -464,7 +480,7 @@ class ReceptionHandler:     # I lied. This is the big one.
                 selectedEnemyDie = selectedEnemyDie % self.enemies[selectedEnemy].speedDiceCount
                 event=None
             if StopTime:
-                char.assignPageToSpeedDice(selectedDie, selectedPage, self.enemies[selectedEnemy], selectedEnemyDie)
+                char.assignPageToSpeedDice(selectedDie, selectedPage, self.enemies[selectedEnemy].speedDice[selectedEnemyDie])
             event = None
         # Begin Combat
         exit()

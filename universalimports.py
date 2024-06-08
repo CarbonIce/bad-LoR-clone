@@ -152,13 +152,13 @@ class Dice:
         '''
         return randint(self.lowerBound, self.upperBound)
 class SpeedDie:
-    def __init__(self, mini, maxi):
+    def __init__(self, mini, maxi, owner=None):
         self.min = mini
         self.max = maxi
         self.value = self.roll()
-        self.target = None  # Target character [Character object]
+        self.target = None  # Target die [Speed Die Object]
         self.pageToUse = None
-        self.targetDie = None   # Index of the targeted die in the Target Characters SpeedDice list
+        self.owner = owner  # In hindsight, should have added this ages ago.
 
     def roll(self):
         return randint(self.min, self.max)
@@ -256,7 +256,6 @@ class CombatPage:
 
     def reverseStr(self):
         return f"{self.color}{self.name}{STOP} | " + ' '.join(reversed([x.miniStrRepr for x in self.dice]))
-
     def longPrint(self):
         return f"{self.color}{self.name}{STOP}\n" + "\n".join([str(x) for x in self.dice])
 
@@ -430,7 +429,7 @@ class Character:    # The big one.
         self.speedDiceCount = newKeyPage.speedDieCount
         self.speedDice = []
         for _ in range(self.speedDiceCount):
-            self.speedDice.append(SpeedDie(self.keyPage.speedLower, self.keyPage.speedUpper))
+            self.speedDice.append(SpeedDie(self.keyPage.speedLower, self.keyPage.speedUpper, self))
         self.emotionCoins = 0
         self.emotionLevel = 0 # Fucking kill me now I forgot about emotion and emotion coins
         self.light = self.keyPage.lightStart
@@ -463,7 +462,7 @@ class Character:    # The big one.
         self.light = self.lightCapacity # Regain all light
         if self.emotionLevel == 4: # Gain an additional Speed die at Emotion Level 4
             self.speedDiceCount += 1
-            self.speedDice.append(SpeedDie(self.keyPage.speedLower, self.keyPage.speedUpper))
+            self.speedDice.append(SpeedDie(self.keyPage.speedLower, self.keyPage.speedUpper, self))
         # Not including an event for passives that activate on emotion level change because fuck you
         # At emotion 5, playing 2+ combat pages in a scene causes an extra draw at the start of the next scene
 
@@ -502,7 +501,7 @@ class Character:    # The big one.
                 self.damageandReasons[1].append([trueStagger, staggerReason])
         # Insert death and stagger logic here i actually wanna die
 
-    def assignPageToSpeedDice(self, speedDiceID, pageID, target, targetDie):
+    def assignPageToSpeedDice(self, speedDiceID, pageID, targetDie):
         page = self.Hand[pageID]
         add = 0
         if self.speedDice[speedDiceID].pageToUse != None:
@@ -511,8 +510,7 @@ class Character:    # The big one.
             raise ValueError("No Light?")
         if self.speedDice[speedDiceID].pageToUse != None:
             self.removePageFromSpeedDice(speedDiceID)
-        self.speedDice[speedDiceID].target = target
-        self.speedDice[speedDiceID].targetDie = targetDie
+        self.speedDice[speedDiceID].target = targetDie
         self.light -= page.lightCost
         self.speedDice[speedDiceID].pageToUse = page
         self.Hand.remove(page)
@@ -532,7 +530,7 @@ class Character:    # The big one.
             self.stagger = min(self.stagger + stagger, self.keyPage.stagger)
         self.health = min(self.health + health, self.keyPage.health)
     
-    def outputData(self):
+    def outputData(self, selected):
         statusString = ""
         for status in self.statusEffects:
             statusString += f" {statusEffects[status]}"
@@ -544,9 +542,14 @@ class Character:    # The big one.
             physicalDamageReason = " ".join([f"({x[1]} {x[0]})" for x in self.damageandReasons[0] if x[0] != 0])
         if len(self.damageandReasons[1]) > 0:
             staggerDamageReason = " ".join([f"({x[1]} {x[0]})" for x in self.damageandReasons[1] if x[0] != 0])
-        
+        dice = ""
+        for speedD in range(self.speedDiceCount):
+            if speedD == selected:
+                dice += f" {TM.YELLOW if self.speedDice[speedD].target is not None else TM.DARK_GRAY}>[{speedD} ({self.speedDice[speedD].value})]<{STOP}"
+            else:
+                dice += f" {TM.YELLOW if self.speedDice[speedD].target is not None else TM.DARK_GRAY}[{speedD} ({self.speedDice[speedD].value})]{STOP}"
         toReturn = [f"{self.name} | {TM.LIGHT_RED}{self.health}{physicalDamageReason} {TM.YELLOW}{self.stagger}{staggerDamageReason}{STOP} | {TM.LIGHT_RED}({resistanceToColorPhysical[self.keyPage.physicalResistances['Slash']]}S:{resistanceToText[self.keyPage.physicalResistances['Slash']]} {resistanceToColorPhysical[self.keyPage.physicalResistances['Pierce']]}P:{resistanceToText[self.keyPage.physicalResistances['Pierce']]} {resistanceToColorPhysical[self.keyPage.physicalResistances['Blunt']]}B:{resistanceToText[self.keyPage.physicalResistances['Blunt']]}{TM.LIGHT_RED}){STOP} {TM.YELLOW}({resistanceToColorStagger[self.keyPage.staggerResistances['Slash']]}S:{resistanceToText[self.keyPage.staggerResistances['Slash']]} {resistanceToColorStagger[self.keyPage.staggerResistances['Pierce']]}P:{resistanceToText[self.keyPage.staggerResistances['Pierce']]} {resistanceToColorStagger[self.keyPage.staggerResistances['Blunt']]}B:{resistanceToText[self.keyPage.staggerResistances['Blunt']]}{TM.YELLOW}){STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}",
-                     f"{TM.YELLOW}{u'◆ ' * self.light}{TM.DARK_GRAY}{u'◇ ' * (self.lightCapacity-self.light)}{STOP} | {TM.YELLOW}{" ".join([f"{TM.YELLOW}[{x} ({str(self.speedDice[x])})]{STOP}" if self.speedDice[x].target != None else f"{TM.DARK_GRAY}[{x} ({str(self.speedDice[x])})]" for x in range(len(self.speedDice))])}{STOP} |{(statusString if len(statusString) > 1 else f" {TM.DARK_GRAY}no status effects{STOP}")}"]
+                     f"{TM.YELLOW}{u'◆ ' * self.light}{TM.DARK_GRAY}{u'◇ ' * (self.lightCapacity-self.light)}{STOP} |{dice} |{(statusString if len(statusString) > 1 else f" {TM.DARK_GRAY}no status effects{STOP}")}"]
         
         self.damageandReasons = [[], []]
         return toReturn
