@@ -614,6 +614,7 @@ class ReceptionHandler:     # I lied. This is the big one.
                 chara.startingStaggered = False
                 chara.stagger = chara.keyPage.maxStagger
             chara.checkForIncrementEmotionLevel()
+            chara.cleanStatusEffects()
     def Act(self, characters, enemies):
         self.act += 1
         self.characters = characters
