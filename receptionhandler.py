@@ -212,20 +212,28 @@ class ReceptionHandler:     # I lied. This is the big one.
             if not enemyTrueelseFalse and selectedCharIndex == pindex:
                 dataP = self.players[player].outputData(hoverDie)
             else:
-                dataP = self.players[player].outputData(hoverDie)
+                dataP = self.players[player].outputData(-1)
             if player < len(self.enemies):
-                dataE = self.enemies[player].outputData()
+                if enemyTrueelseFalse and selectedCharIndex == pindex:
+                    dataE = self.enemies[player].outputData(hoverDie)
+                else:
+                    dataE = self.enemies[player].outputData(-1)
                 Screen.printRightandLeft(dataP[0], dataE[0])
                 Screen.printRightandLeft(dataP[1], dataE[1])
                 print()
             else:
                 print(dataP[0])
                 print(dataP[1])
+            pindex += 1
         if len(self.enemies) > len(self.players):
             for enemy in range(len(self.enemies) - len(self.players)): # enemies [0, 1, 2, 3], ally [0, 1, 2], len 4 - 3 = 1, first number will be enemy #3, then #4... 
-                data = [enemy + len(self.players) + 1].miniOutputData()
+                if enemyTrueelseFalse and selectedCharIndex == pindex:
+                    data = self.enemies[enemy + len(self.players) + 1].outputData(hoverDie)
+                else:
+                    data = self.enemies[enemy + len(self.players) + 1].outputData(-1)
                 Screen.printRightAligned(data[0])
                 Screen.printRightAligned(data[1])
+            pindex += 1
     def pageClash(self, p1, p2, page1, page2):
         while len(page1) > 0 or len(page2) > 0:
             Screen.printMiddle(f"{page1.reverseStr()} >< {reverseOutput(str(page2))}")
