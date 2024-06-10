@@ -6,9 +6,9 @@ import os
 import sys
 import keyboard
 from regex import sub, compile, findall
-EmotionCoinRequirements = [3, 3, 5, 7, 9]   # From level index to index + 1
+EmotionCoinRequirements = [3, 3, 5, 7, 9]      # From level index to index + 1
 
-class TextModifiers:  # A class containing ANSI text modifiers to make text different colors or have different effects.
+class TextModifiers:     # A class containing ANSI text modifiers to make text different colors or have different effects.
     BLACK = "\033[0;30m"
     RED = "\033[0;31m"
     GREEN = "\033[0;32m"
@@ -35,26 +35,26 @@ class TextModifiers:  # A class containing ANSI text modifiers to make text diff
     END = "\033[0m"
 
 
-# Aliases for TextModifiers because typing out TextModifiers every time is slow and TM.END is hard to type out
+    # Aliases for TextModifiers because typing out TextModifiers every time is slow and TM.END is hard to type out
 TM = TextModifiers
 STOP = TM.END
-def stripAnsi(inp): # https://stackoverflow.com/questions/37192606/python-regex-how-to-delete-all-matches-from-a-string https://www.tutorialspoint.com/How-can-I-remove-the-ANSI-escape-sequences-from-a-string-in-python#:~:text=You%20can%20use%20regexes%20to,%5B)%5B0%2D%3F%5D
+def stripAnsi(inp):    # https://stackoverflow.com/questions/37192606/python-regex-how-to-delete-all-matches-from-a-string https://www.tutorialspoint.com/How-can-I-remove-the-ANSI-escape-sequences-from-a-string-in-python    #:~:text=You%20can%20use%20regexes%20to, %5B)%5B0%2D%3F%5D
     new = sub(r"(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]", '', inp)
     return new
 '''
 diceIcons = {
-    "Slash":"𐑠",
-    "Pierce":"🜚",
-    "Blunt":"⚙",
-    "Guard":"⛉",
+    "Slash":"𐑠", 
+    "Pierce":"🜚", 
+    "Blunt":"⚙", 
+    "Guard":"⛉", 
     "Evade":"☇"
 }
 '''
 diceIcons = {
-    "Slash":"S",
-    "Pierce":"P",
-    "Blunt":"B",
-    "Guard":"G",
+    "Slash":"S", 
+    "Pierce":"P", 
+    "Blunt":"B", 
+    "Guard":"G", 
     "Evade":"E"
 }
 
@@ -83,30 +83,30 @@ class Dice:
 
         [6] action=None: callable, this function is run when event is called
         '''
-        # Defining properties, boring
+           # Defining properties, boring
         self.type = diceType
         self.lowerBound = lowerBound
         self.upperBound = upperBound
         self.counter = counter
-        self.description = description  # UI friendly version of onEvent and action
-        self.onEvent = onEvent  # I think all dice are on Hit, on Roll, and on Clash Win / Lose, (Hit should be handeled by the key page...) god i hope there arn't any dice with >1 effects
+        self.description = description     # UI friendly version of onEvent and action
+        self.onEvent = onEvent     # I think all dice are on Hit, on Roll, and on Clash Win / Lose, (Hit should be handeled by the key page...) god i hope there arn't any dice with >1 effects
         self.action = action
         self.icon = diceIcons[self.type]
 
-        if self.counter:  # All counter die are Yellow, regardless of type.
-            self.primaryColor = TM.YELLOW  # Primary color is the color the dice type is highlighted in: the [S] part
-            self.secondaryColor = TM.YELLOW  # Secondary color is the color used by the range: the 2 - 6 part
+        if self.counter:     # All counter die are Yellow, regardless of type.
+            self.primaryColor = TM.YELLOW     # Primary color is the color the dice type is highlighted in: the [S] part
+            self.secondaryColor = TM.YELLOW     # Secondary color is the color used by the range: the 2 - 6 part
         elif self.type in ["Guard", "Evade"]:
             self.primaryColor = TM.LIGHT_CYAN
             self.secondaryColor = TM.CYAN
         else:
             self.primaryColor = TM.LIGHT_RED
             self.secondaryColor = TM.RED
-        if self.description and ":" in self.description:  # A ":" in the description usually is a part of On Hit: do thing or On Clash Win: do thing
+        if self.description and ":" in self.description:     # A ":" in the description usually is a part of On Hit: do thing or On Clash Win: do thing
             parts = self.description.split(':')
             self.description = f"{TM.YELLOW}{parts[0]}:{STOP}{parts[1]}"
-        self.currentValue = None    # Set when rolling die.
-        self.naturalValue = None    # Set when rolling die.
+        self.currentValue = None       # Set when rolling die.
+        self.naturalValue = None       # Set when rolling die.
 
     def onRoll(self, character, enemy, enemydie=None):
         if self.onEvent == "onRoll":
@@ -124,7 +124,7 @@ class Dice:
         if self.type in ['Slash', 'Pierce', 'Blunt']:
             return "Offensive"
         else:
-            return self.type    # Guard or Evade
+            return self.type       # Guard or Evade
     @property
     def miniStrRepr(self):
         '''
@@ -157,9 +157,9 @@ class SpeedDie:
         self.min = mini
         self.max = maxi
         self.value = self.roll()
-        self.target = None  # Target die [Speed Die Object]
+        self.target = None     # Target die [Speed Die Object]
         self.pageToUse = None
-        self.owner = owner  # In hindsight, should have added this ages ago.
+        self.owner = owner     # In hindsight, should have added this ages ago. The character object that has this SpeedDie object in their SpeedDie attribute.
 
     def roll(self):
         return randint(self.min, self.max)
@@ -182,7 +182,7 @@ class CombatPage:
         [2] rarity: string, the rarity of the page, only affects the color of the name when the Combat Page is displayed.
         Valid values are Common, Uncommon, Rare, Unique. (These corrospond to Paperback, Hardcover, Limited, and Object of Art respectively).
 
-        [3] onEvent: string, Special description of the Combat Page, detailing extra information such as action to take when the Page is played,
+        [3] onEvent: string, Special description of the Combat Page, detailing extra information such as action to take when the Page is played, 
         action to take when the page is discarded, Mass Attack type, Single Use, etc. If automatic parsing fails, the entire description is dumped here.
 
         [4] action: callable, Action to take when onEvent condition is met. Only set if there is a single clear format of (Event) (Action)
@@ -191,22 +191,22 @@ class CombatPage:
         [5] dice: list, Dice to initialize this page with. This is a queue, not a stack.
         '''
         self.name = name
-        self.rarity = rarity  # Dictates the color of the page name. Nothing else.
+        self.rarity = rarity     # Dictates the color of the page name. Nothing else.
         self.lightCost = light
         self.description = description
-        self.onEvent = onEvent  # This is going to be a hellhole. Events are fine, but there are so many custom actions I need to account for.
-        # Prob just going to focus on the ones most critical to gameplay, namely Light Restore and Page Draw
-        self.action = action  # If onEvent is defined, but action is not, treat onEvent as the entire description.
-        # This project already makes me want to die and it hasn't even been 3 hours yet.
+        self.onEvent = onEvent     # This is going to be a hellhole. Events are fine, but there are so many custom actions I need to account for.
+           # Prob just going to focus on the ones most critical to gameplay, namely Light Restore and Page Draw
+        self.action = action     # If onEvent is defined, but action is not, treat onEvent as the entire description.
+           # This project already makes me want to die and it hasn't even been 3 hours yet.
         self.dice = dice
-        match self.rarity:  # https://www.freecodecamp.org/news/python-switch-statement-switch-case-example/
-            case "Unique":  # Object of Art
+        match self.rarity:     # https://www.freecodecamp.org/news/python-switch-statement-switch-case-example/
+            case "Unique":     # Object of Art
                 self.color = TM.YELLOW
-            case "Rare":  # Limited
+            case "Rare":     # Limited
                 self.color = TM.BLUE
-            case "Uncommon":  # Hardcover
+            case "Uncommon":     # Hardcover
                 self.color = TM.CYAN
-            case "Common":  # Paperback
+            case "Common":     # Paperback
                 self.color = TM.GREEN
 
     def onPlay(self, user):
@@ -241,13 +241,13 @@ class CombatPage:
     def onHit(self, user, hit):
         if self.onEvent == "onHit":
             out = self.action(self, user, hit)
-            if type(out) != type([]) and len(out) != 2:
+            if isinstance(out, list) and len(out) != 2:
                 return [0, 0]
             return self.action(self, user, hit)
         return [0, 0]
 
     def __str__(self):
-        # OH GOD WHY
+           # OH GOD WHY
         '''
         if self.description is not None:
             return f"{self.description} | {self.color}{self.name}{STOP} | " + ' '.join([x.miniStrRepr for x in self.dice])
@@ -260,14 +260,14 @@ class CombatPage:
     def longPrint(self):
         return f"{self.color}{self.name}{STOP}\n" + "\n".join([str(x) for x in self.dice])
 
-class Passive:  # This class handles everything about a passive ability that goes on a key page - namely, when to activate some arbitrary function that affects the Character using the Key Page.}
-    # Unfortunetly, due to the nature of many passive abilties, there will have to be a LOT of hard coding...
-    # The most commmon events that I can find are OnAttribute (immedietly apply, do something simple like adding a speed die (Speed I through III)). Pass in 
-    # rollDie (Wedge, Swordplay, Lions Fist, etc. that buff the value of dice)
-    # OnHit (Deal extra damage, stagger, apply ailment, etc. depending on situation)
-    # OnKill (Gain strength, gain health, etc.)
-    # OnDeath (Maybe just make this event run whenever anything dies, given that there are passives on any death and on ally death)
-    # OnSceneStart and OnSceneEnd (Usual stuff)
+class Passive:     # This class handles everything about a passive ability that goes on a key page - namely, when to activate some arbitrary function that affects the Character using the Key Page.}
+       # Unfortunetly, due to the nature of many passive abilties, there will have to be a LOT of hard coding...
+       # The most commmon events that I can find are OnAttribute (immedietly apply, do something simple like adding a speed die (Speed I through III)). Pass in 
+       # rollDie (Wedge, Swordplay, Lions Fist, etc. that buff the value of dice)
+       # OnHit (Deal extra damage, stagger, apply ailment, etc. depending on situation)
+       # OnKill (Gain strength, gain health, etc.)
+       # OnDeath (Maybe just make this event run whenever anything dies, given that there are passives on any death and on ally death)
+       # OnSceneStart and OnSceneEnd (Usual stuff)
     def __init__(self, name, description, onAttribute=None, rollDie=None, onHit=None, onKill=None, onDeath=None, onSceneStart=None, onSceneEnd=None, onTakeDamage=None):
         self.name = name
         self.description = description
@@ -286,7 +286,7 @@ class Passive:  # This class handles everything about a passive ability that goe
         if self.rollDieE: mod = self.rollDieE(self, user, target, die); return mod
         return 0
 
-    def onHit(self, enemy, die):    # onHit will double as onClashWin because i cant take it anymore
+    def onHit(self, enemy, die):       # onHit will double as onClashWin because i cant take it anymore
         mod = 0
         if self.onHitE: self.onHitE(self, enemy, die)
         return mod
@@ -303,7 +303,7 @@ class Passive:  # This class handles everything about a passive ability that goe
     def onKill(self):
         if self.onKillE: self.onKillE(self)
 
-    def onDeath(self, ally=False): # Ally determines if it was an ally who died. Whaddaya know.
+    def onDeath(self, ally=False):    # Ally determines if it was an ally who died. Whaddaya know.
         if self.onDeathE: self.onDeathE(self, ally)
 
     def onSceneStart(self, char, first=False):
@@ -312,8 +312,8 @@ class Passive:  # This class handles everything about a passive ability that goe
     def onSceneEnd(self, char):
         if self.onSceneEndE: self.onSceneEndE(self, char)
 
-class KeyPage:  # Key Pages are basically the character sheet; they dicate how much health, stagger resist, resistance to certain attacks, speed dice, etc. each character has.
-    def __init__(self, name="Patron Librarian of Gen. Works", health=30, stagger=15, physicalResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, staggerResistances={'Slash':1,'Pierce':1.5,'Blunt':2}, speedLower=1, speedUpper=4, passives=[], lightStart=3):     # Default stats based off of the Patron Librarian key page
+class KeyPage:     # Key Pages are basically the character sheet; they dicate how much health, stagger resist, resistance to certain attacks, speed dice, etc. each character has.
+    def __init__(self, name="Patron Librarian of Gen. Works", health=30, stagger=15, physicalResistances={'Slash':1, 'Pierce':1.5, 'Blunt':2}, staggerResistances={'Slash':1, 'Pierce':1.5, 'Blunt':2}, speedLower=1, speedUpper=4, passives=[], lightStart=3):        # Default stats based off of the Patron Librarian key page
         self.name = name
         self.maxHealth = health
         self.maxStagger = stagger
@@ -322,15 +322,15 @@ class KeyPage:  # Key Pages are basically the character sheet; they dicate how m
         self.speedLower = speedLower
         self.speedUpper = speedUpper
         self.passives = passives
-        self.lightStart = lightStart    # Most likely 3 but can be 4 for high tier Star and Impurity Key Pages
-        self.speedDieCount = 1 # 1 by default. Increased by the Speed I through III passives.
+        self.lightStart = lightStart       # Most likely 3 but can be 4 for high tier Star and Impurity Key Pages
+        self.speedDieCount = 1    # 1 by default. Increased by the Speed I through III passives.
         self.user = None
         self.onAttribute()
     
     def gainSpeedDice(self, amount):
         self.speedDieCount += amount
     
-    # I'm sorry to the CS gods, but this is how I worked it out.
+       # I'm sorry to the CS gods, but this is how I worked it out.
     def onAttribute(self):
         for passive in self.passives:
             if passive.onAttribute: passive.onAttribute(self)
@@ -338,12 +338,12 @@ class KeyPage:  # Key Pages are basically the character sheet; they dicate how m
     def rollDie(self, target, die):
         modifier = 0
         for passive in self.passives:
-            if passive.rollDie: modifier += passive.rollDie(self.user, target, die) # rollDie should return an integer, how much to change the dice value by.
+            if passive.rollDie: modifier += passive.rollDie(self.user, target, die)    # rollDie should return an integer, how much to change the dice value by.
         for status in self.user.statusEffects:
             if self.user.statusEffects[status].rollDie: modifier += self.user.statusEffects[status].rollDie(self.user, target, die)
         return modifier
 
-    def onHit(self, enemy, die):    # onHit will double as onClashWin because i cant take it anymore
+    def onHit(self, enemy, die):       # onHit will double as onClashWin because i cant take it anymore
         mod = 0
         for passive in self.passives:
             if passive.onHit: mod = passive.onHit(enemy, die)
@@ -362,7 +362,7 @@ class KeyPage:  # Key Pages are basically the character sheet; they dicate how m
         for passive in self.passives:
             if passive.onKill: passive.onKill()
 
-    def onDeath(self, ally=False): # Ally determines if it was an ally who died. Whaddaya know.
+    def onDeath(self, ally=False):    # Ally determines if it was an ally who died. Whaddaya know.
         for passive in self.passives:
             if passive.onDeath: passive.onDeath(ally)
 
@@ -378,10 +378,10 @@ class KeyPage:  # Key Pages are basically the character sheet; they dicate how m
         for status in self.user.statusEffects:
             if self.user.statusEffects[status].onSceneEnd: self.user.statusEffects[status].onSceneEnd(self.user)
 
-class StatusEffect(Passive): #  I had to look up a tutorial for this because i forgor. This over having to rewrite all of those events. https://realpython.com/inheritance-composition-python/
+class StatusEffect(Passive):    # I had to look up a tutorial for this because i forgor. This over having to rewrite all of those events. https://realpython.com/inheritance-composition-python/
     def __init__(self, name, description, stacks, rollDie=None, onSceneStart=None, onSceneEnd=None, onTakeDamage=None):
-        # All status effects only use (I PRAY THAT THEY ONLY NEED) rollDie (Fairy, Bleed, Paralysis (Paral fucks with die bounds directly) and Erosion) onSceneEnd (Burn, Erosion, Fairy) onSceneStart (Haste and Bind), and onTakeDamage (Smoke, Commanders Mark)
-        self.stacks = stacks # Stacks is how many times this status effect has been applied
+           # All status effects only use (I PRAY THAT THEY ONLY NEED) rollDie (Fairy, Bleed, Paralysis (Paral fucks with die bounds directly) and Erosion) onSceneEnd (Burn, Erosion, Fairy) onSceneStart (Haste and Bind), and onTakeDamage (Smoke, Commanders Mark)
+        self.stacks = stacks    # Stacks is how many times this status effect has been applied
         self.justApplied = True
         super().__init__(name, description, rollDie=rollDie, onSceneEnd=onSceneEnd, onSceneStart=onSceneStart, onTakeDamage=onTakeDamage)
 
@@ -395,27 +395,27 @@ class StatusEffect(Passive): #  I had to look up a tutorial for this because i f
     def Apply(self):
         self.justApplied = False
 
-class Character:    # The big one.
+class Character:       # The big one.
     def __init__(self, name, keyPage=KeyPage(), deck=[]):
-        # The deck consists of 9 Combat Page elements. Most of the characters attributes are set by the Key Page.
+           # The deck consists of 9 Combat Page elements. Most of the characters attributes are set by the Key Page.
         self.name = name
         self.keyPage = keyPage
-        self.activeCombatPage = None    # Assume that activeCombatPage is the combat page currently being used.
+        self.activeCombatPage = None       # Assume that activeCombatPage is the combat page currently being used.
         self.swapKeyPage(keyPage)
-        self.deck = deck # Pages that need to be drawn. This is a Queue.
-        self.damageandReasons = [[], []] # First list is physical damage and reason, second list is stagger and reason
+        self.deck = deck    # Pages that need to be drawn. This is a Queue.
+        self.damageandReasons = [[], []]    # First list is physical damage and reason, second list is stagger and reason
         self.counterDice = CombatPage("Counter Dice", 0, "Common", None, None, None, [])
         self.startingStaggered = False
     def beginAct(self):
-        # Reinitialize health and stagger, purge status effects, run onSceneStart functions
+           # Reinitialize health and stagger, purge status effects, run onSceneStart functions
         self.statusEffects = {}
         self.health = self.keyPage.maxHealth
-        self.stagger = self.keyPage.maxStagger # Almost everything can be grabbed from the key page, as they don't change* (*They probably do, but i am sure as hell not dealing with that.)
+        self.stagger = self.keyPage.maxStagger    # Almost everything can be grabbed from the key page, as they don't change* (*They probably do, but i am sure as hell not dealing with that.)
         self.light = self.keyPage.lightStart
         self.lightCapacity = self.keyPage.lightStart
-        self.Hand = []  # Pages readily accessable to use
+        self.Hand = []     # Pages readily accessable to use
         shuffle(self.deck)
-        # Draw 4
+           # Draw 4
         self.drawPages(3)
 
     def playCombatPage(self, page, target):
@@ -433,12 +433,12 @@ class Character:    # The big one.
         for _ in range(self.speedDiceCount):
             self.speedDice.append(SpeedDie(self.keyPage.speedLower, self.keyPage.speedUpper, self))
         self.emotionCoins = 0
-        self.emotionLevel = 0 # Fucking kill me now I forgot about emotion and emotion coins
+        self.emotionLevel = 0    # Fucking kill me now I forgot about emotion and emotion coins
         self.light = self.keyPage.lightStart
         self.lightCapacity = self.keyPage.lightStart
-        newKeyPage.user = self  # This seems like a disaster waiting to happen. Oh well...
+        newKeyPage.user = self     # This seems like a disaster waiting to happen. Oh well...
         self.health = self.keyPage.maxHealth
-        self.stagger = self.keyPage.maxStagger # Almost everything can be grabbed from the key page, as they don't change* (*They probably do, but i am sure as hell not dealing with that.)
+        self.stagger = self.keyPage.maxStagger    # Almost everything can be grabbed from the key page, as they don't change* (*They probably do, but i am sure as hell not dealing with that.)
         self.statusEffects = {}
         self.keyPage.onAttribute()
     
@@ -450,35 +450,35 @@ class Character:    # The big one.
     def drawPages(self, amount):
         for _ in range(amount):
             if len(self.deck) > 0:
-                self.Hand.append(self.deck[0]) # Draw a card
-                self.deck = self.deck[1:] # Pop that card from the deck
+                self.Hand.append(self.deck[0])    # Draw a card
+                self.deck = self.deck[1:]    # Pop that card from the deck
     
-    def gainEmotionCoins(self, count):    # Ignoring distinction between Positive and Negative coins because fuck no i'm not doing abno pages
+    def gainEmotionCoins(self, count):       # Ignoring distinction between Positive and Negative coins because fuck no i'm not doing abno pages
         self.emotionCoins = min(self.emotionCoins + count, EmotionCoinRequirements[self.emotionLevel])
 
     def checkForIncrementEmotionLevel(self):
         if self.emotionLevel < 5 and self.emotionCoins == EmotionCoinRequirements[self.emotionLevel]:
             self.emotionCoins = 0
             self.emotionLevel += 1
-            self.lightCapacity += 1 # Increase max light by 1
-            self.light = self.lightCapacity # Regain all light
-        if self.emotionLevel == 4: # Gain an additional Speed die at Emotion Level 4
+            self.lightCapacity += 1    # Increase max light by 1
+            self.light = self.lightCapacity    # Regain all light
+        if self.emotionLevel == 4:    # Gain an additional Speed die at Emotion Level 4
             self.speedDiceCount += 1
             self.speedDice.append(SpeedDie(self.keyPage.speedLower, self.keyPage.speedUpper, self))
-        # Not including an event for passives that activate on emotion level change because fuck you
-        # At emotion 5, playing 2+ combat pages in a scene causes an extra draw at the start of the next scene
+           # Not including an event for passives that activate on emotion level change because fuck you
+           # At emotion 5, playing 2+ combat pages in a scene causes an extra draw at the start of the next scene
 
     def cleanStatusEffects(self):
         for status in self.statusEffects:
             if statusEffects[status].stacks == 0:
                 statusEffects.pop(status)
 
-    def takeDamage(self, damageType, amountPhysical, amountStagger, truePhysical=0, trueStagger=0, physicalReason=None, staggerReason=None):   # Yes, all of these distinctions are neccesary. Yes I hate this.
+    def takeDamage(self, damageType, amountPhysical, amountStagger, truePhysical=0, trueStagger=0, physicalReason=None, staggerReason=None):      # Yes, all of these distinctions are neccesary. Yes I hate this.
         if damageType in ["Slash", "Pierce", "Blunt"]:
             mods = self.keyPage.onTakeDamage(damageType, amountPhysical, amountStagger)
-            amountPhysical += mods[0]   # I think this is proper order of operations on the stagger and physical damage???
+            amountPhysical += mods[0]      # I think this is proper order of operations on the stagger and physical damage???
             amountStagger += mods[1]
-            physicalDamage = int(self.keyPage.physicalResistances[damageType] * amountPhysical) # Rounded down.
+            physicalDamage = int(self.keyPage.physicalResistances[damageType] * amountPhysical)    # Rounded down.
             staggerDamage = int(self.keyPage.staggerResistances[damageType] * amountStagger)
             self.health -= max(physicalDamage, 0)
             self.stagger -= max(staggerDamage, 0)
@@ -492,7 +492,7 @@ class Character:    # The big one.
             raise AssertionError(f"What? {amountPhysical} {amountStagger}")
         else:
             self.health -= truePhysical
-            self.stagger -= trueStagger # Let's just... not... get into the abno cards that reduce max stagger. Actually, lets just not with abno cards altogether.
+            self.stagger -= trueStagger    # Let's just... not... get into the abno cards that reduce max stagger. Actually, lets just not with abno cards altogether.
             if not physicalReason:
                 self.damageandReasons[0].append([truePhysical, ""])
             else:
@@ -501,7 +501,7 @@ class Character:    # The big one.
                 self.damageandReasons[1].append([trueStagger, ""])
             else:
                 self.damageandReasons[1].append([trueStagger, staggerReason])
-        # Insert death and stagger logic here i actually wanna die
+           # Insert death and stagger logic here i actually wanna die
 
     def assignPageToSpeedDice(self, speedDiceID, pageID, targetDie):
         page = self.Hand[pageID]
@@ -543,7 +543,7 @@ class Character:    # The big one.
         for status in self.statusEffects:
             statusString += f" {statusEffects[status]}"
         if statusString == "":
-            statusString = " "  # So that my formatting methods work because theres a " | " not a " |"
+            statusString = " "     # So that my formatting methods work because theres a " | " not a " |"
         physicalDamageReason = ""
         staggerDamageReason = ""
         if len(self.damageandReasons[0]) > 0:
@@ -556,8 +556,8 @@ class Character:    # The big one.
                 dice += f" {TM.YELLOW if self.speedDice[speedD].target is not None else TM.DARK_GRAY}>[{speedD} ({self.speedDice[speedD].value})]<{STOP}"
             else:
                 dice += f" {TM.YELLOW if self.speedDice[speedD].target is not None else TM.DARK_GRAY}[{speedD} ({self.speedDice[speedD].value})]{STOP}"
-        toReturn = [f"{self.name} | {TM.LIGHT_RED}{self.health}{physicalDamageReason} {TM.YELLOW}{self.stagger}{staggerDamageReason}{STOP} | {TM.LIGHT_RED}({resistanceToColorPhysical[self.keyPage.physicalResistances['Slash']]}S:{resistanceToText[self.keyPage.physicalResistances['Slash']]} {resistanceToColorPhysical[self.keyPage.physicalResistances['Pierce']]}P:{resistanceToText[self.keyPage.physicalResistances['Pierce']]} {resistanceToColorPhysical[self.keyPage.physicalResistances['Blunt']]}B:{resistanceToText[self.keyPage.physicalResistances['Blunt']]}{TM.LIGHT_RED}){STOP} {TM.YELLOW}({resistanceToColorStagger[self.keyPage.staggerResistances['Slash']]}S:{resistanceToText[self.keyPage.staggerResistances['Slash']]} {resistanceToColorStagger[self.keyPage.staggerResistances['Pierce']]}P:{resistanceToText[self.keyPage.staggerResistances['Pierce']]} {resistanceToColorStagger[self.keyPage.staggerResistances['Blunt']]}B:{resistanceToText[self.keyPage.staggerResistances['Blunt']]}{TM.YELLOW}){STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}",
-                     f"{TM.YELLOW}{u'◆ ' * self.light}{TM.DARK_GRAY}{u'◇ ' * (self.lightCapacity-self.light)}{STOP} |{dice} |{(statusString if len(statusString) > 1 else f" {TM.DARK_GRAY}no status effects{STOP}")}"]
+        toReturn = [f"{self.name} | {TM.LIGHT_RED}{self.health}{physicalDamageReason} {TM.YELLOW}{self.stagger}{staggerDamageReason}{STOP} | {TM.LIGHT_RED}({resistanceToColorPhysical[self.keyPage.physicalResistances['Slash']]}S:{resistanceToText[self.keyPage.physicalResistances['Slash']]} {resistanceToColorPhysical[self.keyPage.physicalResistances['Pierce']]}P:{resistanceToText[self.keyPage.physicalResistances['Pierce']]} {resistanceToColorPhysical[self.keyPage.physicalResistances['Blunt']]}B:{resistanceToText[self.keyPage.physicalResistances['Blunt']]}{TM.LIGHT_RED}){STOP} {TM.YELLOW}({resistanceToColorStagger[self.keyPage.staggerResistances['Slash']]}S:{resistanceToText[self.keyPage.staggerResistances['Slash']]} {resistanceToColorStagger[self.keyPage.staggerResistances['Pierce']]}P:{resistanceToText[self.keyPage.staggerResistances['Pierce']]} {resistanceToColorStagger[self.keyPage.staggerResistances['Blunt']]}B:{resistanceToText[self.keyPage.staggerResistances['Blunt']]}{TM.YELLOW}){STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}", 
+                     f"{TM.YELLOW}{u'◆ ' * self.light}{TM.DARK_GRAY}{u'◇ ' * (self.lightCapacity-self.light)}{STOP} |{dice} |{statusString if len(statusString) > 1 else f' {TM.DARK_GRAY}no status effects{STOP}'}"]    # {TM.YELLOW}{u'◆ ' * self.light}{TM.DARK_GRAY}{u'◇ ' * (self.lightCapacity-self.light)}{STOP} |{dice} |{(statusString if len(statusString) > 1 else f" {TM.DARK_GRAY}no status effects{STOP}")}
         
         self.damageandReasons = [[], []]
         return toReturn
@@ -567,7 +567,7 @@ class Character:    # The big one.
         for status in self.statusEffects:
             statusString += f" {statusEffects[status]}"
         if statusString == "":
-            statusString = " "  # So that my formatting methods work because theres a " | " not a " |"
+            statusString = " "     # So that my formatting methods work because theres a " | " not a " |"
         physicalDamageReason = ""
         staggerDamageReason = ""
         if len(self.damageandReasons[0]) > 0:
@@ -575,13 +575,15 @@ class Character:    # The big one.
         if len(self.damageandReasons[1]) > 0:
             staggerDamageReason = " ".join([f"({x[1]} {x[0]})" for x in self.damageandReasons[1] if x[0] != 0])
         
-        toReturn = [f"{self.name} | {TM.LIGHT_RED}{self.health}{physicalDamageReason} {TM.YELLOW}{self.stagger}{staggerDamageReason}{STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {self.emotionCoins * 'O'}{(EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins) * '-'}{STOP}",
-                     f"{TM.YELLOW}{u'◆ ' * self.light}{TM.DARK_GRAY}{u'◇ ' * (self.lightCapacity-self.light)}{STOP} | {TM.YELLOW}{" ".join([f"{TM.YELLOW}[{x} ({str(self.speedDice[x])})]{STOP}" if self.speedDice[x].target != None else f"{TM.DARK_GRAY}[{x} ({str(self.speedDice[x])})]" for x in range(len(self.speedDice))])}{STOP} |{(statusString if len(statusString) > 1 else f" {TM.DARK_GRAY}no status effects{STOP}")}"]
-        
+        toReturn = [
+            f"{self.name} | {TM.LIGHT_RED}{self.health}{physicalDamageReason} {TM.YELLOW}{self.stagger}{staggerDamageReason}{STOP} | {TM.LIGHT_PURPLE}({self.emotionLevel}) {'O' * self.emotionCoins}{'-' * (EmotionCoinRequirements[self.emotionLevel] - self.emotionCoins)}{STOP}", 
+            f"{TM.YELLOW}{'◆ ' * self.light}{TM.DARK_GRAY}{'◇ ' * (self.lightCapacity - self.light)}{STOP} | {TM.YELLOW}{' '.join([f'{TM.YELLOW}[{x} ({str(self.speedDice[x])})]{STOP}' if self.speedDice[x].target is not None else f'{TM.DARK_GRAY}[{x} ({str(self.speedDice[x])})]{STOP}' for x in range(len(self.speedDice))])}{STOP} | {statusString if len(statusString) > 1 else f' {TM.DARK_GRAY}no status effects{STOP}'}"
+        ]
+
         self.damageandReasons = [[], []]
         return toReturn
     
-# Constants
+    # Constants
 def reverseOutput(text):
     textSplat = text.split(" | ")
     textSplat.reverse()
@@ -608,16 +610,16 @@ def Bind(target, amount):
 statusEffects = {
     "Bleed":StatusEffect("Bleed", 
                          "Take damage equal to the number of Bleed stacks on character when rolling an Offensive die, then reduce the number of stacks by 1/3.", 
-                         1, rollDie=lambda me,usr,target,die: bleedOut(me,usr,target,die) if not me.justApplied else 0,
-                         onSceneEnd=lambda me,usr: removeStacks(me, me.stacks) if not me.justApplied else int(me.Apply() or 0)), # To convert None to 0
-    "Strength":StatusEffect("Strength",
-                             "All Offensive dice gain power equal to the number of stacks",
-                             1, rollDie=lambda me,usr,target,die: me.stacks * strCheck(die) if not me.justApplied else 0,
-                             onSceneEnd=lambda me,usr:removeStacks(me, me.stacks) if not me.justApplied else int(me.Apply() or 0)),
-    "Fragile":StatusEffect("Fragile", "Take extra true damage equal to the number of stacks from attacks",
-                           1, onTakeDamage=lambda me,usr,type,physical,stagger : (me.stacks, 0), onSceneEnd=lambda me:removeStacks(me, me.stacks ) if not me.justApplied else me.Apply()),
+                         1, rollDie=lambda me, usr, target, die: bleedOut(me, usr, target, die) if not me.justApplied else 0, 
+                         onSceneEnd=lambda me, usr: removeStacks(me, me.stacks) if not me.justApplied else int(me.Apply() or 0)),    # To convert None to 0
+    "Strength":StatusEffect("Strength", 
+                             "All Offensive dice gain power equal to the number of stacks", 
+                             1, rollDie=lambda me, usr, target, die: me.stacks * strCheck(die) if not me.justApplied else 0, 
+                             onSceneEnd=lambda me, usr:removeStacks(me, me.stacks) if not me.justApplied else int(me.Apply() or 0)), 
+    "Fragile":StatusEffect("Fragile", "Take extra true damage equal to the number of stacks from attacks", 
+                           1, onTakeDamage=lambda me, usr, type, physical, stagger : (me.stacks, 0), onSceneEnd=lambda me:removeStacks(me, me.stacks ) if not me.justApplied else me.Apply()), 
     "Bind":StatusEffect("Bind", "Lowers speed value of all speed die by number of stacks", 1, 
-                        onSceneStart=lambda me,usr: Bind(usr, me.stacks) if not me.justApplied else None, onSceneEnd=lambda me,usr:removeStacks(me, me.stacks) if not me.justApplied else me.Apply())
+                        onSceneStart=lambda me, usr: Bind(usr, me.stacks) if not me.justApplied else None, onSceneEnd=lambda me, usr:removeStacks(me, me.stacks) if not me.justApplied else me.Apply())
 }
 
 statusEffectColors = {
