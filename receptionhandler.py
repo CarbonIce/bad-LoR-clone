@@ -228,7 +228,7 @@ class ReceptionHandler:     # I lied. This is the big one.
                 Screen.printRightAligned(data[0])
                 Screen.printRightAligned(data[1])
     def drawSceneExtendedData(self, selectedCharIndex=-1, enemyTrueelseFalse=False, hoverDie=-1):
-        Clashes, oneSided, _, _ = self.calculateTargeting()
+        Clashes, oneSided, _, _ = self.calculateTargeting()     # Get clash data
         Screen.clearScreen()
         pindex = 0
         for player in range(len(self.players)):
@@ -269,6 +269,9 @@ class ReceptionHandler:     # I lied. This is the big one.
                 Screen.printRightAligned(f"{TM.LIGHT_RED}{oneSidedAttack[0].target.owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].target.owner.speedDice.index(oneSidedAttack[0].target)}{TM.LIGHT_RED} <- {STOP}({oneSidedAttack[0].pageToUse.reverseStr()}){TM.LIGHT_RED} (Speed {oneSidedAttack[0]}) {oneSidedAttack[0].owner.name}'s die {TM.YELLOW}#{oneSidedAttack[0].owner.speedDice.index(oneSidedAttack[0])}{STOP}")
         Screen.printDivider()
     def pageClash(self, p1, p2, page1, page2):
+        '''
+        Handles the clashing of two pages, using the dice in order.
+        '''
         while len(page1) > 0 or len(page2) > 0:
             if p1.stagger == 0: # If either character is staggaered, destroy all dice on their page.
                 page1.dice = []
@@ -411,17 +414,17 @@ class ReceptionHandler:     # I lied. This is the big one.
         # Have user choose combat pages and target them
         event = None
         while True:
-            selectedCharacter = 0
-            selectedDie = 0
+            selectedCharacter = 0   # Index of selected character in self.characters
+            selectedDie = 0 # Index of speed die in self.characters[selectedCharacter].speedDice
             option = 0
-            COMBATTIME = False
-            REMOVEPAGE = False
+            COMBATTIME = False  # Set to True if the first option selected is 2 (Begin Scene)
+            REMOVEPAGE = False  # Set to True if the first option selected is 1 (Remove Combat Page)
             char = self.characters[selectedCharacter]
             while True:
                 self.drawSceneExtendedData()
                 print(f"{TM.DARK_GRAY if option != 0 else TM.LIGHT_GRAY}Assign Combat Page {STOP}| {TM.DARK_GRAY if option != 1 else TM.LIGHT_GRAY}Remove Combat Page{STOP} | {TM.DARK_GRAY if option != 2 else TM.LIGHT_GRAY}Begin Scene{STOP}")
                 print("(Use right and left arrows to select options, press space to confirm)")
-                while not event or event.event_type != 'down' or event.name not in 'right left space'.split(" "):
+                while not event or event.event_type != 'down' or event.name not in 'right left space'.split(" "):   # Loop to prevent redrawing the entire scene on a key up or on a key press that isn't important
                     event = keyboard.read_event()
                 if event.name == 'space':
                     if option == 2:
