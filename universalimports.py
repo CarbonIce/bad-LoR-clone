@@ -1,10 +1,6 @@
-from random import randint, choice, shuffle
+from random import randint, shuffle
 from math import ceil
-from time import sleep
 from copy import deepcopy
-import os
-import sys
-import keyboard
 from regex import sub, compile, findall
 EmotionCoinRequirements = [3, 3, 5, 7, 9]      # From level index to index + 1
 

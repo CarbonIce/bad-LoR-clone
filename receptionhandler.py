@@ -1,4 +1,8 @@
 from universalimports import *
+import os
+import keyboard
+from time import sleep
+from random import choice
 # Automatically conformed it to PEP8 using autopep8, because who in their
 # right mind would try to fix this manually
 
