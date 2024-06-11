@@ -566,6 +566,7 @@ class ReceptionHandler:     # I lied. This is the big one.
                                 print(
                                     "There is no combat page assigned to that die.")
                                 sleep(1)
+                                event = None
                                 continue
                             break
                         if event.name == 'esc':

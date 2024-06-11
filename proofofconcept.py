@@ -1,5 +1,5 @@
-from universalimports import *
-from receptionhandler import *
+from universalimports import CombatPage, Character, KeyPage, Dice, Passive, statusEffects
+from receptionhandler import ReceptionHandler
 from copy import deepcopy
 # EDGE CASE: If Allas Workshop ends up in a one sided attack, it tries to lower the value of an non existant dice, and the
 # program combusts. Pls fix
