@@ -243,7 +243,8 @@ SpeedII = Passive(
     "Gain 2 Speed dice",
     onAttribute=lambda KP: KP.gainSpeedDice(2))
 TheBlackSilencePassive = Passive("The Black Silence", "Draw 2 additional pages at the start of the Act. All dice gain +2 Power.",  # This should be on every 3rd page but no because fuck you (Actually I'm gonna remove gaining 2 power.)
-                                 onSceneStart=lambda me, char, first: blackSilenceDraw(char, first), rollDie=lambda a, b, c, d: 2)
+                                 # onSceneStart=lambda me, char, first: blackSilenceDraw(char, first), rollDie=lambda a, b, c, d: 2) 
+                                 onSceneStart=lambda me, char, first: blackSilenceDraw(char, first))
 TheBlackSilence = KeyPage("The Black Silence",
                           106, 56,
                           {'Slash': 1, "Pierce": 1, "Blunt": 0.5},
